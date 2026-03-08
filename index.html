@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
 <title>WAC — Website Accountability Challenge</title>
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#B8860B" />
+<meta name="theme-color" content="#c9a84c" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="WAC" />
@@ -15,10 +15,10 @@
    CSS VARIABLES & RESET
    ============================== */
 :root {
-  --gold: #B8860B;
-  --gold-light: #d4a843;
-  --gold-dark: #8B6508;
-  --bg: #faf9f7;
+  --gold: #c9a84c;
+  --gold-light: #d4bc6a;
+  --gold-dark: #a8893a;
+  --bg: #fbf9f5;
   --surface: #ffffff;
   --surface2: #f3f1ed;
   --border: #e8e4de;
@@ -221,47 +221,111 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   align-items: center;
   justify-content: center;
   min-height: 100dvh;
-  padding: 32px 20px;
-  background: var(--bg);
+  padding: 40px 24px;
+  background: #fbf9f5;
+}
+.auth-card-wrap {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 48px 32px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+  text-align: center;
 }
 .auth-logo {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 64px;
+  font-size: 96px;
   color: var(--gold);
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
-}
-.auth-tagline {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-bottom: 32px;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  margin-bottom: 8px;
   text-align: center;
 }
-.auth-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px 24px;
-  width: 100%;
-  max-width: 380px;
-  box-shadow: var(--shadow);
+.auth-subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 24px;
 }
-.auth-card h2 {
+.auth-round-badge {
+  display: inline-block;
+  background: var(--gold);
+  border: none;
+  border-radius: 24px;
+  padding: 8px 24px;
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  color: #fff;
+  margin-bottom: 36px;
   text-align: center;
 }
+.auth-form-area {
+  width: 100%;
+  text-align: left;
+}
+.auth-form-label {
+  display: block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.auth-form-input {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface2);
+  font-size: 16px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.auth-form-input:focus { border-color: var(--gold); }
+.auth-form-input::placeholder { color: #aaa; }
+.auth-form-group { margin-bottom: 20px; }
+.auth-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 10px;
+  border: none;
+  background: var(--gold);
+  color: #fff;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.auth-btn:hover { background: var(--gold-dark); }
 .auth-error {
   display: none;
   color: var(--danger);
   font-size: 13px;
-  margin-top: 10px;
+  margin-top: 12px;
   text-align: center;
+}
+.auth-forgot {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.auth-forgot a {
+  color: var(--gold);
+  font-weight: 600;
+  cursor: pointer;
 }
 .pass-toggle {
   position: absolute;
-  right: 12px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -978,25 +1042,25 @@ textarea.form-input { resize: vertical; min-height: 80px; }
      AUTH SCREEN
      ============================== -->
 <div id="auth-screen">
-  <div class="auth-logo">WAC</div>
-  <div class="auth-tagline">90 days. Build your website. Show up.</div>
-  <div class="auth-card">
-    <h2>Sign In</h2>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" id="auth-email" class="form-input" placeholder="you@email.com" autocomplete="email" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <div class="pass-wrap">
-        <input type="password" id="auth-pass" class="form-input" placeholder="Your password" autocomplete="current-password" />
-        <button type="button" class="pass-toggle" onclick="togglePassVisibility()">👁</button>
+  <div class="auth-card-wrap">
+    <div class="auth-logo">WAC</div>
+    <div class="auth-subtitle">Website Accountability<br>Challenge</div>
+    <div class="auth-round-badge">Round 1 · May–July 2026</div>
+    <div class="auth-form-area">
+      <div class="auth-form-group">
+        <label class="auth-form-label">EMAIL ADDRESS</label>
+        <input type="email" id="auth-email" class="auth-form-input" placeholder="e.g. jane@example.com" autocomplete="email" />
       </div>
-    </div>
-    <button class="btn btn-gold btn-block" onclick="handleLogin()">Sign In</button>
-    <div id="auth-error" class="auth-error"></div>
-    <div style="text-align:center;margin-top:14px;">
-      <button style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;" onclick="handleForgotPassword()">Forgot password?</button>
+      <div class="auth-form-group">
+        <label class="auth-form-label">PASSWORD</label>
+        <div class="pass-wrap">
+          <input type="password" id="auth-pass" class="auth-form-input" placeholder="Enter your passcode" autocomplete="current-password" />
+          <button type="button" class="pass-toggle" onclick="togglePassVisibility()">👁</button>
+        </div>
+      </div>
+      <button class="auth-btn" onclick="handleLogin()">ENTER COMMUNITY</button>
+      <div id="auth-error" class="auth-error"></div>
+      <div class="auth-forgot">Forgot your password? <a onclick="handleForgotPassword()">Reset it</a></div>
     </div>
   </div>
 </div>
@@ -1147,7 +1211,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <!-- PAGE: RANKS (Leaderboard) -->
     <div class="page" id="page-ranks">
       <div class="page-title">Leaderboard</div>
-      <div class="text-sm text-muted mb-16">Round 1 · June–August 2026</div>
+      <div class="text-sm text-muted mb-16">Round 1 · May–July 2026</div>
       <div id="leaderboard-list"></div>
       <div class="points-card">
         <h4>How Points Work</h4>
