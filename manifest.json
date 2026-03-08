@@ -1,0 +1,12 @@
+{
+  "name": "WAC Community",
+  "short_name": "WAC",
+  "start_url": "/wac-community/",
+  "display": "standalone",
+  "background_color": "#faf9f7",
+  "theme_color": "#B8860B",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

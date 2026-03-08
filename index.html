@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+<title>WAC — Website Accountability Challenge</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#B8860B" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="WAC" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ==============================
+   CSS VARIABLES & RESET
+   ============================== */
+:root {
+  --gold: #B8860B;
+  --gold-light: #d4a843;
+  --gold-dark: #8B6508;
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #f3f1ed;
+  --border: #e8e4de;
+  --text: #1a1a1a;
+  --text-muted: #6b6b6b;
+  --radius: 12px;
+  --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+  --danger: #c0392b;
+  --success: #27ae60;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; height: 100dvh; }
+body {
+  height: 100%; height: 100dvh; overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; }
+a { color: var(--gold); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { cursor: pointer; font-family: 'DM Sans', sans-serif; }
+input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
+
+/* ==============================
+   APP SHELL
+   ============================== */
+#app {
+  display: none;
+  position: fixed;
+  inset: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+#app.visible { display: flex !important; }
+
+#app-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ==============================
+   TOPNAV
+   ============================== */
+.topnav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topnav-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+}
+.topnav-user {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==============================
+   BOTTOM NAV
+   ============================== */
+.bottomnav {
+  position: relative;
+  flex-shrink: 0;
+  height: calc(68px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 100;
+}
+.bottomnav button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 10px;
+  padding: 6px 4px;
+  min-width: 0;
+  transition: color 0.15s;
+}
+.bottomnav button .nav-icon { font-size: 20px; }
+.bottomnav button.active { color: var(--gold); }
+.bottomnav button:hover { color: var(--gold-dark); }
+
+/* ==============================
+   PAGE CONTAINERS
+   ============================== */
+.page { display: none; padding: 20px 16px 40px; max-width: 600px; margin: 0 auto; }
+.page.active { display: block; }
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+/* ==============================
+   CARDS
+   ============================== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+/* ==============================
+   FORM ELEMENTS
+   ============================== */
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--gold); }
+textarea.form-input { resize: vertical; min-height: 80px; }
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.form-group { margin-bottom: 14px; }
+
+/* ==============================
+   BUTTONS
+   ============================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  transition: background 0.15s, opacity 0.15s;
+}
+.btn-gold {
+  background: var(--gold);
+  color: #fff;
+}
+.btn-gold:hover { background: var(--gold-dark); }
+.btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-outline {
+  background: transparent;
+  color: var(--gold);
+  border: 1.5px solid var(--gold);
+}
+.btn-outline:hover { background: rgba(184,134,11,0.06); }
+.btn-sm { padding: 8px 16px; font-size: 13px; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #a93226; }
+.btn-block { width: 100%; }
+
+/* ==============================
+   AUTH SCREEN
+   ============================== */
+#auth-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 32px 20px;
+  background: var(--bg);
+}
+.auth-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 64px;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.auth-tagline {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  text-align: center;
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: var(--shadow);
+}
+.auth-card h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.auth-error {
+  display: none;
+  color: var(--danger);
+  font-size: 13px;
+  margin-top: 10px;
+  text-align: center;
+}
+.pass-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+}
+.pass-wrap { position: relative; }
+
+/* ==============================
+   TOAST
+   ============================== */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+  max-width: 90%;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ==============================
+   FEED
+   ============================== */
+.announcement-card {
+  border-left: 4px solid var(--gold);
+  background: linear-gradient(135deg, rgba(184,134,11,0.04), var(--surface));
+}
+.announcement-tag {
+  display: inline-block;
+  background: var(--gold);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.feed-post {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.feed-post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.feed-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.feed-meta { flex: 1; }
+.feed-author { font-weight: 600; font-size: 14px; }
+.feed-time { font-size: 12px; color: var(--text-muted); }
+.feed-body { font-size: 15px; line-height: 1.6; margin-bottom: 10px; word-break: break-word; }
+.feed-actions { display: flex; gap: 12px; align-items: center; }
+.feed-actions button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.feed-actions button:hover { background: var(--surface2); }
+.props-list {
+  display: none;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+/* ==============================
+   ADMIN COMPOSE
+   ============================== */
+.admin-compose {
+  background: linear-gradient(135deg, rgba(184,134,11,0.06), var(--surface));
+  border: 1.5px solid var(--gold-light);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.admin-compose .admin-tag {
+  display: inline-block;
+  background: var(--gold);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+/* ==============================
+   RESOURCES
+   ============================== */
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (max-width: 480px) { .resource-grid { grid-template-columns: 1fr; } }
+.resource-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.resource-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.resource-emoji { font-size: 28px; margin-bottom: 8px; }
+.resource-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.resource-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+.resource-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.resource-tag {
+  font-size: 10px;
+  background: var(--surface2);
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.filter-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+/* ==============================
+   MODAL (bottom-sheet)
+   ============================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1000;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 24px 20px 40px;
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--surface2);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.modal-header {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+/* ==============================
+   SUBMIT PAGE
+   ============================== */
+.round-ended-banner {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.round-ended-icon { font-size: 28px; }
+.round-ended-title { font-weight: 700; color: var(--danger); }
+.round-ended-sub { font-size: 13px; color: var(--text-muted); }
+
+.format-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.format-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.format-btn.selected { border-color: var(--gold); background: rgba(184,134,11,0.06); color: var(--gold); }
+
+.pts-preview {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pts-preview .pts-num { font-weight: 700; color: var(--gold); font-size: 20px; }
+
+.screenshot-area {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.screenshot-area:hover { border-color: var(--gold-light); }
+.screenshot-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 8px; }
+
+/* Engagement section */
+.eng-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid var(--border);
+}
+.eng-type-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.eng-type-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.eng-type-btn.selected { border-color: var(--gold); background: rgba(184,134,11,0.06); color: var(--gold); }
+
+/* ==============================
+   TRACKER
+   ============================== */
+.tracker-progress {
+  background: var(--surface2);
+  border-radius: 8px;
+  height: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.tracker-progress-bar {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 8px;
+  transition: width 0.3s;
+}
+.tracker-month-group { margin-bottom: 20px; }
+.tracker-month-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.tracker-month-req { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+.tracker-week {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.tracker-week:hover { border-color: var(--gold-light); }
+.tracker-week.checked { border-color: var(--gold); background: rgba(184,134,11,0.04); }
+.tracker-week-label { font-weight: 600; font-size: 14px; }
+.tracker-week-dates { font-size: 12px; color: var(--text-muted); }
+.tracker-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  font-size: 14px;
+}
+.tracker-week.checked .tracker-check {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #fff;
+}
+
+/* ==============================
+   LEADERBOARD
+   ============================== */
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.lb-rank { font-weight: 700; font-size: 16px; min-width: 32px; text-align: center; }
+.lb-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.lb-info { flex: 1; min-width: 0; }
+.lb-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-badges { font-size: 12px; }
+.lb-pts { font-weight: 700; color: var(--gold); font-size: 16px; }
+
+/* ==============================
+   MEMBER GRID
+   ============================== */
+.member-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (max-width: 480px) { .member-grid { grid-template-columns: 1fr; } }
+.member-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+  text-align: center;
+}
+.member-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.member-card-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  margin: 0 auto 8px;
+}
+.member-card-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.member-card-biz { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.member-card-link {
+  font-size: 12px;
+  color: var(--gold);
+  display: inline-block;
+}
+
+/* ==============================
+   MEMBER PROFILE MODAL
+   ============================== */
+.member-profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 24px;
+  margin: 0 auto 12px;
+}
+.member-profile-name { text-align: center; font-weight: 700; font-size: 18px; margin-bottom: 2px; }
+.member-profile-biz { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+.member-profile-badges { text-align: center; margin-bottom: 16px; }
+.member-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.member-stat {
+  text-align: center;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 12px 8px;
+}
+.member-stat-num { font-weight: 700; font-size: 20px; color: var(--gold); }
+.member-stat-label { font-size: 11px; color: var(--text-muted); }
+.member-dot-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+}
+.member-dot {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--border);
+}
+.member-dot.done { background: var(--gold); }
+
+/* ==============================
+   REPORTS
+   ============================== */
+.report-table-wrap { overflow-x: auto; margin-bottom: 20px; }
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.report-table th, .report-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  white-space: nowrap;
+}
+.report-table th {
+  background: var(--surface2);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+.report-table td:first-child, .report-table th:first-child { text-align: left; position: sticky; left: 0; background: var(--surface); z-index: 1; }
+
+/* ==============================
+   PROFILE
+   ============================== */
+.profile-hero {
+  text-align: center;
+  padding: 24px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 28px;
+  margin: 0 auto 12px;
+}
+.profile-name { font-weight: 700; font-size: 20px; margin-bottom: 2px; }
+.profile-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+.profile-badges { margin-bottom: 12px; }
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+.profile-stat-num { font-weight: 700; font-size: 20px; color: var(--gold); }
+.profile-stat-label { font-size: 11px; color: var(--text-muted); }
+
+.push-notif-card {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.install-pwa-card {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+/* ==============================
+   ADMIN REGISTRY CONTROLS
+   ============================== */
+.admin-member-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.admin-member-controls button {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.admin-member-controls button:hover { border-color: var(--gold); }
+.admin-member-controls button.active-flag { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+/* ==============================
+   WELCOME MODAL
+   ============================== */
+.welcome-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.welcome-overlay.open { display: flex; }
+.welcome-modal {
+  background: var(--surface);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+.welcome-header {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  padding: 28px 24px;
+  text-align: center;
+  color: #fff;
+}
+.welcome-header .welcome-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  letter-spacing: 0.08em;
+}
+.welcome-body { padding: 24px; }
+.welcome-body h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; margin-bottom: 16px; }
+.welcome-step {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+.welcome-step-icon { font-size: 20px; flex-shrink: 0; }
+.welcome-footer { padding: 0 24px 24px; text-align: center; }
+.welcome-dismiss {
+  display: block;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.welcome-dismiss:hover { color: var(--text); }
+
+/* Admin tracker modal */
+.admin-tracker-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1500;
+  align-items: flex-end;
+  justify-content: center;
+}
+.admin-tracker-modal-overlay.open { display: flex; }
+
+/* ==============================
+   SUBMISSIONS HISTORY
+   ============================== */
+.submission-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.submission-info { flex: 1; }
+.submission-week { font-weight: 600; font-size: 13px; }
+.submission-url { font-size: 12px; color: var(--gold); word-break: break-all; }
+.submission-pts { font-weight: 700; color: var(--gold); }
+.submission-del {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+}
+.submission-del:hover { color: var(--danger); }
+
+/* ==============================
+   SEARCH BAR
+   ============================== */
+.search-bar {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 14px;
+  margin-bottom: 16px;
+  outline: none;
+}
+.search-bar:focus { border-color: var(--gold); }
+
+/* ==============================
+   MISC
+   ============================== */
+.badge { font-size: 14px; }
+.text-center { text-align: center; }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 13px; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+.hidden { display: none !important; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+
+/* How Points Work card */
+.points-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 16px; }
+.points-card h4 { font-family: 'Bebas Neue', sans-serif; font-size: 16px; margin-bottom: 8px; }
+.points-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; }
+.points-row .pts-val { font-weight: 700; color: var(--gold); }
+
+/* Engagement history */
+.eng-history-item {
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+/* Export CSV btn */
+.export-btn { margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<!-- ==============================
+     AUTH SCREEN
+     ============================== -->
+<div id="auth-screen">
+  <div class="auth-logo">WAC</div>
+  <div class="auth-tagline">90 days. Build your website. Show up.</div>
+  <div class="auth-card">
+    <h2>Sign In</h2>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" id="auth-email" class="form-input" placeholder="you@email.com" autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="pass-wrap">
+        <input type="password" id="auth-pass" class="form-input" placeholder="Your password" autocomplete="current-password" />
+        <button type="button" class="pass-toggle" onclick="togglePassVisibility()">👁</button>
+      </div>
+    </div>
+    <button class="btn btn-gold btn-block" onclick="handleLogin()">Sign In</button>
+    <div id="auth-error" class="auth-error"></div>
+    <div style="text-align:center;margin-top:14px;">
+      <button style="background:none;border:none;color:var(--gold);font-size:13px;cursor:pointer;" onclick="handleForgotPassword()">Forgot password?</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================
+     APP SHELL
+     ============================== -->
+<div id="app">
+  <div id="app-scroll">
+    <!-- TOPNAV -->
+    <nav class="topnav">
+      <div class="topnav-brand">WAC</div>
+      <div class="topnav-user" id="topnav-user"></div>
+    </nav>
+
+    <!-- PAGE: FEED -->
+    <div class="page" id="page-feed">
+      <div class="page-title">Feed</div>
+      <!-- Admin announcement compose -->
+      <div class="admin-compose" id="admin-announce-box" style="display:none;">
+        <div class="admin-tag">ADMIN</div>
+        <div class="card-title">Post Announcement</div>
+        <div class="form-group">
+          <input type="text" id="ann-title" class="form-input" placeholder="Announcement title" />
+        </div>
+        <div class="form-group">
+          <textarea id="ann-body" class="form-input" placeholder="Announcement body"></textarea>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="submitAnnouncement()">Post Announcement</button>
+      </div>
+      <!-- Member compose -->
+      <div class="card">
+        <div class="form-group">
+          <textarea id="feed-compose" class="form-input" placeholder="Share something with the community..."></textarea>
+        </div>
+        <div class="form-group">
+          <input type="url" id="feed-url" class="form-input" placeholder="Link URL (optional)" />
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="submitPost()">Post</button>
+      </div>
+      <div id="announcements-list"></div>
+      <div id="feed-list"></div>
+    </div>
+
+    <!-- PAGE: RESOURCES -->
+    <div class="page" id="page-resources">
+      <div class="page-title">Resources</div>
+      <!-- Admin resource compose -->
+      <div class="admin-compose" id="admin-resource-box" style="display:none;">
+        <div class="admin-tag">ADMIN</div>
+        <div class="card-title">Add Resource</div>
+        <div class="form-group"><input type="text" id="res-emoji" class="form-input" placeholder="Emoji icon (e.g. 📖)" /></div>
+        <div class="form-group"><input type="text" id="res-title" class="form-input" placeholder="Title" /></div>
+        <div class="form-group"><input type="text" id="res-desc" class="form-input" placeholder="Short description" /></div>
+        <div class="form-group"><textarea id="res-body" class="form-input" placeholder="Full body content"></textarea></div>
+        <div class="form-group"><input type="url" id="res-url" class="form-input" placeholder="External URL (optional)" /></div>
+        <div class="form-group"><input type="text" id="res-link-label" class="form-input" placeholder="Link label (e.g. Read More)" /></div>
+        <div class="form-group"><input type="text" id="res-tags" class="form-input" placeholder="Tags (comma separated)" /></div>
+        <div class="form-group"><input type="text" id="res-source" class="form-input" placeholder="Source (optional)" /></div>
+        <button class="btn btn-gold btn-sm" onclick="submitResource()">Add Resource</button>
+      </div>
+      <div id="filter-bar" class="filter-bar"></div>
+      <div id="resource-grid" class="resource-grid"></div>
+    </div>
+
+    <!-- PAGE: SUBMIT -->
+    <div class="page" id="page-submit">
+      <div class="page-title">Submit Update</div>
+      <div id="round-ended-banner" class="round-ended-banner" style="display:none;">
+        <div class="round-ended-icon">🏁</div>
+        <div>
+          <div class="round-ended-title">Round 1 Has Ended</div>
+          <div class="round-ended-sub">Submissions are closed. Thanks for an amazing 90 days!</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Weekly Update</div>
+        <div id="pts-preview" class="pts-preview">
+          <span class="pts-num" id="pts-num">10</span>
+          <span>pts for on-time update</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Website URL (what page did you update?)</label>
+          <input type="url" id="submit-url" class="form-input" placeholder="https://yoursite.com/page" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">What did you update?</label>
+          <textarea id="submit-note" class="form-input" placeholder="Describe what you changed or added..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Update type</label>
+          <div class="format-btns" id="format-btns">
+            <button class="format-btn" onclick="selectFormat(this,'Static')">Static</button>
+            <button class="format-btn" onclick="selectFormat(this,'Video')">Video</button>
+            <button class="format-btn" onclick="selectFormat(this,'Redesign')">Redesign</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Screenshot (optional, +2 pts)</label>
+          <div class="screenshot-area" id="screenshot-area" onclick="document.getElementById('screenshot-input').click()">
+            <div id="screenshot-placeholder">📷 Tap to add screenshot</div>
+            <img id="screenshot-preview" class="screenshot-preview" style="display:none;" />
+            <input type="file" id="screenshot-input" accept="image/*" style="display:none;" onchange="handleScreenshotSelect(event)" />
+          </div>
+          <button class="btn btn-sm btn-outline mt-8" id="clear-screenshot-btn" style="display:none;" onclick="clearScreenshot()">Remove screenshot</button>
+        </div>
+        <button class="btn btn-gold btn-block btn-post" onclick="submitUpdate()">Submit Update</button>
+      </div>
+
+      <!-- Engagement section -->
+      <div class="eng-section">
+        <div class="card">
+          <div class="card-title">Engage With a Member's Site</div>
+          <p class="text-sm text-muted mb-8">Visit another member's website and earn +2 pts (max 5/week)</p>
+          <div id="eng-count-display" class="text-sm mb-8"></div>
+          <div class="form-group">
+            <label class="form-label">Member's website URL</label>
+            <input type="url" id="eng-url" class="form-input" placeholder="https://theirsite.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">What did you do?</label>
+            <div class="eng-type-btns" id="eng-type-btns">
+              <button class="eng-type-btn" onclick="selectEngType(this,'Comment')">Comment</button>
+              <button class="eng-type-btn" onclick="selectEngType(this,'Share')">Share</button>
+              <button class="eng-type-btn" onclick="selectEngType(this,'Feedback')">Feedback</button>
+              <button class="eng-type-btn" onclick="selectEngType(this,'Review')">Review</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Note (optional)</label>
+            <textarea id="eng-note" class="form-input" placeholder="Describe your engagement..."></textarea>
+          </div>
+          <button class="btn btn-gold btn-block" id="eng-submit-btn" onclick="submitEngagement()">Submit Engagement</button>
+        </div>
+        <div class="card mt-16">
+          <div class="card-title">Engagement History</div>
+          <div id="eng-history"></div>
+        </div>
+      </div>
+
+      <!-- My Submissions -->
+      <div class="card mt-16">
+        <div class="card-title">My Submissions</div>
+        <div id="my-submissions"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: RANKS (Leaderboard) -->
+    <div class="page" id="page-ranks">
+      <div class="page-title">Leaderboard</div>
+      <div class="text-sm text-muted mb-16">Round 1 · June–August 2026</div>
+      <div id="leaderboard-list"></div>
+      <div class="points-card">
+        <h4>How Points Work</h4>
+        <div class="points-row"><span>On-time update</span><span class="pts-val">+10 pts</span></div>
+        <div class="points-row"><span>Late update (within 24h)</span><span class="pts-val">+5 pts</span></div>
+        <div class="points-row"><span>Screenshot bonus</span><span class="pts-val">+2 pts</span></div>
+        <div class="points-row"><span>Format bonus (Video/Redesign)</span><span class="pts-val">+2 pts</span></div>
+        <div class="points-row"><span>4-week streak</span><span class="pts-val">+25 pts</span></div>
+        <div class="points-row"><span>Engagement (per site)</span><span class="pts-val">+2 pts</span></div>
+        <div class="points-row"><span>Max engagements/week</span><span class="pts-val">5</span></div>
+      </div>
+    </div>
+
+    <!-- PAGE: TRACKER -->
+    <div class="page" id="page-tracker">
+      <div class="page-title">Tracker</div>
+      <div id="tracker-header" class="mb-16"></div>
+      <div id="tracker-body"></div>
+      <div class="card mt-16" style="background:linear-gradient(135deg,rgba(184,134,11,0.06),var(--surface));">
+        <div class="card-title">⭐ WAC All-Star</div>
+        <p class="text-sm text-muted">Complete all 12 weekly requirements across June, July, and August to earn All-Star status. That's 24 total updates over 90 days.</p>
+      </div>
+    </div>
+
+    <!-- PAGE: REPORTS -->
+    <div class="page" id="page-reports">
+      <div class="page-title">All-Star Reports</div>
+      <button class="btn btn-outline btn-sm export-btn" onclick="exportCSV()">📥 Export CSV</button>
+      <div id="report-table-wrap" class="report-table-wrap"></div>
+      <div class="card mt-16">
+        <div class="card-title">Engagement Activity</div>
+        <div id="engagement-report"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: MEMBERS -->
+    <div class="page" id="page-members">
+      <div class="page-title">Members</div>
+      <input type="text" class="search-bar" id="member-search" placeholder="Search members..." oninput="filterMembers()" />
+      <!-- Admin create member -->
+      <div class="admin-compose" id="admin-create-box" style="display:none;">
+        <div class="admin-tag">ADMIN</div>
+        <div class="card-title">Create Member Account</div>
+        <div class="form-group"><input type="text" id="cm-name" class="form-input" placeholder="Full Name" /></div>
+        <div class="form-group"><input type="email" id="cm-email" class="form-input" placeholder="Email" /></div>
+        <div class="form-group"><input type="url" id="cm-website" class="form-input" placeholder="Website URL" /></div>
+        <div class="form-group"><input type="text" id="cm-biz" class="form-input" placeholder="Business Name" /></div>
+        <div class="form-group"><input type="text" id="cm-type" class="form-input" placeholder="Business Type" /></div>
+        <div class="form-group">
+          <label class="form-label">Rounds</label>
+          <div style="display:flex;gap:12px;">
+            <label style="font-size:13px;"><input type="checkbox" id="cm-r1" checked /> R1</label>
+            <label style="font-size:13px;"><input type="checkbox" id="cm-r2" /> R2</label>
+            <label style="font-size:13px;"><input type="checkbox" id="cm-r3" /> R3</label>
+          </div>
+        </div>
+        <div class="form-group" style="display:flex;gap:12px;">
+          <label style="font-size:13px;"><input type="checkbox" id="cm-founder" /> Founder</label>
+          <label style="font-size:13px;"><input type="checkbox" id="cm-vip" /> VIP</label>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="cm-pass" class="form-input" readonly />
+            <button class="btn btn-outline btn-sm" onclick="initPasswordField()" style="white-space:nowrap;">🔄</button>
+          </div>
+        </div>
+        <button class="btn btn-gold btn-block" onclick="createMemberAccount()">Create Account</button>
+        <div id="cm-result" style="margin-top:12px;"></div>
+      </div>
+      <!-- Admin full registry -->
+      <div id="admin-registry" style="display:none;"></div>
+      <!-- Member grid (non-admin) -->
+      <div id="member-grid" class="member-grid"></div>
+    </div>
+
+    <!-- PAGE: PROFILE -->
+    <div class="page" id="page-profile">
+      <div class="page-title">Profile</div>
+      <div id="profile-hero" class="profile-hero"></div>
+      <!-- Push notifications card -->
+      <div class="push-notif-card" id="push-notif-card">
+        <div style="font-size:24px;">🔔</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:14px;">Enable Reminders</div>
+          <div class="text-sm text-muted">Get notified 24h before each deadline</div>
+        </div>
+        <button class="btn btn-gold btn-sm" id="push-enable-btn" onclick="requestPushPermission()">Enable</button>
+      </div>
+      <!-- Install PWA card -->
+      <div class="install-pwa-card" id="install-pwa-card">
+        <div style="font-size:24px;">📲</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:14px;">Install WAC</div>
+          <div class="text-sm text-muted">Add to your home screen for quick access</div>
+        </div>
+        <button class="btn btn-gold btn-sm" id="install-pwa-btn" onclick="installPWA()">Install</button>
+      </div>
+      <!-- Edit profile -->
+      <div class="card">
+        <div class="card-title">Edit Profile</div>
+        <div class="form-group">
+          <label class="form-label">Name (contact Nate to change)</label>
+          <input type="text" id="prof-name" class="form-input" readonly style="opacity:0.6;" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Business Name</label>
+          <input type="text" id="prof-biz" class="form-input" placeholder="Your business" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Business Type</label>
+          <input type="text" id="prof-type" class="form-input" placeholder="e.g. Photography, Coaching" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Website URL</label>
+          <input type="url" id="prof-website" class="form-input" placeholder="https://yoursite.com" />
+        </div>
+        <button class="btn btn-gold btn-block" onclick="saveProfile()">Save Changes</button>
+      </div>
+      <!-- Change password -->
+      <div class="card">
+        <div class="card-title">Change Password</div>
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <input type="password" id="new-pass" class="form-input" placeholder="New password" />
+        </div>
+        <button class="btn btn-outline btn-block" onclick="changePassword()">Update Password</button>
+      </div>
+      <!-- Firebase setup (admin only) -->
+      <div class="card" id="firebase-setup-card" style="display:none;">
+        <div class="card-title">🔧 Firebase Setup</div>
+        <div id="firebase-setup-content"></div>
+      </div>
+      <!-- Sign out -->
+      <div style="text-align:center;margin-top:20px;">
+        <button class="btn btn-outline" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottomnav" id="bottomnav" style="display:none;">
+    <button onclick="navTo('feed')" data-page="feed"><span class="nav-icon">💬</span><span>Feed</span></button>
+    <button onclick="navTo('resources')" data-page="resources"><span class="nav-icon">📚</span><span>Resources</span></button>
+    <button onclick="navTo('submit')" data-page="submit"><span class="nav-icon">📤</span><span>Submit</span></button>
+    <button onclick="navTo('ranks')" data-page="ranks"><span class="nav-icon">🏆</span><span>Ranks</span></button>
+    <button onclick="navTo('tracker')" data-page="tracker"><span class="nav-icon">✅</span><span>Tracker</span></button>
+    <button onclick="navTo('reports')" data-page="reports"><span class="nav-icon">📊</span><span>Reports</span></button>
+    <button onclick="navTo('members')" data-page="members"><span class="nav-icon">👥</span><span>Members</span></button>
+    <button onclick="navTo('profile')" data-page="profile"><span class="nav-icon">👤</span><span>Profile</span></button>
+  </nav>
+</div>
+
+<!-- WELCOME MODAL -->
+<div class="welcome-overlay" id="welcome-overlay">
+  <div class="welcome-modal">
+    <div class="welcome-header">
+      <div class="welcome-logo">WAC</div>
+      <div style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;opacity:0.85;">Website Accountability Challenge</div>
+    </div>
+    <div class="welcome-body">
+      <h3>Welcome to Round 1! 👋</h3>
+      <div class="welcome-step"><span class="welcome-step-icon">🌐</span><span>Submit your updates — paste your URL each week after you update your site</span></div>
+      <div class="welcome-step"><span class="welcome-step-icon">✅</span><span>Check your Tracker — mark weeks complete, hit the streak bonus for +25 pts</span></div>
+      <div class="welcome-step"><span class="welcome-step-icon">🤝</span><span>Engage with members — visit and comment on other members' sites for +2 pts each</span></div>
+      <div class="welcome-step"><span class="welcome-step-icon">⭐</span><span>Earn All-Star status — complete every weekly requirement across all 12 weeks</span></div>
+    </div>
+    <div class="welcome-footer">
+      <button class="btn btn-gold btn-block" onclick="closeWelcomeModal()">Let's Go! 🚀</button>
+      <button class="welcome-dismiss" onclick="closeWelcomeModal()">Don't show this again</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESOURCE MODAL -->
+<div class="modal-overlay" id="res-modal-overlay" onclick="closeResModalDirect(event)">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeResModal()">✕</button>
+    </div>
+    <div id="res-modal-content"></div>
+  </div>
+</div>
+
+<!-- MEMBER PROFILE MODAL -->
+<div class="modal-overlay" id="member-modal-overlay" onclick="closeMemberModalDirect(event)">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeMemberModal()">✕</button>
+    </div>
+    <div id="member-modal-content"></div>
+  </div>
+</div>
+
+<!-- ADMIN TRACKER EDITOR MODAL -->
+<div class="admin-tracker-modal-overlay" id="admin-tracker-overlay" onclick="closeTrackerModalDirect(event)">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeTrackerModal()">✕</button>
+    </div>
+    <div id="admin-tracker-content"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ==============================
+     JAVASCRIPT
+     ============================== -->
+<script type="module">
+// ==============================
+// FIREBASE IMPORTS
+// ==============================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+  sendPasswordResetEmail, updatePassword
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
+  deleteDoc, query, where, orderBy, limit, increment, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ==============================
+// FIREBASE CONFIG
+// ==============================
+const _a = "AIzaSyDGDVzpO-3k_q4O"; const _b = "50yQdv8mccfPE5s1qdU";
+const FIREBASE_CONFIG = {
+  apiKey: _a + _b,
+  authDomain: "wac-26.firebaseapp.com",
+  projectId: "wac-26",
+  storageBucket: "wac-26.firebasestorage.app",
+  messagingSenderId: "156486763557",
+  appId: "1:156486763557:web:9b324fe46446bee0436bcc"
+};
+
+// ==============================
+// CONSTANTS
+// ==============================
+const ADMIN_EMAIL   = "nate@templetonimage.com";
+const CURRENT_ROUND = "R1";
+
+const PTS_ON_TIME   = 10;
+const PTS_LATE_24H  = 5;
+const PTS_SCREENSHOT = 2;
+const PTS_STREAK    = 25;
+const PTS_ENGAGEMENT = 2;
+const MAX_ENG_PER_WEEK = 5;
+
+const GRACE_WEEKS = ["w1", "w2"];
+
+const ROUND_END_TS = Date.UTC(2026, 8, 1, 3, 59, 59, 999);
+
+const WEEK_SCHEDULE = [
+  [Date.UTC(2026,5,1,4,0,0),   Date.UTC(2026,5,8,3,59,59,999)],
+  [Date.UTC(2026,5,8,4,0,0),   Date.UTC(2026,5,15,3,59,59,999)],
+  [Date.UTC(2026,5,15,4,0,0),  Date.UTC(2026,5,22,3,59,59,999)],
+  [Date.UTC(2026,5,22,4,0,0),  Date.UTC(2026,6,1,3,59,59,999)],
+  [Date.UTC(2026,6,1,4,0,0),   Date.UTC(2026,6,8,3,59,59,999)],
+  [Date.UTC(2026,6,8,4,0,0),   Date.UTC(2026,6,15,3,59,59,999)],
+  [Date.UTC(2026,6,15,4,0,0),  Date.UTC(2026,6,22,3,59,59,999)],
+  [Date.UTC(2026,6,22,4,0,0),  Date.UTC(2026,7,1,3,59,59,999)],
+  [Date.UTC(2026,7,1,4,0,0),   Date.UTC(2026,7,8,3,59,59,999)],
+  [Date.UTC(2026,7,8,4,0,0),   Date.UTC(2026,7,15,3,59,59,999)],
+  [Date.UTC(2026,7,15,4,0,0),  Date.UTC(2026,7,22,3,59,59,999)],
+  [Date.UTC(2026,7,22,4,0,0),  Date.UTC(2026,8,1,3,59,59,999)],
+];
+// Fix week 12 end timestamp explicitly
+WEEK_SCHEDULE[11][1] = Date.UTC(2026, 8, 1, 3, 59, 59, 999);
+
+const WEEKS = [
+  {id:"w1",  label:"Week 1", dates:"Jun 1–7",   month:"June",   required:1},
+  {id:"w2",  label:"Week 2", dates:"Jun 8–14",  month:"June",   required:1},
+  {id:"w3",  label:"Week 3", dates:"Jun 15–21", month:"June",   required:1},
+  {id:"w4",  label:"Week 4", dates:"Jun 22–30", month:"June",   required:1},
+  {id:"w5",  label:"Week 1", dates:"Jul 1–7",   month:"July",   required:2},
+  {id:"w6",  label:"Week 2", dates:"Jul 8–14",  month:"July",   required:2},
+  {id:"w7",  label:"Week 3", dates:"Jul 15–21", month:"July",   required:2},
+  {id:"w8",  label:"Week 4", dates:"Jul 22–31", month:"July",   required:2},
+  {id:"w9",  label:"Week 1", dates:"Aug 1–7",   month:"August", required:3},
+  {id:"w10", label:"Week 2", dates:"Aug 8–14",  month:"August", required:3},
+  {id:"w11", label:"Week 3", dates:"Aug 15–21", month:"August", required:3},
+  {id:"w12", label:"Week 4", dates:"Aug 22–31", month:"August", required:3},
+];
+const MONTHS = ["June", "July", "August"];
+const MONTH_REQS = {"June":"1 update/week", "July":"2 updates/week", "August":"3 updates/week"};
+
+// ==============================
+// APP STATE
+// ==============================
+let app, auth, db;
+let currentUser = null;
+let useLocalFallback = false;
+let _booted = false;
+let _memberMap = {};
+let _selectedFormat = "";
+let _selectedEngType = "";
+let _screenshotData = null;
+let _engScreenshotData = null;
+let _allResources = [];
+let _currentFilter = "All";
+let _deferredInstallPrompt = null;
+
+// ==============================
+// UTILITIES
+// ==============================
+function esc(str) {
+  if (!str) return "";
+  const d = document.createElement("div");
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return mins + "m ago";
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + "h ago";
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return days + "d ago";
+  return new Date(ts).toLocaleDateString();
+}
+
+function getWeekIndex() {
+  const now = Date.now();
+  for (let i = 0; i < WEEK_SCHEDULE.length; i++) {
+    if (now >= WEEK_SCHEDULE[i][0] && now <= WEEK_SCHEDULE[i][1]) return i;
+  }
+  // If before round start, return 0; if after, return 11
+  if (now < WEEK_SCHEDULE[0][0]) return 0;
+  return 11;
+}
+
+function getWeekDeadline(weekIdx) {
+  return WEEK_SCHEDULE[weekIdx] ? WEEK_SCHEDULE[weekIdx][1] : WEEK_SCHEDULE[11][1];
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+function lsGet(key) {
+  try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
+}
+function lsSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+function lsPush(key, val) {
+  const arr = lsGet(key) || [];
+  arr.push(val);
+  lsSet(key, arr);
+}
+
+function getInitials(name) {
+  if (!name) return "?";
+  return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+}
+
+function getMilestoneBadges(totalPosts) {
+  let b = "";
+  if (totalPosts >= 50) b += "🏆";
+  if (totalPosts >= 25) b += "💎";
+  if (totalPosts >= 10) b += "🔥";
+  if (totalPosts >= 1) b += "🌱";
+  return b;
+}
+
+// ==============================
+// FIREBASE INIT
+// ==============================
+function initFirebase() {
+  try {
+    app = initializeApp(FIREBASE_CONFIG);
+    auth = getAuth(app);
+    db = getFirestore(app);
+  } catch (e) {
+    console.error("Firebase init failed:", e);
+    useLocalFallback = true;
+  }
+}
+
+// ==============================
+// ERROR LOGGING
+// ==============================
+async function logPlatformError(context, message) {
+  try {
+    if (!db || useLocalFallback) return;
+    await addDoc(collection(db, "platform_errors"), {
+      context, message,
+      timestamp: Date.now(),
+      reportedBy: currentUser?.email || "system"
+    });
+  } catch(e) { console.error("logPlatformError failed:", e); }
+}
+
+// ==============================
+// AUTH
+// ==============================
+function togglePassVisibility() {
+  const inp = document.getElementById("auth-pass");
+  const btn = inp.nextElementSibling;
+  if (inp.type === "password") { inp.type = "text"; btn.textContent = "🙈"; }
+  else { inp.type = "password"; btn.textContent = "👁"; }
+}
+
+async function handleLogin() {
+  const email = document.getElementById("auth-email").value.trim();
+  const pass = document.getElementById("auth-pass").value;
+  const errEl = document.getElementById("auth-error");
+  errEl.style.display = "none";
+  if (!email || !pass) { errEl.textContent = "Please enter email and password."; errEl.style.display = "block"; return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (e) {
+    let msg = "Login failed. Check your credentials.";
+    if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") msg = "Incorrect password.";
+    else if (e.code === "auth/user-not-found") msg = "No account found with this email.";
+    else if (e.code === "auth/too-many-requests") msg = "Too many attempts. Try again later.";
+    errEl.textContent = msg;
+    errEl.style.display = "block";
+  }
+}
+
+async function handleForgotPassword() {
+  const email = document.getElementById("auth-email").value.trim();
+  if (!email) { showToast("Enter your email first."); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showToast("Password reset email sent!");
+  } catch { showToast("Could not send reset email."); }
+}
+
+async function changePassword() {
+  const newPass = document.getElementById("new-pass").value;
+  if (!newPass || newPass.length < 6) { showToast("Password must be at least 6 characters."); return; }
+  try {
+    await updatePassword(auth.currentUser, newPass);
+    showToast("Password updated!");
+    document.getElementById("new-pass").value = "";
+  } catch (e) {
+    showToast("Failed to update password. You may need to re-login.");
+  }
+}
+
+function handleLogout() {
+  signOut(auth);
+  localStorage.removeItem("wac_session");
+  currentUser = null;
+  _booted = false;
+  document.getElementById("app").classList.remove("visible");
+  document.getElementById("auth-screen").style.display = "flex";
+  document.getElementById("bottomnav").style.display = "none";
+}
+
+async function resolveUser(user) {
+  const email = user.email;
+  const uid = user.uid;
+  if (email === ADMIN_EMAIL) {
+    return { name: "Nate Templeton", email, isAdmin: true, uid };
+  }
+  // Load from registry
+  const snap = await getDoc(doc(db, "wac_registry", uid));
+  if (!snap.exists()) return null;
+  const d = snap.data();
+  if (!d.rounds?.includes(CURRENT_ROUND) && !d.isFounder) return null;
+  return {
+    name: d.name || email,
+    email,
+    uid,
+    isAdmin: false,
+    website: d.website || "",
+    business: d.business || "",
+    type: d.type || "",
+    rounds: d.rounds || [],
+    points: d.points || 0,
+    totalPosts: d.totalPosts || 0,
+    isFounder: d.isFounder || false,
+    isVIP: d.isVIP || false,
+    isAllStar: d.isAllStar || false,
+  };
+}
+
+// ==============================
+// AUTH STATE OBSERVER
+// ==============================
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    document.getElementById("app").classList.remove("visible");
+    document.getElementById("auth-screen").style.display = "flex";
+    document.getElementById("bottomnav").style.display = "none";
+    return;
+  }
+  if (_booted) return;
+
+  // Check for stale session
+  const saved = lsGet("wac_session");
+  if (saved && saved.email !== user.email) {
+    localStorage.removeItem("wac_session");
+  }
+  // Stale admin name migration
+  if (saved && saved.isAdmin && saved.name !== "Nate Templeton") {
+    localStorage.removeItem("wac_session");
+  }
+
+  // Try session restore
+  const validSaved = lsGet("wac_session");
+  if (validSaved && validSaved.email === user.email && validSaved.uid === user.uid) {
+    currentUser = validSaved;
+  } else {
+    try {
+      const resolved = await resolveUser(user);
+      if (!resolved) {
+        document.getElementById("auth-error").textContent = "You're not enrolled in Round 1 yet. Contact Nate.";
+        document.getElementById("auth-error").style.display = "block";
+        await signOut(auth);
+        return;
+      }
+      currentUser = resolved;
+      lsSet("wac_session", currentUser);
+    } catch (e) {
+      console.error("Auth resolve error:", e);
+      return;
+    }
+  }
+
+  _booted = true;
+  bootApp();
+});
+
+// ==============================
+// BOOT APP
+// ==============================
+function bootApp() {
+  // 1. Show app, hide auth
+  document.getElementById("auth-screen").style.display = "none";
+  document.getElementById("app").classList.add("visible");
+  document.getElementById("bottomnav").style.display = "flex";
+
+  // 2. Set topnav username
+  document.getElementById("topnav-user").textContent = currentUser.name;
+
+  // 3. Show/hide admin elements — explicitly hide all first
+  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card"];
+  adminBoxes.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+  if (currentUser.isAdmin) {
+    adminBoxes.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = id === "admin-registry" ? "block" : (id === "firebase-setup-card" ? "block" : "block");
+    });
+    showFirebaseSetupCard();
+  }
+
+  // 4. Load all data
+  loadFeed();
+  loadAnnouncements();
+  loadResources();
+  buildTracker();
+  loadProfile();
+  loadDirectory();
+  loadMySubmissions();
+  updatePtsPreview();
+  loadLeaderboard();
+  loadTrackerReport();
+  loadEngHistory();
+
+  // 5. Default to feed
+  navTo("feed");
+
+  // 6. Delayed new features
+  setTimeout(showWelcomeModal, 600);
+  setTimeout(initPushNotifications, 1000);
+  setTimeout(checkRoundEnd, 300);
+
+  // Init password field for admin create
+  if (currentUser.isAdmin) initPasswordField();
+}
+
+// ==============================
+// NAVIGATION
+// ==============================
+function navTo(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const target = document.getElementById("page-" + page);
+  if (target) target.classList.add("active");
+
+  document.querySelectorAll(".bottomnav button").forEach(b => b.classList.remove("active"));
+  const navBtn = document.querySelector(`.bottomnav button[data-page="${page}"]`);
+  if (navBtn) navBtn.classList.add("active");
+
+  // Scroll to top
+  const scroller = document.getElementById("app-scroll");
+  if (scroller) scroller.scrollTop = 0;
+
+  // Page-specific loads
+  if (page === "submit") loadSubmitPage();
+  if (page === "ranks") loadLeaderboard();
+  if (page === "reports") { loadTrackerReport(); }
+}
+
+function loadSubmitPage() {
+  updatePtsPreview();
+  loadEngHistory();
+  loadMySubmissions();
+}
+
+// ==============================
+// FEED
+// ==============================
+async function submitPost() {
+  const text = document.getElementById("feed-compose").value.trim();
+  const url = document.getElementById("feed-url").value.trim();
+  if (!text) { showToast("Write something first."); return; }
+  try {
+    await addDoc(collection(db, "posts"), {
+      author: currentUser.name,
+      authorUid: currentUser.uid,
+      text,
+      url: url || "",
+      props: [],
+      propsCount: 0,
+      timestamp: Date.now()
+    });
+    document.getElementById("feed-compose").value = "";
+    document.getElementById("feed-url").value = "";
+    showToast("Posted!");
+    loadFeed();
+  } catch (e) { showToast("Failed to post."); }
+}
+
+async function loadFeed() {
+  try {
+    const q = query(collection(db, "posts"), orderBy("timestamp", "desc"), limit(50));
+    const snap = await getDocs(q);
+    const posts = [];
+    snap.forEach(d => posts.push({ id: d.id, ...d.data() }));
+    renderFeed(posts);
+  } catch (e) {
+    console.error("loadFeed error:", e);
+  }
+}
+
+function renderFeed(posts) {
+  const el = document.getElementById("feed-list");
+  if (!posts.length) { el.innerHTML = '<p class="text-sm text-muted text-center">No posts yet. Be the first!</p>'; return; }
+  el.innerHTML = posts.map(p => {
+    const initials = getInitials(p.author);
+    const urlHtml = p.url ? `<div style="margin-bottom:8px;"><a href="${esc(p.url)}" target="_blank" rel="noopener" style="font-size:13px;word-break:break-all;">${esc(p.url)}</a></div>` : "";
+    const isOwner = p.authorUid === currentUser.uid || currentUser.isAdmin;
+    const propsNames = (p.props || []).join(", ");
+    return `<div class="feed-post">
+      <div class="feed-post-header">
+        <div class="feed-avatar">${initials}</div>
+        <div class="feed-meta">
+          <div class="feed-author">${esc(p.author)}</div>
+          <div class="feed-time">${timeAgo(p.timestamp)}</div>
+        </div>
+      </div>
+      <div class="feed-body">${esc(p.text)}</div>
+      ${urlHtml}
+      <div class="feed-actions">
+        <button onclick="giveProps('${p.id}')">👏 ${p.propsCount || 0}</button>
+        <button onclick="togglePropsList('${p.id}')">👥</button>
+        ${isOwner ? `<button onclick="deletePost('${p.id}')" style="color:var(--danger);">🗑</button>` : ""}
+      </div>
+      <div class="props-list" id="props-${p.id}">${propsNames || "No props yet"}</div>
+    </div>`;
+  }).join("");
+}
+
+async function giveProps(postId) {
+  // Props opens their site, then confirms
+  try {
+    const ref = doc(db, "posts", postId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data();
+    const props = data.props || [];
+    if (props.includes(currentUser.name)) { showToast("You already gave props!"); return; }
+    // If user has a website, open it
+    // Find the post author's registry doc for their website
+    confirmProps(postId);
+  } catch (e) { showToast("Error giving props."); }
+}
+
+async function confirmProps(postId) {
+  try {
+    const ref = doc(db, "posts", postId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data();
+    const props = data.props || [];
+    if (props.includes(currentUser.name)) return;
+    props.push(currentUser.name);
+    await updateDoc(ref, { props, propsCount: props.length });
+    showToast("Props given! 👏");
+    loadFeed();
+  } catch (e) { showToast("Error confirming props."); }
+}
+
+function togglePropsList(postId) {
+  const el = document.getElementById("props-" + postId);
+  if (el) el.style.display = el.style.display === "block" ? "none" : "block";
+}
+
+async function toggleLike(postId) {
+  await giveProps(postId);
+}
+
+async function deletePost(postId) {
+  if (!confirm("Delete this post?")) return;
+  try {
+    await deleteDoc(doc(db, "posts", postId));
+    showToast("Post deleted.");
+    loadFeed();
+  } catch { showToast("Failed to delete."); }
+}
+
+// ==============================
+// ANNOUNCEMENTS
+// ==============================
+async function submitAnnouncement() {
+  const title = document.getElementById("ann-title").value.trim();
+  const body = document.getElementById("ann-body").value.trim();
+  if (!title || !body) { showToast("Title and body required."); return; }
+  try {
+    await addDoc(collection(db, "announcements"), {
+      title, body,
+      author: currentUser.name,
+      authorUid: currentUser.uid,
+      timestamp: Date.now()
+    });
+    document.getElementById("ann-title").value = "";
+    document.getElementById("ann-body").value = "";
+    showToast("Announcement posted!");
+    loadAnnouncements();
+  } catch { showToast("Failed to post announcement."); }
+}
+
+async function loadAnnouncements() {
+  try {
+    const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"), limit(10));
+    const snap = await getDocs(q);
+    const anns = [];
+    snap.forEach(d => anns.push({ id: d.id, ...d.data() }));
+    renderAnnouncements(anns);
+  } catch (e) { console.error("loadAnnouncements error:", e); }
+}
+
+function renderAnnouncements(anns) {
+  const el = document.getElementById("announcements-list");
+  if (!anns.length) { el.innerHTML = ""; return; }
+  el.innerHTML = anns.map(a => {
+    const isAdmin = currentUser.isAdmin;
+    return `<div class="card announcement-card" style="margin-bottom:12px;">
+      <div class="announcement-tag">ANNOUNCEMENT</div>
+      <div style="font-weight:700;font-size:16px;margin-bottom:6px;">${esc(a.title)}</div>
+      <div class="feed-body">${esc(a.body)}</div>
+      <div class="feed-time">${timeAgo(a.timestamp)}</div>
+      ${isAdmin ? `<button onclick="deleteAnn('${a.id}')" style="background:none;border:none;color:var(--danger);font-size:12px;margin-top:6px;cursor:pointer;">Delete</button>` : ""}
+    </div>`;
+  }).join("");
+}
+
+async function deleteAnn(id) {
+  if (!confirm("Delete this announcement?")) return;
+  try {
+    await deleteDoc(doc(db, "announcements", id));
+    showToast("Announcement deleted.");
+    loadAnnouncements();
+  } catch { showToast("Failed to delete."); }
+}
+
+// ==============================
+// RESOURCES
+// ==============================
+async function submitResource() {
+  const emoji = document.getElementById("res-emoji").value.trim();
+  const title = document.getElementById("res-title").value.trim();
+  const desc = document.getElementById("res-desc").value.trim();
+  const body = document.getElementById("res-body").value.trim();
+  const url = document.getElementById("res-url").value.trim();
+  const linkLabel = document.getElementById("res-link-label").value.trim();
+  const tags = document.getElementById("res-tags").value.trim().split(",").map(t => t.trim()).filter(Boolean);
+  const source = document.getElementById("res-source").value.trim();
+  if (!title) { showToast("Title required."); return; }
+  try {
+    await addDoc(collection(db, "resources"), {
+      emoji: emoji || "📄", title, description: desc, body, url, linkLabel, tags, source,
+      timestamp: Date.now()
+    });
+    ["res-emoji","res-title","res-desc","res-body","res-url","res-link-label","res-tags","res-source"].forEach(id => document.getElementById(id).value = "");
+    showToast("Resource added!");
+    loadResources();
+  } catch { showToast("Failed to add resource."); }
+}
+
+async function loadResources() {
+  try {
+    const q = query(collection(db, "resources"), orderBy("timestamp", "desc"));
+    const snap = await getDocs(q);
+    _allResources = [];
+    snap.forEach(d => _allResources.push({ id: d.id, ...d.data() }));
+    renderResourceFilters();
+    renderResources();
+  } catch (e) { console.error("loadResources error:", e); }
+}
+
+function getAllTags() {
+  const tags = new Set();
+  _allResources.forEach(r => (r.tags || []).forEach(t => tags.add(t)));
+  return Array.from(tags).sort();
+}
+
+function renderResourceFilters() {
+  const tags = getAllTags();
+  const el = document.getElementById("filter-bar");
+  el.innerHTML = `<button class="filter-btn ${_currentFilter === 'All' ? 'active' : ''}" onclick="setFilter('All')">All</button>` +
+    tags.map(t => `<button class="filter-btn ${_currentFilter === t ? 'active' : ''}" onclick="setFilter('${esc(t)}')">${esc(t)}</button>`).join("");
+}
+
+function setFilter(tag) {
+  _currentFilter = tag;
+  renderResourceFilters();
+  renderResources();
+}
+
+function renderResources() {
+  const filtered = _currentFilter === "All" ? _allResources : _allResources.filter(r => (r.tags || []).includes(_currentFilter));
+  const el = document.getElementById("resource-grid");
+  if (!filtered.length) { el.innerHTML = '<p class="text-sm text-muted">No resources yet.</p>'; return; }
+  el.innerHTML = filtered.map(r => {
+    const tagsHtml = (r.tags || []).map(t => `<span class="resource-tag">${esc(t)}</span>`).join("");
+    return `<div class="resource-card" onclick="openResModal('${r.id}')">
+      <div class="resource-emoji">${esc(r.emoji || "📄")}</div>
+      <div class="resource-title">${esc(r.title)}</div>
+      <div class="resource-desc">${esc(r.description || "")}</div>
+      <div class="resource-tags">${tagsHtml}</div>
+    </div>`;
+  }).join("");
+}
+
+function openResModal(id) {
+  const r = _allResources.find(x => x.id === id);
+  if (!r) return;
+  const el = document.getElementById("res-modal-content");
+  const linkBtn = r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener" class="btn btn-gold btn-sm mt-16">${esc(r.linkLabel || "Open Link")}</a>` : "";
+  el.innerHTML = `
+    <div style="font-size:36px;margin-bottom:12px;">${esc(r.emoji || "📄")}</div>
+    <h3 style="font-size:20px;font-weight:700;margin-bottom:8px;">${esc(r.title)}</h3>
+    ${r.source ? `<div class="text-sm text-muted mb-8">Source: ${esc(r.source)}</div>` : ""}
+    <div style="font-size:15px;line-height:1.7;white-space:pre-wrap;">${esc(r.body || r.description || "")}</div>
+    ${linkBtn}
+  `;
+  document.getElementById("res-modal-overlay").classList.add("open");
+}
+
+function closeResModal() {
+  document.getElementById("res-modal-overlay").classList.remove("open");
+}
+function closeResModalDirect(e) {
+  if (e.target === document.getElementById("res-modal-overlay")) closeResModal();
+}
+
+// ==============================
+// SUBMIT UPDATE
+// ==============================
+function selectFormat(btn, fmt) {
+  _selectedFormat = fmt;
+  document.querySelectorAll("#format-btns .format-btn").forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+  updatePtsPreview();
+}
+
+function updatePtsPreview() {
+  const weekIdx = getWeekIndex();
+  const deadline = getWeekDeadline(weekIdx);
+  const now = Date.now();
+  const isLate = now > deadline;
+  const lateWindow = deadline + (24 * 60 * 60 * 1000);
+  let pts = isLate ? (now <= lateWindow ? PTS_LATE_24H : 0) : PTS_ON_TIME;
+  if (_screenshotData) pts += PTS_SCREENSHOT;
+  if (_selectedFormat === "Video" || _selectedFormat === "Redesign") pts += 2;
+  document.getElementById("pts-num").textContent = pts;
+  const label = isLate ? "pts for late update" : "pts for on-time update";
+  document.getElementById("pts-preview").innerHTML = `<span class="pts-num" id="pts-num">${pts}</span><span>${label}</span>`;
+}
+
+async function compressImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX = 800;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = (h * MAX) / w; w = MAX; }
+        if (h > MAX) { w = (w * MAX) / h; h = MAX; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", 0.7));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleScreenshotSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  _screenshotData = await compressImage(file);
+  document.getElementById("screenshot-preview").src = _screenshotData;
+  document.getElementById("screenshot-preview").style.display = "block";
+  document.getElementById("screenshot-placeholder").style.display = "none";
+  document.getElementById("clear-screenshot-btn").style.display = "inline-flex";
+  updatePtsPreview();
+}
+
+function clearScreenshot() {
+  _screenshotData = null;
+  document.getElementById("screenshot-preview").style.display = "none";
+  document.getElementById("screenshot-placeholder").style.display = "block";
+  document.getElementById("clear-screenshot-btn").style.display = "none";
+  document.getElementById("screenshot-input").value = "";
+  updatePtsPreview();
+}
+
+async function submitUpdate() {
+  const url = document.getElementById("submit-url").value.trim();
+  const note = document.getElementById("submit-note").value.trim();
+  if (!url || !note) { showToast("URL and description are required."); return; }
+  if (isRoundOver()) { showToast("Round has ended."); return; }
+
+  const weekIdx = getWeekIndex();
+  const deadline = getWeekDeadline(weekIdx);
+  const now = Date.now();
+  const isLate = now > deadline;
+  const lateWindow = deadline + (24 * 60 * 60 * 1000);
+  if (isLate && now > lateWindow) { showToast("Submission window has closed for this week."); return; }
+
+  // Check weekly limit
+  try {
+    const required = WEEKS[weekIdx].required;
+    const q = query(collection(db, "submissions"),
+      where("authorUid", "==", currentUser.uid),
+      where("weekIdx", "==", weekIdx));
+    const snap = await getDocs(q);
+    if (snap.size >= required) { showToast(`You've already submitted ${required} update(s) this week.`); return; }
+
+    let pts = isLate ? PTS_LATE_24H : PTS_ON_TIME;
+    if (_screenshotData) pts += PTS_SCREENSHOT;
+    if (_selectedFormat === "Video" || _selectedFormat === "Redesign") pts += 2;
+
+    await addDoc(collection(db, "submissions"), {
+      author: currentUser.name,
+      authorUid: currentUser.uid,
+      weekIdx,
+      weekLabel: WEEKS[weekIdx].label + " (" + WEEKS[weekIdx].dates + ")",
+      url,
+      note,
+      format: _selectedFormat || "Static",
+      hasScreenshot: !!_screenshotData,
+      pts,
+      isLate,
+      timestamp: Date.now()
+    });
+
+    // Update registry points + totalPosts
+    const regRef = doc(db, "wac_registry", currentUser.uid);
+    await updateDoc(regRef, {
+      points: increment(pts),
+      totalPosts: increment(1)
+    });
+
+    // Update local user
+    currentUser.points = (currentUser.points || 0) + pts;
+    currentUser.totalPosts = (currentUser.totalPosts || 0) + 1;
+    lsSet("wac_session", currentUser);
+
+    // Reset form
+    document.getElementById("submit-url").value = "";
+    document.getElementById("submit-note").value = "";
+    _selectedFormat = "";
+    document.querySelectorAll("#format-btns .format-btn").forEach(b => b.classList.remove("selected"));
+    clearScreenshot();
+    showToast(`Update submitted! +${pts} pts`);
+    loadMySubmissions();
+    updatePtsPreview();
+  } catch (e) {
+    console.error("submitUpdate error:", e);
+    showToast("Failed to submit update.");
+  }
+}
+
+// ==============================
+// ENGAGEMENT
+// ==============================
+function selectEngType(btn, type) {
+  _selectedEngType = type;
+  document.querySelectorAll("#eng-type-btns .eng-type-btn").forEach(b => b.classList.remove("selected"));
+  btn.classList.add("selected");
+}
+
+async function getWeeklyEngCount() {
+  const weekIdx = getWeekIndex();
+  try {
+    const q = query(collection(db, "engagements"),
+      where("authorUid", "==", currentUser.uid),
+      where("weekIdx", "==", weekIdx));
+    const snap = await getDocs(q);
+    return snap.size;
+  } catch { return 0; }
+}
+
+async function submitEngagement() {
+  const url = document.getElementById("eng-url").value.trim();
+  if (!url) { showToast("Enter the member's website URL."); return; }
+  if (!_selectedEngType) { showToast("Select engagement type."); return; }
+  if (isRoundOver()) { showToast("Round has ended."); return; }
+
+  const count = await getWeeklyEngCount();
+  if (count >= MAX_ENG_PER_WEEK) { showToast(`Max ${MAX_ENG_PER_WEEK} engagements per week.`); return; }
+
+  const weekIdx = getWeekIndex();
+  const note = document.getElementById("eng-note").value.trim();
+  try {
+    await addDoc(collection(db, "engagements"), {
+      author: currentUser.name,
+      authorUid: currentUser.uid,
+      weekIdx,
+      targetUrl: url,
+      note,
+      type: _selectedEngType,
+      pts: PTS_ENGAGEMENT,
+      timestamp: Date.now()
+    });
+    // Update registry points
+    const regRef = doc(db, "wac_registry", currentUser.uid);
+    await updateDoc(regRef, { points: increment(PTS_ENGAGEMENT) });
+    currentUser.points = (currentUser.points || 0) + PTS_ENGAGEMENT;
+    lsSet("wac_session", currentUser);
+
+    document.getElementById("eng-url").value = "";
+    document.getElementById("eng-note").value = "";
+    _selectedEngType = "";
+    document.querySelectorAll("#eng-type-btns .eng-type-btn").forEach(b => b.classList.remove("selected"));
+    showToast(`Engagement submitted! +${PTS_ENGAGEMENT} pts`);
+    loadEngHistory();
+  } catch (e) {
+    console.error("submitEngagement error:", e);
+    showToast("Failed to submit engagement.");
+  }
+}
+
+async function loadEngHistory() {
+  try {
+    const weekIdx = getWeekIndex();
+    const count = await getWeeklyEngCount();
+    const el = document.getElementById("eng-count-display");
+    if (el) el.textContent = `${count}/${MAX_ENG_PER_WEEK} engagements this week`;
+
+    const q = query(collection(db, "engagements"),
+      where("authorUid", "==", currentUser.uid),
+      orderBy("timestamp", "desc"),
+      limit(20));
+    const snap = await getDocs(q);
+    const items = [];
+    snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    const el2 = document.getElementById("eng-history");
+    if (!items.length) { el2.innerHTML = '<p class="text-sm text-muted">No engagements yet.</p>'; return; }
+    el2.innerHTML = items.map(e => `<div class="eng-history-item">
+      <div style="font-weight:600;">${esc(e.type)} — <a href="${esc(e.targetUrl)}" target="_blank" rel="noopener">${esc(e.targetUrl)}</a></div>
+      ${e.note ? `<div class="text-muted">${esc(e.note)}</div>` : ""}
+      <div class="text-muted" style="font-size:11px;">${timeAgo(e.timestamp)} · +${e.pts} pts</div>
+    </div>`).join("");
+  } catch (e) { console.error("loadEngHistory error:", e); }
+}
+
+// ==============================
+// MY SUBMISSIONS
+// ==============================
+async function loadMySubmissions() {
+  if (currentUser.isAdmin) { document.getElementById("my-submissions").innerHTML = ""; return; }
+  try {
+    const q = query(collection(db, "submissions"),
+      where("authorUid", "==", currentUser.uid),
+      orderBy("timestamp", "desc"));
+    const snap = await getDocs(q);
+    const items = [];
+    snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    const el = document.getElementById("my-submissions");
+    if (!items.length) { el.innerHTML = '<p class="text-sm text-muted">No submissions yet.</p>'; return; }
+    el.innerHTML = items.map(s => `<div class="submission-item">
+      <div class="submission-info">
+        <div class="submission-week">${esc(s.weekLabel)}${s.isLate ? ' <span style="color:var(--danger);font-size:11px;">(late)</span>' : ""}</div>
+        <div class="submission-url"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>
+      </div>
+      <div class="submission-pts">+${s.pts}</div>
+      <button class="submission-del" onclick="deleteSubmission('${s.id}', ${s.pts})">🗑</button>
+    </div>`).join("");
+  } catch (e) { console.error("loadMySubmissions error:", e); }
+}
+
+async function deleteSubmission(id, pts) {
+  if (!confirm("Delete this submission? Points will be deducted.")) return;
+  try {
+    await deleteDoc(doc(db, "submissions", id));
+    const regRef = doc(db, "wac_registry", currentUser.uid);
+    await updateDoc(regRef, {
+      points: increment(-pts),
+      totalPosts: increment(-1)
+    });
+    currentUser.points = Math.max(0, (currentUser.points || 0) - pts);
+    currentUser.totalPosts = Math.max(0, (currentUser.totalPosts || 0) - 1);
+    lsSet("wac_session", currentUser);
+    showToast("Submission deleted. Points deducted.");
+    loadMySubmissions();
+  } catch { showToast("Failed to delete submission."); }
+}
+
+// ==============================
+// TRACKER
+// ==============================
+async function initGracePeriod() {
+  if (currentUser.isAdmin) return;
+  try {
+    const ref = doc(db, "trackers", currentUser.uid);
+    const snap = await getDoc(ref);
+    let data = snap.exists() ? snap.data() : {};
+    let changed = false;
+    for (const wk of GRACE_WEEKS) {
+      if (!data[wk]) { data[wk] = true; changed = true; }
+    }
+    if (changed) {
+      await setDoc(ref, { uid: currentUser.uid, ...data }, { merge: true });
+    }
+  } catch (e) { console.error("initGracePeriod error:", e); }
+}
+
+async function buildTracker() {
+  if (currentUser.isAdmin) {
+    document.getElementById("tracker-body").innerHTML = '<p class="text-sm text-muted">Admin view — use Reports to manage trackers.</p>';
+    return;
+  }
+  await initGracePeriod();
+
+  let trackerData = {};
+  try {
+    const ref = doc(db, "trackers", currentUser.uid);
+    const snap = await getDoc(ref);
+    if (snap.exists()) trackerData = snap.data();
+  } catch {}
+
+  const completed = WEEKS.filter(w => trackerData[w.id]).length;
+  const pct = Math.round((completed / 12) * 100);
+
+  const headerEl = document.getElementById("tracker-header");
+  headerEl.innerHTML = `
+    <div class="flex-between mb-8">
+      <span class="text-sm" style="font-weight:600;">${completed}/12 weeks complete</span>
+      <span class="text-sm text-muted">${pct}%</span>
+    </div>
+    <div class="tracker-progress"><div class="tracker-progress-bar" style="width:${pct}%"></div></div>
+  `;
+
+  let html = "";
+  for (const month of MONTHS) {
+    const monthWeeks = WEEKS.filter(w => w.month === month);
+    html += `<div class="tracker-month-group">
+      <div class="tracker-month-title">${month}</div>
+      <div class="tracker-month-req">${MONTH_REQS[month]}</div>`;
+    for (const w of monthWeeks) {
+      const checked = trackerData[w.id] ? "checked" : "";
+      const grace = GRACE_WEEKS.includes(w.id) ? ' <span style="font-size:11px;color:var(--text-muted);">(grace)</span>' : "";
+      html += `<div class="tracker-week ${checked}" data-week="${w.id}" onclick="toggleCheck('${w.id}')">
+        <div>
+          <div class="tracker-week-label">${w.label}${grace}</div>
+          <div class="tracker-week-dates">${w.dates}</div>
+        </div>
+        <div class="tracker-check">${trackerData[w.id] ? "✓" : ""}</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  document.getElementById("tracker-body").innerHTML = html;
+}
+
+async function toggleCheck(weekId) {
+  if (currentUser.isAdmin) return;
+  try {
+    const ref = doc(db, "trackers", currentUser.uid);
+    const snap = await getDoc(ref);
+    let data = snap.exists() ? snap.data() : { uid: currentUser.uid };
+    data[weekId] = !data[weekId];
+    await setDoc(ref, data, { merge: true });
+    await checkAndAwardStreak(data);
+    await checkAllStar(data);
+    buildTracker();
+  } catch (e) { showToast("Failed to update tracker."); }
+}
+
+async function checkAndAwardStreak(data) {
+  // 4 consecutive checked weeks → +25 pts (once per streak start)
+  let consecutive = 0;
+  let streakAwarded = data._streakAwarded || [];
+  for (let i = 0; i < WEEKS.length; i++) {
+    if (data[WEEKS[i].id]) {
+      consecutive++;
+      if (consecutive >= 4) {
+        const streakKey = "streak_" + (i - 3);
+        if (!streakAwarded.includes(streakKey)) {
+          streakAwarded.push(streakKey);
+          // Award points
+          const regRef = doc(db, "wac_registry", currentUser.uid);
+          await updateDoc(regRef, { points: increment(PTS_STREAK) });
+          currentUser.points = (currentUser.points || 0) + PTS_STREAK;
+          lsSet("wac_session", currentUser);
+          showToast(`🔥 4-week streak! +${PTS_STREAK} pts`);
+        }
+      }
+    } else {
+      consecutive = 0;
+    }
+  }
+  // Save streak tracking
+  const ref = doc(db, "trackers", currentUser.uid);
+  await setDoc(ref, { _streakAwarded: streakAwarded }, { merge: true });
+}
+
+async function checkAllStar(data) {
+  const allDone = WEEKS.every(w => data[w.id]);
+  if (allDone) {
+    const regRef = doc(db, "wac_registry", currentUser.uid);
+    await updateDoc(regRef, { isAllStar: true });
+    currentUser.isAllStar = true;
+    lsSet("wac_session", currentUser);
+  }
+}
+
+// ==============================
+// LEADERBOARD
+// ==============================
+async function loadLeaderboard() {
+  try {
+    let members = [];
+    // Try ordered query first
+    try {
+      const q = query(collection(db, "wac_registry"), orderBy("points", "desc"));
+      const snap = await getDocs(q);
+      snap.forEach(d => members.push({ id: d.id, ...d.data() }));
+    } catch {
+      // Fallback: unordered + client sort
+      const snap = await getDocs(collection(db, "wac_registry"));
+      snap.forEach(d => members.push({ id: d.id, ...d.data() }));
+      members.sort((a, b) => (b.points || 0) - (a.points || 0));
+    }
+
+    // Filter to current round + founders
+    members = members.filter(m => (m.rounds || []).includes(CURRENT_ROUND) || m.isFounder);
+
+    // Inject admin as synthetic entry
+    const adminEntry = {
+      name: "Nate Templeton",
+      website: "",
+      points: 0,
+      totalPosts: 0,
+      isFounder: true,
+      isVIP: false,
+      isAllStar: false,
+      _isAdmin: true
+    };
+    // Only add if not already in list
+    if (!members.find(m => m.email === ADMIN_EMAIL)) {
+      members.push(adminEntry);
+      members.sort((a, b) => (b.points || 0) - (a.points || 0));
+    }
+
+    const el = document.getElementById("leaderboard-list");
+    el.innerHTML = members.map((m, i) => {
+      const rank = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
+      const badges = [];
+      if (m.isAllStar) badges.push("⭐");
+      if (m.isFounder) badges.push("🏅");
+      if (m.isVIP) badges.push("⚡");
+      const milestone = getMilestoneBadges(m.totalPosts || 0);
+      const initials = getInitials(m.name);
+      const websiteLink = m.website ? `<a href="${esc(m.website)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--gold);">${esc(m.website)}</a>` : "";
+      return `<div class="lb-row">
+        <div class="lb-rank">${rank}</div>
+        <div class="lb-avatar">${initials}</div>
+        <div class="lb-info">
+          <div class="lb-name">${esc(m.name)} ${badges.join("")}${milestone}</div>
+          ${websiteLink}
+        </div>
+        <div class="lb-pts">${m.points || 0}</div>
+      </div>`;
+    }).join("");
+  } catch (e) { console.error("loadLeaderboard error:", e); }
+}
+
+// ==============================
+// DIRECTORY / MEMBERS
+// ==============================
+async function getRegistryForCurrentRound() {
+  const members = [];
+  try {
+    const snap = await getDocs(collection(db, "wac_registry"));
+    snap.forEach(d => {
+      const data = d.data();
+      if ((data.rounds || []).includes(CURRENT_ROUND) || data.isFounder) {
+        members.push({ id: d.id, ...data });
+      }
+    });
+  } catch (e) { console.error("getRegistryForCurrentRound error:", e); }
+  return members;
+}
+
+async function loadDirectory() {
+  if (currentUser.isAdmin) {
+    await renderAdminRegistry();
+  }
+  await renderMemberGrid();
+}
+
+async function renderAdminRegistry() {
+  try {
+    const snap = await getDocs(collection(db, "wac_registry"));
+    const all = [];
+    snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+    all.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+    const el = document.getElementById("admin-registry");
+    el.innerHTML = `<div class="card"><div class="card-title">Full Registry (${all.length})</div>` +
+      all.map(m => {
+        const rounds = (m.rounds || []).join(", ");
+        const flags = [];
+        if (m.isFounder) flags.push("🏅 Founder");
+        if (m.isVIP) flags.push("⚡ VIP");
+        if (m.isAllStar) flags.push("⭐ All-Star");
+        return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div style="font-weight:600;">${esc(m.name)}</div>
+          <div class="text-sm text-muted">${esc(m.email)} · ${rounds} ${flags.join(" ")}</div>
+          <div class="admin-member-controls">
+            <button class="${(m.rounds||[]).includes('R1')?'active-flag':''}" onclick="toggleRegistryRound('${m.id}','R1')">R1</button>
+            <button class="${(m.rounds||[]).includes('R2')?'active-flag':''}" onclick="toggleRegistryRound('${m.id}','R2')">R2</button>
+            <button class="${(m.rounds||[]).includes('R3')?'active-flag':''}" onclick="toggleRegistryRound('${m.id}','R3')">R3</button>
+            <button class="${m.isFounder?'active-flag':''}" onclick="toggleRegistryFlag('${m.id}','isFounder')">Founder</button>
+            <button class="${m.isVIP?'active-flag':''}" onclick="toggleRegistryFlag('${m.id}','isVIP')">VIP</button>
+            <button class="${m.isAllStar?'active-flag':''}" onclick="toggleRegistryFlag('${m.id}','isAllStar')">All-Star</button>
+            <button onclick="editRegistryEmail('${m.id}','${esc(m.email)}')">✏️ Email</button>
+            <button onclick="removeRegistryMember('${m.id}','${esc(m.name)}')" style="color:var(--danger);">✕ Remove</button>
+          </div>
+        </div>`;
+      }).join("") + `</div>`;
+  } catch (e) { console.error("renderAdminRegistry error:", e); }
+}
+
+async function renderMemberGrid() {
+  const members = await getRegistryForCurrentRound();
+  _memberMap = {};
+  members.forEach(m => { _memberMap[m.id] = m; });
+  members.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+  const el = document.getElementById("member-grid");
+  el.innerHTML = members.map(m => {
+    const initials = getInitials(m.name);
+    const websiteLink = m.website ? `<a href="${esc(m.website)}" target="_blank" rel="noopener" class="member-card-link" onclick="event.stopPropagation()">${esc(m.website)}</a>` : "";
+    return `<div class="member-card" data-member-key="${m.id}" onclick="handleMemberCardClick(this)">
+      <div class="member-card-avatar">${initials}</div>
+      <div class="member-card-name">${esc(m.name)}</div>
+      <div class="member-card-biz">${esc(m.business || "")}</div>
+      ${websiteLink}
+    </div>`;
+  }).join("");
+}
+
+function filterMembers() {
+  const q = document.getElementById("member-search").value.toLowerCase();
+  document.querySelectorAll(".member-card").forEach(card => {
+    const name = card.querySelector(".member-card-name")?.textContent.toLowerCase() || "";
+    card.style.display = name.includes(q) ? "" : "none";
+  });
+}
+
+// ==============================
+// MEMBER PROFILE MODAL
+// ==============================
+function handleMemberCardClick(card) {
+  const key = card.getAttribute("data-member-key");
+  const member = _memberMap[key];
+  if (member) openMemberProfile(member);
+}
+
+async function openMemberProfile(member) {
+  const initials = getInitials(member.name);
+  const badges = [];
+  if (member.isAllStar) badges.push("⭐ All-Star");
+  if (member.isFounder) badges.push("🏅 Founder");
+  if (member.isVIP) badges.push("⚡ VIP");
+  const milestone = getMilestoneBadges(member.totalPosts || 0);
+
+  // Load tracker data
+  let trackerData = {};
+  try {
+    const snap = await getDoc(doc(db, "trackers", member.id));
+    if (snap.exists()) trackerData = snap.data();
+  } catch {}
+  const weeksCompleted = WEEKS.filter(w => trackerData[w.id]).length;
+
+  const dots = WEEKS.map(w => `<div class="member-dot ${trackerData[w.id] ? 'done' : ''}"></div>`).join("");
+  const websiteBtn = member.website ? `<a href="${esc(member.website)}" target="_blank" rel="noopener" class="btn btn-gold btn-block btn-sm mt-16">Visit Website</a>` : "";
+
+  document.getElementById("member-modal-content").innerHTML = `
+    <div class="member-profile-avatar">${initials}</div>
+    <div class="member-profile-name">${esc(member.name)}</div>
+    <div class="member-profile-biz">${esc(member.business || "")}</div>
+    <div class="member-profile-badges">${badges.join(" · ")} ${milestone}</div>
+    <div class="member-stats-grid">
+      <div class="member-stat"><div class="member-stat-num">${member.points || 0}</div><div class="member-stat-label">Points</div></div>
+      <div class="member-stat"><div class="member-stat-num">${member.totalPosts || 0}</div><div class="member-stat-label">Updates</div></div>
+      <div class="member-stat"><div class="member-stat-num">${weeksCompleted}</div><div class="member-stat-label">Weeks</div></div>
+    </div>
+    <div class="member-dot-grid">${dots}</div>
+    ${websiteBtn}
+  `;
+  document.getElementById("member-modal-overlay").classList.add("open");
+}
+
+function closeMemberModal() {
+  document.getElementById("member-modal-overlay").classList.remove("open");
+}
+function closeMemberModalDirect(e) {
+  if (e.target === document.getElementById("member-modal-overlay")) closeMemberModal();
+}
+
+// ==============================
+// REPORTS
+// ==============================
+async function loadTrackerReport() {
+  try {
+    const members = await getRegistryForCurrentRound();
+    // Load all trackers
+    const trackerSnap = await getDocs(collection(db, "trackers"));
+    const trackerMap = {};
+    trackerSnap.forEach(d => { trackerMap[d.id] = d.data(); });
+
+    let rows = members.map(m => {
+      const t = trackerMap[m.id] || {};
+      const completed = WEEKS.filter(w => t[w.id]).length;
+      return { ...m, tracker: t, completed };
+    });
+    rows.sort((a, b) => b.completed - a.completed || (b.points || 0) - (a.points || 0));
+
+    const el = document.getElementById("report-table-wrap");
+    let html = `<table class="report-table"><thead><tr><th>Member</th>`;
+    WEEKS.forEach((w, i) => { html += `<th>W${i + 1}</th>`; });
+    html += `<th>Done</th><th>Pts</th>`;
+    if (currentUser.isAdmin) html += `<th></th>`;
+    html += `</tr></thead><tbody>`;
+    rows.forEach(r => {
+      html += `<tr><td style="font-weight:600;font-size:12px;">${esc(r.name)}</td>`;
+      WEEKS.forEach(w => {
+        html += `<td>${r.tracker[w.id] ? "✅" : "⬜"}</td>`;
+      });
+      html += `<td style="font-weight:700;">${r.completed}/12</td>`;
+      html += `<td style="font-weight:700;color:var(--gold);">${r.points || 0}</td>`;
+      if (currentUser.isAdmin) {
+        html += `<td><button onclick="openAdminTrackerEditor('${r.id}','${esc(r.name)}')" style="background:none;border:none;cursor:pointer;">✏️</button></td>`;
+      }
+      html += `</tr>`;
+    });
+    html += `</tbody></table>`;
+    el.innerHTML = html;
+
+    // Engagement report
+    await renderEngagementReport(members);
+  } catch (e) { console.error("loadTrackerReport error:", e); }
+}
+
+async function renderEngagementReport(members) {
+  try {
+    const snap = await getDocs(collection(db, "engagements"));
+    const engs = [];
+    snap.forEach(d => engs.push(d.data()));
+
+    const byAuthor = {};
+    engs.forEach(e => {
+      if (!byAuthor[e.author]) byAuthor[e.author] = 0;
+      byAuthor[e.author]++;
+    });
+
+    const sorted = Object.entries(byAuthor).sort((a, b) => b[1] - a[1]);
+    const el = document.getElementById("engagement-report");
+    if (!sorted.length) { el.innerHTML = '<p class="text-sm text-muted">No engagement activity yet.</p>'; return; }
+    el.innerHTML = sorted.map(([name, count]) =>
+      `<div class="flex-between" style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <span>${esc(name)}</span><span style="font-weight:700;color:var(--gold);">${count}</span>
+      </div>`
+    ).join("");
+  } catch (e) { console.error("renderEngagementReport error:", e); }
+}
+
+function exportCSV() {
+  const table = document.querySelector(".report-table");
+  if (!table) return;
+  let csv = "";
+  table.querySelectorAll("tr").forEach(row => {
+    const cells = [];
+    row.querySelectorAll("th, td").forEach(cell => {
+      cells.push('"' + cell.textContent.replace(/"/g, '""') + '"');
+    });
+    csv += cells.join(",") + "\n";
+  });
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "wac-report.csv";
+  a.click();
+}
+
+// ==============================
+// ADMIN TRACKER EDITOR
+// ==============================
+let _editingTrackerUid = null;
+
+async function openAdminTrackerEditor(uid, name) {
+  _editingTrackerUid = uid;
+  let data = {};
+  try {
+    const snap = await getDoc(doc(db, "trackers", uid));
+    if (snap.exists()) data = snap.data();
+  } catch {}
+  renderAdminTrackerModal(name, data);
+  document.getElementById("admin-tracker-overlay").classList.add("open");
+}
+
+function renderAdminTrackerModal(name, data) {
+  let html = `<h3 style="font-size:18px;font-weight:700;margin-bottom:16px;">Edit Tracker: ${esc(name)}</h3>`;
+  WEEKS.forEach(w => {
+    const checked = data[w.id] ? "checked" : "";
+    const grace = GRACE_WEEKS.includes(w.id) ? " (grace)" : "";
+    html += `<label style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;cursor:pointer;">
+      <input type="checkbox" ${checked} onchange="adminToggleCheck('${w.id}', this.checked)" />
+      <span>${w.label} — ${w.dates}${grace}</span>
+    </label>`;
+  });
+  document.getElementById("admin-tracker-content").innerHTML = html;
+}
+
+async function adminToggleCheck(weekId, val) {
+  if (!_editingTrackerUid) return;
+  try {
+    const ref = doc(db, "trackers", _editingTrackerUid);
+    await setDoc(ref, { uid: _editingTrackerUid, [weekId]: val }, { merge: true });
+  } catch (e) { showToast("Failed to save."); }
+}
+
+function closeTrackerModal() {
+  document.getElementById("admin-tracker-overlay").classList.remove("open");
+  _editingTrackerUid = null;
+  loadTrackerReport();
+}
+function closeTrackerModalDirect(e) {
+  if (e.target === document.getElementById("admin-tracker-overlay")) closeTrackerModal();
+}
+
+// ==============================
+// ADMIN REGISTRY CONTROLS
+// ==============================
+async function toggleRegistryRound(docId, round) {
+  try {
+    const ref = doc(db, "wac_registry", docId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data();
+    let rounds = data.rounds || [];
+    if (rounds.includes(round)) { rounds = rounds.filter(r => r !== round); }
+    else { rounds.push(round); }
+    await updateDoc(ref, { rounds });
+    showToast(`Toggled ${round}`);
+    loadDirectory();
+  } catch { showToast("Failed to update."); }
+}
+
+async function toggleRegistryFlag(docId, flag) {
+  try {
+    const ref = doc(db, "wac_registry", docId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data();
+    await updateDoc(ref, { [flag]: !data[flag] });
+    showToast(`Toggled ${flag}`);
+    loadDirectory();
+  } catch { showToast("Failed to update."); }
+}
+
+async function removeRegistryMember(docId, name) {
+  if (!confirm(`Remove ${name} from registry?`)) return;
+  try {
+    await deleteDoc(doc(db, "wac_registry", docId));
+    showToast(`${name} removed.`);
+    loadDirectory();
+  } catch { showToast("Failed to remove."); }
+}
+
+async function editRegistryEmail(docId, currentEmail) {
+  const newEmail = prompt("New email:", currentEmail);
+  if (!newEmail || newEmail === currentEmail) return;
+  try {
+    await updateDoc(doc(db, "wac_registry", docId), { email: newEmail });
+    showToast("Email updated.");
+    loadDirectory();
+  } catch { showToast("Failed to update email."); }
+}
+
+// ==============================
+// ADMIN CREATE MEMBER
+// ==============================
+function generatePassword() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let pass = "";
+  for (let i = 0; i < 10; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+  return pass;
+}
+
+function initPasswordField() {
+  const el = document.getElementById("cm-pass");
+  if (el) el.value = generatePassword();
+}
+
+async function createMemberAccount() {
+  const name = document.getElementById("cm-name").value.trim();
+  const email = document.getElementById("cm-email").value.trim();
+  const website = document.getElementById("cm-website").value.trim();
+  const biz = document.getElementById("cm-biz").value.trim();
+  const type = document.getElementById("cm-type").value.trim();
+  const pass = document.getElementById("cm-pass").value;
+  const resultEl = document.getElementById("cm-result");
+
+  if (!name || !email || !pass) { showToast("Name, email, and password required."); return; }
+
+  const rounds = [];
+  if (document.getElementById("cm-r1").checked) rounds.push("R1");
+  if (document.getElementById("cm-r2").checked) rounds.push("R2");
+  if (document.getElementById("cm-r3").checked) rounds.push("R3");
+  const isFounder = document.getElementById("cm-founder").checked;
+  const isVIP = document.getElementById("cm-vip").checked;
+
+  try {
+    // Step 1: Create Firebase Auth user via REST API (without signing out admin)
+    const apiKey = FIREBASE_CONFIG.apiKey;
+    const resp = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password: pass, returnSecureToken: true })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const uid = data.localId;
+
+    // Step 2: Create wac_registry doc
+    await addRegistryMember(uid, name, email, website, biz, type, rounds, isFounder, isVIP);
+
+    // Step 3: Show success
+    resultEl.innerHTML = `<div class="card" style="background:#f0fdf4;border-color:#86efac;">
+      <div style="font-weight:700;color:var(--success);margin-bottom:8px;">✅ Account Created</div>
+      <div class="text-sm"><strong>Name:</strong> ${esc(name)}</div>
+      <div class="text-sm"><strong>Email:</strong> ${esc(email)}</div>
+      <div class="text-sm"><strong>Password:</strong> ${esc(pass)}</div>
+      <button class="btn btn-outline btn-sm mt-8" onclick="copyWelcomeEmail('${esc(name)}','${esc(email)}','${esc(pass)}')">📋 Copy Welcome Email to Clipboard</button>
+    </div>`;
+
+    // Reset form
+    document.getElementById("cm-name").value = "";
+    document.getElementById("cm-email").value = "";
+    document.getElementById("cm-website").value = "";
+    document.getElementById("cm-biz").value = "";
+    document.getElementById("cm-type").value = "";
+    initPasswordField();
+    loadDirectory();
+  } catch (e) {
+    console.error("createMemberAccount error:", e);
+    resultEl.innerHTML = `<div style="color:var(--danger);font-size:13px;margin-top:8px;">❌ ${esc(e.message)}</div>`;
+    logPlatformError("createMemberAccount", e.message);
+  }
+}
+
+async function addRegistryMember(uid, name, email, website, biz, type, rounds, isFounder, isVIP) {
+  await setDoc(doc(db, "wac_registry", uid), {
+    name, email, uid, website: website || "", business: biz || "", type: type || "",
+    rounds, points: 0, totalPosts: 0,
+    isFounder, isVIP, isAllStar: false,
+    addedAt: Date.now()
+  });
+}
+
+function copyWelcomeEmail(name, email, pass) {
+  const text = `Hey ${name},
+
+You're in! Your WAC account is set up and ready to go.
+
+Here's what to do next:
+
+1. Log in at https://app.joinwac.com
+2. Add your website URL in your Profile
+3. Submit your first update when Week 1 starts
+
+Email: ${email}
+Temporary Password: ${pass}
+
+Please change your password after your first login under Profile.
+
+See you inside,
+Nate`;
+  navigator.clipboard.writeText(text).then(() => showToast("Welcome email copied!")).catch(() => showToast("Failed to copy."));
+}
+
+// ==============================
+// PROFILE
+// ==============================
+function loadProfile() {
+  renderProfileHero();
+  if (!currentUser.isAdmin) {
+    document.getElementById("prof-name").value = currentUser.name || "";
+    document.getElementById("prof-biz").value = currentUser.business || "";
+    document.getElementById("prof-type").value = currentUser.type || "";
+    document.getElementById("prof-website").value = currentUser.website || "";
+  } else {
+    document.getElementById("prof-name").value = "Nate Templeton";
+    document.getElementById("prof-biz").value = "";
+    document.getElementById("prof-type").value = "";
+    document.getElementById("prof-website").value = "";
+  }
+}
+
+function renderProfileHero() {
+  const initials = getInitials(currentUser.name);
+  const badges = [];
+  if (currentUser.isAllStar) badges.push("⭐ All-Star");
+  if (currentUser.isFounder) badges.push("🏅 Founder");
+  if (currentUser.isVIP) badges.push("⚡ VIP");
+  if (currentUser.isAdmin) badges.push("👑 Admin");
+  const milestone = getMilestoneBadges(currentUser.totalPosts || 0);
+  const subtitle = currentUser.isAdmin ? "Founder of WAC" : (currentUser.business || "");
+
+  document.getElementById("profile-hero").innerHTML = `
+    <div class="profile-avatar">${initials}</div>
+    <div class="profile-name">${esc(currentUser.name)}</div>
+    <div class="profile-subtitle">${esc(subtitle)}</div>
+    <div class="profile-badges">${badges.join(" · ")} ${milestone}</div>
+    <div class="profile-stats">
+      <div><div class="profile-stat-num">${currentUser.points || 0}</div><div class="profile-stat-label">Points</div></div>
+      <div><div class="profile-stat-num">${currentUser.totalPosts || 0}</div><div class="profile-stat-label">Updates</div></div>
+    </div>
+  `;
+}
+
+async function saveProfile() {
+  if (currentUser.isAdmin) { showToast("Admin profile is read-only."); return; }
+  const biz = document.getElementById("prof-biz").value.trim();
+  const type = document.getElementById("prof-type").value.trim();
+  const website = document.getElementById("prof-website").value.trim();
+  try {
+    await updateDoc(doc(db, "wac_registry", currentUser.uid), { business: biz, type, website });
+    currentUser.business = biz;
+    currentUser.type = type;
+    currentUser.website = website;
+    lsSet("wac_session", currentUser);
+    renderProfileHero();
+    showToast("Profile saved!");
+  } catch { showToast("Failed to save profile."); }
+}
+
+function showFirebaseSetupCard() {
+  if (!currentUser.isAdmin) return;
+  const el = document.getElementById("firebase-setup-content");
+  el.innerHTML = `<p class="text-sm text-muted">Firebase project: wac-26<br/>Admin: ${ADMIN_EMAIL}<br/>Round: ${CURRENT_ROUND}</p>`;
+}
+
+// ==============================
+// ROUND END
+// ==============================
+function isRoundOver() { return Date.now() > ROUND_END_TS; }
+
+function checkRoundEnd() {
+  if (!isRoundOver()) return;
+  const banner = document.getElementById("round-ended-banner");
+  if (banner) banner.style.display = "flex";
+  document.querySelectorAll('#page-submit .btn-post, #eng-submit-btn').forEach(btn => {
+    btn.disabled = true;
+    btn.textContent = "Round Ended";
+    btn.style.opacity = "0.5";
+  });
+}
+
+// ==============================
+// WELCOME MODAL
+// ==============================
+function showWelcomeModal() {
+  const key = `wac_welcomed_${currentUser.uid}`;
+  if (localStorage.getItem(key)) return;
+  document.getElementById("welcome-overlay").classList.add("open");
+}
+
+function closeWelcomeModal() {
+  const key = `wac_welcomed_${currentUser.uid}`;
+  localStorage.setItem(key, "1");
+  document.getElementById("welcome-overlay").classList.remove("open");
+}
+
+// ==============================
+// PUSH NOTIFICATIONS
+// ==============================
+function initPushNotifications() {
+  if (!("Notification" in window)) return;
+  if (Notification.permission === "granted") {
+    schedulePushReminders();
+    const card = document.getElementById("push-notif-card");
+    if (card) card.style.display = "none";
+    return;
+  }
+  if (Notification.permission !== "denied") {
+    document.getElementById("push-notif-card").style.display = "flex";
+  }
+}
+
+function requestPushPermission() {
+  const btn = document.getElementById("push-enable-btn");
+  btn.disabled = true;
+  Notification.requestPermission().then(perm => {
+    if (perm === "granted") {
+      document.getElementById("push-notif-card").style.display = "none";
+      schedulePushReminders();
+      showToast("Reminders enabled! 🔔");
+    } else {
+      showToast("Notification permission denied.");
+      btn.disabled = false;
+    }
+  });
+}
+
+function schedulePushReminders() {
+  WEEK_SCHEDULE.forEach(([start, end], i) => {
+    const reminderTime = end - (24 * 60 * 60 * 1000);
+    const delay = reminderTime - Date.now();
+    if (delay <= 0 || delay > 2147483647) return;
+    setTimeout(() => {
+      if (Notification.permission === "granted") {
+        const w = WEEKS[i];
+        new Notification("⏰ WAC Deadline Tomorrow", {
+          body: `${w.month} ${w.label} ends tomorrow — don't forget to submit your update!`,
+          icon: "./icon-192.png",
+          tag: "wac-reminder-w" + i
+        });
+      }
+    }, delay);
+  });
+}
+
+// ==============================
+// PWA
+// ==============================
+let _deferredPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  _deferredPrompt = e;
+  document.getElementById("install-pwa-card").style.display = "flex";
+});
+
+function installPWA() {
+  if (!_deferredPrompt) return;
+  _deferredPrompt.prompt();
+  _deferredPrompt.userChoice.then(choice => {
+    if (choice.outcome === "accepted") {
+      document.getElementById("install-pwa-card").style.display = "none";
+    }
+    _deferredPrompt = null;
+  });
+}
+
+// Service worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+// ==============================
+// EXPOSE GLOBALS
+// ==============================
+window.handleLogin = handleLogin;
+window.handleLogout = handleLogout;
+window.handleForgotPassword = handleForgotPassword;
+window.changePassword = changePassword;
+window.togglePassVisibility = togglePassVisibility;
+window.navTo = navTo;
+window.submitPost = submitPost;
+window.giveProps = giveProps;
+window.confirmProps = confirmProps;
+window.togglePropsList = togglePropsList;
+window.toggleLike = toggleLike;
+window.deletePost = deletePost;
+window.submitAnnouncement = submitAnnouncement;
+window.deleteAnn = deleteAnn;
+window.submitResource = submitResource;
+window.setFilter = setFilter;
+window.openResModal = openResModal;
+window.closeResModal = closeResModal;
+window.closeResModalDirect = closeResModalDirect;
+window.selectFormat = selectFormat;
+window.handleScreenshotSelect = handleScreenshotSelect;
+window.clearScreenshot = clearScreenshot;
+window.submitUpdate = submitUpdate;
+window.selectEngType = selectEngType;
+window.submitEngagement = submitEngagement;
+window.deleteSubmission = deleteSubmission;
+window.toggleCheck = toggleCheck;
+window.handleMemberCardClick = handleMemberCardClick;
+window.closeMemberModal = closeMemberModal;
+window.closeMemberModalDirect = closeMemberModalDirect;
+window.openAdminTrackerEditor = openAdminTrackerEditor;
+window.adminToggleCheck = adminToggleCheck;
+window.closeTrackerModal = closeTrackerModal;
+window.closeTrackerModalDirect = closeTrackerModalDirect;
+window.toggleRegistryRound = toggleRegistryRound;
+window.toggleRegistryFlag = toggleRegistryFlag;
+window.removeRegistryMember = removeRegistryMember;
+window.editRegistryEmail = editRegistryEmail;
+window.createMemberAccount = createMemberAccount;
+window.initPasswordField = initPasswordField;
+window.copyWelcomeEmail = copyWelcomeEmail;
+window.saveProfile = saveProfile;
+window.closeWelcomeModal = closeWelcomeModal;
+window.requestPushPermission = requestPushPermission;
+window.installPWA = installPWA;
+window.exportCSV = exportCSV;
+window.filterMembers = filterMembers;
+window.loadLeaderboard = loadLeaderboard;
+
+// ==============================
+// INIT
+// ==============================
+initFirebase();
+</script>
+</body>
+</html>
