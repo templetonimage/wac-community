@@ -1637,6 +1637,11 @@ async function resolveUser(user) {
 }
 
 // ==============================
+// INIT FIREBASE (must run before auth observer)
+// ==============================
+initFirebase();
+
+// ==============================
 // AUTH STATE OBSERVER
 // ==============================
 onAuthStateChanged(auth, async (user) => {
@@ -3097,9 +3102,8 @@ window.filterMembers = filterMembers;
 window.loadLeaderboard = loadLeaderboard;
 
 // ==============================
-// INIT
+// INIT COMPLETE
 // ==============================
-initFirebase();
 </script>
 </body>
 </html>
