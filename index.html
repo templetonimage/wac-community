@@ -1215,7 +1215,6 @@ textarea.form-input { resize: vertical; min-height: 80px; }
               <button class="eng-type-btn" onclick="selectEngType(this,'Shared')">📤 Shared</button>
               <button class="eng-type-btn" onclick="selectEngType(this,'Left Feedback')">📝 Left Feedback</button>
               <button class="eng-type-btn" onclick="selectEngType(this,'Reviewed')">⭐ Reviewed</button>
-              <button class="eng-type-btn" onclick="selectEngType(this,'Screenshotted')">📷 Screenshotted</button>
             </div>
           </div>
           <div class="form-group">
@@ -1246,7 +1245,6 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <h4>How Points Work</h4>
         <div class="points-row"><span>On-time update</span><span class="pts-val">+10 pts</span></div>
         <div class="points-row"><span>Late update (within 24h)</span><span class="pts-val">+5 pts</span></div>
-        <div class="points-row"><span>Screenshot bonus</span><span class="pts-val">+2 pts</span></div>
         <div class="points-row"><span>Blog Post or New Page</span><span class="pts-val">+2 pts</span></div>
         <div class="points-row"><span>Engagement (per member site)</span><span class="pts-val">+2 pts</span></div>
         <div class="points-row"><span>Max engagements/week</span><span class="pts-val">5</span></div>
@@ -2059,7 +2057,7 @@ async function submitPost() {
   try {
     await addDoc(collection(db, "posts"), {
       author: currentUser.name,
-      authorUid: currentUser.uid,
+      authorUid: currentUser.uid || currentUser.email,
       text,
       url: url || "",
       props: [],
@@ -2070,7 +2068,10 @@ async function submitPost() {
     document.getElementById("feed-url").value = "";
     showToast("Posted!");
     loadFeed();
-  } catch (e) { showToast("Failed to post."); }
+  } catch (e) {
+    console.error("submitPost error:", e);
+    showToast("Failed to post: " + (e.code || e.message));
+  }
 }
 
 async function loadFeed() {
@@ -2172,14 +2173,17 @@ async function submitAnnouncement() {
     await addDoc(collection(db, "announcements"), {
       title, body,
       author: currentUser.name,
-      authorUid: currentUser.uid,
+      authorUid: currentUser.uid || currentUser.email,
       timestamp: Date.now()
     });
     document.getElementById("ann-title").value = "";
     document.getElementById("ann-body").value = "";
     showToast("Announcement posted!");
     loadAnnouncements();
-  } catch { showToast("Failed to post announcement."); }
+  } catch (e) {
+    console.error("submitAnnouncement error:", e);
+    showToast("Failed to post: " + (e.code || e.message));
+  }
 }
 
 async function loadAnnouncements() {
@@ -2242,8 +2246,14 @@ async function submitResource() {
 
 async function loadResources() {
   try {
-    const q = query(collection(db, "resources"), orderBy("timestamp", "desc"));
-    const snap = await getDocs(q);
+    let snap;
+    try {
+      const q = query(collection(db, "resources"), orderBy("timestamp", "desc"));
+      snap = await getDocs(q);
+    } catch (indexErr) {
+      // Index may not exist yet — fall back to unordered fetch
+      snap = await getDocs(collection(db, "resources"));
+    }
     _allResources = [];
     snap.forEach(d => _allResources.push({ id: d.id, ...d.data() }));
     // If empty and admin, show seed prompt
@@ -2602,7 +2612,7 @@ async function deleteSubmission(id, pts) {
 // TRACKER
 // ==============================
 async function initGracePeriod() {
-  if (currentUser.isAdmin) return;
+  if (currentUser.isAdmin) return; // admin uses test tracker, no grace period needed
   try {
     const ref = doc(db, "trackers", currentUser.uid);
     const snap = await getDoc(ref);
@@ -2618,15 +2628,12 @@ async function initGracePeriod() {
 }
 
 async function buildTracker() {
-  if (currentUser.isAdmin) {
-    document.getElementById("tracker-body").innerHTML = '<p class="text-sm text-muted">Admin view — use Reports to manage trackers.</p>';
-    return;
-  }
   await initGracePeriod();
 
   let trackerData = {};
+  const trackerUid = currentUser.isAdmin ? "admin-test" : currentUser.uid;
   try {
-    const ref = doc(db, "trackers", currentUser.uid);
+    const ref = doc(db, "trackers", trackerUid);
     const snap = await getDoc(ref);
     if (snap.exists()) trackerData = snap.data();
   } catch {}
@@ -2641,6 +2648,7 @@ async function buildTracker() {
       <span class="text-sm text-muted">${pct}%</span>
     </div>
     <div class="tracker-progress"><div class="tracker-progress-bar" style="width:${pct}%"></div></div>
+    ${currentUser.isAdmin ? `<div style="font-size:11px;color:var(--text-muted);margin-top:6px;padding:4px 8px;background:var(--surface2);border-radius:4px;">Admin test tracker — use Reports → All-Star Progress to manage member trackers</div>` : ""}
   `;
 
   let html = "";
@@ -2666,14 +2674,14 @@ async function buildTracker() {
 }
 
 async function toggleCheck(weekId) {
-  if (currentUser.isAdmin) return;
+  const trackerUid = currentUser.isAdmin ? "admin-test" : currentUser.uid;
   try {
-    const ref = doc(db, "trackers", currentUser.uid);
+    const ref = doc(db, "trackers", trackerUid);
     const snap = await getDoc(ref);
-    let data = snap.exists() ? snap.data() : { uid: currentUser.uid };
+    let data = snap.exists() ? snap.data() : { uid: trackerUid };
     data[weekId] = !data[weekId];
     await setDoc(ref, data, { merge: true });
-    await checkAllStar(data);
+    if (!currentUser.isAdmin) await checkAllStar(data);
     buildTracker();
   } catch (e) { showToast("Failed to update tracker."); }
 }
@@ -3203,19 +3211,11 @@ Nate`;
 // ==============================
 function loadProfile() {
   renderProfileHero();
-  if (!currentUser.isAdmin) {
-    document.getElementById("prof-name").value = currentUser.name || "";
-    document.getElementById("prof-biz").value = currentUser.business || "";
-    document.getElementById("prof-type").value = currentUser.type || "";
-    document.getElementById("prof-ig").value = currentUser.ig || "";
-    document.getElementById("prof-website").value = currentUser.website || "";
-  } else {
-    document.getElementById("prof-name").value = "Nate Templeton";
-    document.getElementById("prof-biz").value = "";
-    document.getElementById("prof-type").value = "";
-    document.getElementById("prof-ig").value = "";
-    document.getElementById("prof-website").value = "";
-  }
+  document.getElementById("prof-name").value = currentUser.name || "";
+  document.getElementById("prof-biz").value = currentUser.business || "";
+  document.getElementById("prof-type").value = currentUser.type || "";
+  document.getElementById("prof-ig").value = currentUser.ig || "";
+  document.getElementById("prof-website").value = currentUser.website || "";
 }
 
 function renderProfileHero() {
@@ -3227,7 +3227,7 @@ function renderProfileHero() {
   if (currentUser.isAdmin) badges.push("👑 Admin");
   if (userHasPro() && !currentUser.isAdmin) badges.push("★ Pro");
   const milestone = getMilestoneBadges(currentUser.totalPosts || 0);
-  const subtitle = currentUser.isAdmin ? "Founder of WAC" : (currentUser.business || "");
+  const subtitle = currentUser.isAdmin ? (currentUser.business || "Founder of WAC") : (currentUser.business || "");
 
   document.getElementById("profile-hero").innerHTML = `
     <div class="profile-avatar">${initials}</div>
@@ -3242,11 +3242,23 @@ function renderProfileHero() {
 }
 
 async function saveProfile() {
-  if (currentUser.isAdmin) { showToast("Admin profile is read-only."); return; }
   const biz = document.getElementById("prof-biz").value.trim();
   const type = document.getElementById("prof-type").value.trim();
   const ig = document.getElementById("prof-ig").value.trim();
   const website = document.getElementById("prof-website").value.trim();
+
+  if (currentUser.isAdmin) {
+    // Admin: save to session only (no registry doc)
+    currentUser.business = biz;
+    currentUser.type = type;
+    currentUser.ig = ig;
+    currentUser.website = website;
+    lsSet("wac_session", currentUser);
+    renderProfileHero();
+    showToast("Profile updated!");
+    return;
+  }
+
   try {
     await updateDoc(doc(db, "wac_registry", currentUser.uid), { business: biz, type, ig, website });
     currentUser.business = biz;
@@ -3256,13 +3268,46 @@ async function saveProfile() {
     lsSet("wac_session", currentUser);
     renderProfileHero();
     showToast("Profile saved!");
-  } catch { showToast("Failed to save profile."); }
+  } catch (e) {
+    console.error("saveProfile error:", e);
+    showToast("Failed to save profile: " + (e.code || e.message));
+  }
 }
 
 function showFirebaseSetupCard() {
   if (!currentUser.isAdmin) return;
   const el = document.getElementById("firebase-setup-content");
-  el.innerHTML = `<p class="text-sm text-muted">Firebase project: wac-26<br/>Admin: ${ADMIN_EMAIL}<br/>Round: ${CURRENT_ROUND}</p>`;
+  el.innerHTML = `
+    <p class="text-sm text-muted" style="margin-bottom:12px;">Firebase project: <strong>wac-26</strong> · Admin: ${esc(ADMIN_EMAIL)} · Round: ${CURRENT_ROUND}</p>
+    <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Required Firestore Security Rules</div>
+    <div style="background:#f8f8f8;border:1px solid var(--border);border-radius:6px;padding:12px;font-family:monospace;font-size:11px;line-height:1.7;white-space:pre-wrap;overflow-x:auto;">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /wac_registry/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null &&
+        (request.auth.token.email == '${esc(ADMIN_EMAIL)}' ||
+         request.auth.uid == userId);
+    }
+    match /announcements/{id} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if request.auth != null &&
+        request.auth.token.email == '${esc(ADMIN_EMAIL)}';
+    }
+    match /posts/{postId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null &&
+        (request.auth.token.email == '${esc(ADMIN_EMAIL)}' ||
+         request.auth.uid == resource.data.authorUid);
+    }
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}</div>
+    <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Paste these into Firebase Console → Firestore → Rules tab → Publish.</p>
+  `;
 }
 
 // ==============================
