@@ -744,6 +744,30 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 
 /* ==============================
+   WAC PRO
+   ============================== */
+.pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:0.08em;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;line-height:1.4;}
+.pro-locked-label{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:0.1em;padding:3px 10px;border-radius:20px;margin-bottom:10px;}
+.pro-locked-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:4px;}
+.pro-locked-desc{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:14px;}
+.btn-upgrade{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.06em;cursor:pointer;text-decoration:none;transition:opacity .15s;}
+.btn-upgrade:hover{opacity:.85;}
+.pro-page-header{background:linear-gradient(135deg,#1a1500,#2d2000);border-radius:var(--radius);padding:20px;margin-bottom:20px;border:1px solid var(--gold);}
+.pro-page-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.06em;color:var(--gold);line-height:1;}
+.pro-page-sub{font-size:13px;color:rgba(201,168,76,.7);margin-top:4px;}
+.pro-feature-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);}
+.pro-feature-icon{font-size:28px;margin-bottom:10px;}
+.pro-feature-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:6px;}
+.pro-feature-desc{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.pro-coming-soon{display:inline-block;background:var(--surface2);color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:20px;margin-top:8px;}
+.pro-admin-section{background:linear-gradient(135deg,#fffbf0,#fdf5e0);border:1.5px solid var(--gold);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+.pro-admin-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.05em;margin-bottom:4px;color:var(--gold-dark);}
+.pro-global-danger{background:#fff5f5;border:1.5px solid #e74c3c;border-radius:var(--radius);padding:14px;margin-top:12px;}
+.pro-global-danger-title{font-family:'Bebas Neue',sans-serif;font-size:16px;color:#e74c3c;margin-bottom:4px;}
+.pro-notif-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#e74c3c;border-radius:50%;border:2px solid var(--surface);}
+.lb-pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:0.08em;padding:1px 6px;border-radius:20px;margin-left:4px;vertical-align:middle;}
+
+/* ==============================
    MEMBER PROFILE MODAL
    ============================== */
 .member-profile-avatar {
@@ -1072,8 +1096,12 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   <div id="app-scroll">
     <!-- TOPNAV -->
     <nav class="topnav">
-      <div class="topnav-brand">WAC</div>
-      <div class="topnav-user" id="topnav-user"></div>
+      <div class="topnav-brand" onclick="navTo('feed')" style="cursor:pointer;">WAC</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="topnav-user" id="topnav-user"></span>
+        <span id="topnav-pro-badge" style="display:none;" class="pro-badge">PRO</span>
+        <button class="btn btn-outline btn-sm" onclick="handleLogout()" style="white-space:nowrap;">Sign Out</button>
+      </div>
     </nav>
 
     <!-- PAGE: FEED -->
@@ -1153,9 +1181,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="form-group">
           <label class="form-label">Update type</label>
           <div class="format-btns" id="format-btns">
-            <button class="format-btn" onclick="selectFormat(this,'Static')">Static</button>
-            <button class="format-btn" onclick="selectFormat(this,'Video')">Video</button>
-            <button class="format-btn" onclick="selectFormat(this,'Redesign')">Redesign</button>
+            <button class="format-btn" onclick="selectFormat(this,'Page Update')">Page Update</button>
+            <button class="format-btn" onclick="selectFormat(this,'Blog Post')">📝 Blog Post +2pts</button>
+            <button class="format-btn" onclick="selectFormat(this,'New Page')">🆕 New Page +2pts</button>
           </div>
         </div>
         <div class="form-group">
@@ -1174,7 +1202,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div class="eng-section">
         <div class="card">
           <div class="card-title">Engage With a Member's Site</div>
-          <p class="text-sm text-muted mb-8">Visit another member's website and earn +2 pts (max 5/week)</p>
+          <p class="text-sm text-muted mb-8">Visit another member's website and engage — earn +2 pts each (max 5/week)</p>
           <div id="eng-count-display" class="text-sm mb-8"></div>
           <div class="form-group">
             <label class="form-label">Member's website URL</label>
@@ -1183,17 +1211,18 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div class="form-group">
             <label class="form-label">What did you do?</label>
             <div class="eng-type-btns" id="eng-type-btns">
-              <button class="eng-type-btn" onclick="selectEngType(this,'Comment')">Comment</button>
-              <button class="eng-type-btn" onclick="selectEngType(this,'Share')">Share</button>
-              <button class="eng-type-btn" onclick="selectEngType(this,'Feedback')">Feedback</button>
-              <button class="eng-type-btn" onclick="selectEngType(this,'Review')">Review</button>
+              <button class="eng-type-btn" onclick="selectEngType(this,'Commented')">💬 Commented</button>
+              <button class="eng-type-btn" onclick="selectEngType(this,'Shared')">📤 Shared</button>
+              <button class="eng-type-btn" onclick="selectEngType(this,'Left Feedback')">📝 Left Feedback</button>
+              <button class="eng-type-btn" onclick="selectEngType(this,'Reviewed')">⭐ Reviewed</button>
+              <button class="eng-type-btn" onclick="selectEngType(this,'Screenshotted')">📷 Screenshotted</button>
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">Note (optional)</label>
             <textarea id="eng-note" class="form-input" placeholder="Describe your engagement..."></textarea>
           </div>
-          <button class="btn btn-gold btn-block" id="eng-submit-btn" onclick="submitEngagement()">Submit Engagement</button>
+          <button class="btn btn-gold btn-block" id="eng-submit-btn" onclick="submitEngagement()">Submit Engagement +2 pts</button>
         </div>
         <div class="card mt-16">
           <div class="card-title">Engagement History</div>
@@ -1218,9 +1247,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="points-row"><span>On-time update</span><span class="pts-val">+10 pts</span></div>
         <div class="points-row"><span>Late update (within 24h)</span><span class="pts-val">+5 pts</span></div>
         <div class="points-row"><span>Screenshot bonus</span><span class="pts-val">+2 pts</span></div>
-        <div class="points-row"><span>Format bonus (Video/Redesign)</span><span class="pts-val">+2 pts</span></div>
-        <div class="points-row"><span>4-week streak</span><span class="pts-val">+25 pts</span></div>
-        <div class="points-row"><span>Engagement (per site)</span><span class="pts-val">+2 pts</span></div>
+        <div class="points-row"><span>Blog Post or New Page</span><span class="pts-val">+2 pts</span></div>
+        <div class="points-row"><span>Engagement (per member site)</span><span class="pts-val">+2 pts</span></div>
         <div class="points-row"><span>Max engagements/week</span><span class="pts-val">5</span></div>
       </div>
     </div>
@@ -1245,11 +1273,59 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="card-title">Engagement Activity</div>
         <div id="engagement-report"></div>
       </div>
+
+      <!-- ADMIN: WAC Pro Management (hidden until _PRO_GLOBAL_ACTIVE = true) -->
+      <div id="admin-pro-panel" style="display:none;margin-top:28px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">★ WAC Pro Management</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Global Pro controls — inactive until Pro launch. Per-member Pro toggle and trial access are in the Member Directory.</div>
+        <div class="pro-admin-section">
+          <div class="pro-admin-title">Global Enable Pro</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">Sets <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">isPro: true</code> on every member in the registry at once. Use this at Pro launch after members have paid.</div>
+          <div class="pro-global-danger">
+            <div class="pro-global-danger-title">⚠️ One-Way Action</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">Grants Pro to everyone currently in the registry. Requires double confirmation. Use per-member toggle in Directory for individual access.</div>
+            <button class="btn btn-sm" onclick="enableProForAll()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">Grant Pro to All Members</button>
+          </div>
+          <div id="pro-global-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
+        </div>
+      </div>
+
+      <!-- ADMIN: Clear Feed Posts by Week (always visible to admin) -->
+      <div id="admin-clear-feed-tool" style="display:none;margin-top:28px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🗑 Clear Feed Posts by Week</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Remove all feed posts for a completed week after you've verified them. Only deletes the social wall cards — tracker submissions, engagement records, and points are NOT touched.</div>
+        <div class="card" style="border:1.5px solid var(--border);">
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Select Week to Clear</label>
+            <select id="clear-feed-week-select" class="form-input" style="max-width:320px;">
+              <option value="">— choose a week —</option>
+              <option value="0">W1 · Jun 1–7</option>
+              <option value="1">W2 · Jun 8–14</option>
+              <option value="2">W3 · Jun 15–21</option>
+              <option value="3">W4 · Jun 22–30</option>
+              <option value="4">W5 · Jul 1–7</option>
+              <option value="5">W6 · Jul 8–14</option>
+              <option value="6">W7 · Jul 15–21</option>
+              <option value="7">W8 · Jul 22–31</option>
+              <option value="8">W9 · Aug 1–7</option>
+              <option value="9">W10 · Aug 8–14</option>
+              <option value="10">W11 · Aug 15–21</option>
+              <option value="11">W12 · Aug 22–31</option>
+            </select>
+          </div>
+          <div style="background:#fff5f5;border:1px solid #f5c6c6;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#c0392b;line-height:1.5;">
+            ⚠️ Deletes feed posts only. Tracker submissions, engagement records, and points are safe.
+          </div>
+          <button class="btn btn-sm" onclick="clearFeedPostsByWeek()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">🗑 Clear Feed Posts for Selected Week</button>
+          <div id="clear-feed-status" style="display:none;margin-top:12px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
+        </div>
+      </div>
     </div>
 
     <!-- PAGE: MEMBERS -->
     <div class="page" id="page-members">
       <div class="page-title">Members</div>
+      <p class="text-sm text-muted mb-16">Tap any card to visit their website.</p>
       <input type="text" class="search-bar" id="member-search" placeholder="Search members..." oninput="filterMembers()" />
       <!-- Admin create member -->
       <div class="admin-compose" id="admin-create-box" style="display:none;">
@@ -1258,6 +1334,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="form-group"><input type="text" id="cm-name" class="form-input" placeholder="Full Name" /></div>
         <div class="form-group"><input type="email" id="cm-email" class="form-input" placeholder="Email" /></div>
         <div class="form-group"><input type="url" id="cm-website" class="form-input" placeholder="Website URL" /></div>
+        <div class="form-group"><input type="text" id="cm-ig" class="form-input" placeholder="Instagram handle (optional, e.g. @username)" /></div>
         <div class="form-group"><input type="text" id="cm-biz" class="form-input" placeholder="Business Name" /></div>
         <div class="form-group"><input type="text" id="cm-type" class="form-input" placeholder="Business Type" /></div>
         <div class="form-group">
@@ -1326,6 +1403,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <input type="text" id="prof-type" class="form-input" placeholder="e.g. Photography, Coaching" />
         </div>
         <div class="form-group">
+          <label class="form-label">Instagram Handle (optional)</label>
+          <input type="text" id="prof-ig" class="form-input" placeholder="@yourhandle" />
+        </div>
+        <div class="form-group">
           <label class="form-label">Website URL</label>
           <input type="url" id="prof-website" class="form-input" placeholder="https://yoursite.com" />
         </div>
@@ -1345,11 +1426,68 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="card-title">🔧 Firebase Setup</div>
         <div id="firebase-setup-content"></div>
       </div>
-      <!-- Sign out -->
-      <div style="text-align:center;margin-top:20px;">
-        <button class="btn btn-outline" onclick="handleLogout()">Sign Out</button>
+    </div>
+
+    <!-- PAGE: PRO (hidden from free users — visible to admin + Pro members) -->
+    <div class="page" id="page-pro">
+      <div class="pro-page-header">
+        <div class="pro-page-title">WAC PRO</div>
+        <div class="pro-page-sub">Your 90-Day Website Discipline System</div>
+      </div>
+
+      <!-- Weekly Website Action Plan Generator -->
+      <div class="pro-feature-card" id="pro-action-plan-card">
+        <div class="pro-feature-icon">🗓</div>
+        <div class="pro-feature-title">Weekly Website Action Plan</div>
+        <div class="pro-feature-desc">Get a personalized website update plan for the week — tailored to your niche, current streak, and this week's requirement. No more staring at your site wondering what to change. Just open this, read the plan, and execute.</div>
+        <div class="pro-coming-soon">Coming at Pro Launch</div>
+      </div>
+
+      <!-- Website Copy Assist -->
+      <div class="pro-feature-card" id="pro-caption-card">
+        <div class="pro-feature-icon">✍️</div>
+        <div class="pro-feature-title">Website Copy Assist</div>
+        <div class="pro-feature-desc">Got a page or section you want to improve? Drop in your idea and get 3 copy directions to choose from. You pick, you edit, you publish. It supports your voice — it doesn't replace it.</div>
+        <div class="pro-coming-soon">Coming at Pro Launch</div>
+      </div>
+
+      <!-- Advanced Streak Analytics -->
+      <div class="pro-feature-card" id="pro-analytics-card">
+        <div class="pro-feature-icon">📊</div>
+        <div class="pro-feature-title">Advanced Streak Analytics</div>
+        <div class="pro-feature-desc">See your consistency score, update cadence trends, and how your engagement stacks up across weeks. Know exactly where you stand and what's working.</div>
+        <div class="pro-coming-soon">Coming at Pro Launch</div>
+      </div>
+
+      <!-- Priority Accountability Group -->
+      <div class="pro-feature-card" id="pro-priority-group-card">
+        <div class="pro-feature-icon">🔥</div>
+        <div class="pro-feature-title">Priority Accountability Group</div>
+        <div class="pro-feature-desc">A smaller, higher-commitment group inside WAC. Tighter check-ins, faster feedback, and members who are fully committed at the same level you are.</div>
+        <div class="pro-coming-soon">Coming at Pro Launch</div>
+      </div>
+
+      <!-- Stronger Nudges -->
+      <div class="pro-feature-card" id="pro-nudges-card">
+        <div class="pro-feature-icon">🔔</div>
+        <div class="pro-feature-title">Stronger Nudges & Reminders</div>
+        <div class="pro-feature-desc">Smart weekly reminders timed to your submission window — so you never miss a deadline. You signed up to be consistent. We'll make sure you follow through.</div>
+        <div class="pro-coming-soon">Coming at Pro Launch</div>
+      </div>
+
+      <!-- Early Access -->
+      <div class="pro-feature-card" id="pro-early-access-card">
+        <div class="pro-feature-icon">⚡</div>
+        <div class="pro-feature-title">Early Access to New Features</div>
+        <div class="pro-feature-desc">Pro members shape the product. You get every new feature first, plus direct input on what gets built next.</div>
+        <div class="pro-coming-soon">Coming at Pro Launch</div>
+      </div>
+
+      <div id="pro-trial-banner" style="display:none;background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1.5px solid #27ae60;border-radius:var(--radius);padding:14px 16px;margin-top:8px;font-size:13px;line-height:1.6;">
+        <strong style="color:#27ae60;">Trial Access Active</strong> — you have full Pro access through your trial period.
       </div>
     </div>
+
   </div>
 
   <!-- BOTTOM NAV -->
@@ -1362,6 +1500,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <button onclick="navTo('reports')" data-page="reports"><span class="nav-icon">📊</span><span>Reports</span></button>
     <button onclick="navTo('members')" data-page="members"><span class="nav-icon">👥</span><span>Members</span></button>
     <button onclick="navTo('profile')" data-page="profile"><span class="nav-icon">👤</span><span>Profile</span></button>
+    <button id="nav-pro" onclick="navTo('pro')" data-page="pro" style="display:none;position:relative;"><span class="nav-icon">⭐</span><span style="background:linear-gradient(135deg,var(--gold),var(--gold-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;">PRO</span><span id="pro-notif-dot" class="pro-notif-dot" style="display:none;"></span></button>
   </nav>
 </div>
 
@@ -1375,7 +1514,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <div class="welcome-body">
       <h3>Welcome to Round 1! 👋</h3>
       <div class="welcome-step"><span class="welcome-step-icon">🌐</span><span>Submit your updates — paste your URL each week after you update your site</span></div>
-      <div class="welcome-step"><span class="welcome-step-icon">✅</span><span>Check your Tracker — mark weeks complete, hit the streak bonus for +25 pts</span></div>
+      <div class="welcome-step"><span class="welcome-step-icon">✅</span><span>Check your Tracker — mark weeks complete as you go</span></div>
       <div class="welcome-step"><span class="welcome-step-icon">🤝</span><span>Engage with members — visit and comment on other members' sites for +2 pts each</span></div>
       <div class="welcome-step"><span class="welcome-step-icon">⭐</span><span>Earn All-Star status — complete every weekly requirement across all 12 weeks</span></div>
     </div>
@@ -1458,11 +1597,64 @@ const CURRENT_ROUND = "R1";
 const PTS_ON_TIME   = 10;
 const PTS_LATE_24H  = 5;
 const PTS_SCREENSHOT = 2;
-const PTS_STREAK    = 25;
+const PTS_FORMAT_BONUS = 2; // Blog Post or New Page
 const PTS_ENGAGEMENT = 2;
 const MAX_ENG_PER_WEEK = 5;
 
+// WAC Pro launch flags — flip both to true at Pro launch
+const _PRO_GLOBAL_ACTIVE = false; // shows WAC Pro Management panel in Reports
+const _PRO_NOTIFS_ACTIVE = false; // activates in-app notification sequence
+
 const GRACE_WEEKS = ["w1", "w2"];
+
+// ==============================
+// MEMBER SANITIZER
+// ==============================
+function sanitizeMember(m) {
+  if (!m) return {};
+  return {
+    ...m,
+    name:       m.name       || "WAC Member",
+    email:      m.email      || "",
+    uid:        m.uid        || "",
+    ig:         m.ig         || "",
+    website:    m.website    || "",
+    photoURL:   m.photoURL   || "",
+    points:     typeof m.points === "number" ? m.points : 0,
+    totalPosts: typeof m.totalPosts === "number" ? m.totalPosts : 0,
+    rounds:     Array.isArray(m.rounds) ? m.rounds : [],
+    isAdmin:    m.isAdmin    || false,
+    isFounder:  m.isFounder  || false,
+    isAllStar:  m.isAllStar  || false,
+    isVIP:      m.isVIP      || false,
+    business:   m.business   || "",
+    type:       m.type       || "",
+    // WAC Pro fields — all default inactive until Pro launch
+    isPro:      m.isPro      || false,
+    proSince:   m.proSince   || null,
+    proExpiry:  m.proExpiry  || null,
+    trialUntil: m.trialUntil || null,
+  };
+}
+
+// ==============================
+// WAC PRO — Access Helpers
+// ==============================
+function userHasPro() {
+  if (!currentUser) return false;
+  if (currentUser.isAdmin) return true; // admin always sees Pro for testing
+  if (currentUser.isPro === true) return true;
+  if (currentUser.trialUntil && Date.now() < currentUser.trialUntil) return true;
+  return false;
+}
+function userHasTrial() {
+  if (!currentUser) return false;
+  return !currentUser.isPro && currentUser.trialUntil && Date.now() < currentUser.trialUntil;
+}
+function getTrialExpiryStr() {
+  if (!currentUser || !currentUser.trialUntil) return "";
+  return new Date(currentUser.trialUntil).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
+}
 
 const ROUND_END_TS = Date.UTC(2026, 8, 1, 3, 59, 59, 999);
 
@@ -1678,16 +1870,17 @@ async function resolveUser(user) {
   if (email === ADMIN_EMAIL) {
     return { name: "Nate Templeton", email, isAdmin: true, uid };
   }
-  // Load from registry
   const snap = await getDoc(doc(db, "wac_registry", uid));
   if (!snap.exists()) return null;
-  const d = snap.data();
+  const d = sanitizeMember({ id: snap.id, ...snap.data() });
   if (!d.rounds?.includes(CURRENT_ROUND) && !d.isFounder) return null;
   return {
-    name: d.name || email,
+    name: d.name,
     email,
     uid,
+    registryId: snap.id,
     isAdmin: false,
+    ig: d.ig || "",
     website: d.website || "",
     business: d.business || "",
     type: d.type || "",
@@ -1697,6 +1890,10 @@ async function resolveUser(user) {
     isFounder: d.isFounder || false,
     isVIP: d.isVIP || false,
     isAllStar: d.isAllStar || false,
+    isPro: d.isPro || false,
+    proSince: d.proSince || null,
+    proExpiry: d.proExpiry || null,
+    trialUntil: d.trialUntil || null,
   };
 }
 
@@ -1764,7 +1961,15 @@ function bootApp() {
   // 2. Set topnav username
   document.getElementById("topnav-user").textContent = currentUser.name;
 
-  // 3. Show/hide admin elements — explicitly hide all first
+  // 3. Pro topnav badge
+  const _proBadgeEl = document.getElementById("topnav-pro-badge");
+  if (_proBadgeEl) _proBadgeEl.style.display = userHasPro() && !currentUser.isAdmin ? "inline-flex" : "none";
+
+  // 4. Pro nav button
+  const _proNavBtn = document.getElementById("nav-pro");
+  if (_proNavBtn) _proNavBtn.style.display = userHasPro() ? "flex" : "none";
+
+  // 5. Show/hide admin elements
   const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card"];
   adminBoxes.forEach(id => {
     const el = document.getElementById(id);
@@ -1773,12 +1978,23 @@ function bootApp() {
   if (currentUser.isAdmin) {
     adminBoxes.forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.style.display = id === "admin-registry" ? "block" : (id === "firebase-setup-card" ? "block" : "block");
+      if (el) el.style.display = "block";
     });
     showFirebaseSetupCard();
+    // Pro management panel (shown only when _PRO_GLOBAL_ACTIVE flag is on)
+    const _proPanel = document.getElementById("admin-pro-panel");
+    if (_proPanel) _proPanel.style.display = _PRO_GLOBAL_ACTIVE ? "block" : "none";
+    // Clear Feed tool always visible to admin
+    const _clearFeedTool = document.getElementById("admin-clear-feed-tool");
+    if (_clearFeedTool) _clearFeedTool.style.display = "block";
+  } else {
+    const _proPanel = document.getElementById("admin-pro-panel");
+    if (_proPanel) _proPanel.style.display = "none";
+    const _clearFeedTool = document.getElementById("admin-clear-feed-tool");
+    if (_clearFeedTool) _clearFeedTool.style.display = "none";
   }
 
-  // 4. Load all data
+  // 6. Load all data
   loadFeed();
   loadAnnouncements();
   loadResources();
@@ -1791,13 +2007,14 @@ function bootApp() {
   loadTrackerReport();
   loadEngHistory();
 
-  // 5. Default to feed
+  // 7. Default to feed
   navTo("feed");
 
-  // 6. Delayed new features
+  // 8. Delayed features
   setTimeout(showWelcomeModal, 600);
   setTimeout(initPushNotifications, 1000);
   setTimeout(checkRoundEnd, 300);
+  setTimeout(checkProNotifications, 2000);
 
   // Init password field for admin create
   if (currentUser.isAdmin) initPasswordField();
@@ -1823,6 +2040,7 @@ function navTo(page) {
   if (page === "submit") loadSubmitPage();
   if (page === "ranks") loadLeaderboard();
   if (page === "reports") { loadTrackerReport(); }
+  if (page === "pro") renderProPage();
 }
 
 function loadSubmitPage() {
@@ -2028,9 +2246,42 @@ async function loadResources() {
     const snap = await getDocs(q);
     _allResources = [];
     snap.forEach(d => _allResources.push({ id: d.id, ...d.data() }));
+    // If empty and admin, show seed prompt
+    if (!_allResources.length && currentUser && currentUser.isAdmin) {
+      document.getElementById("resource-grid").innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:24px 0;">
+        <p class="text-sm text-muted" style="margin-bottom:12px;">No resources yet. Seed the default WAC starter resources?</p>
+        <button class="btn btn-gold btn-sm" onclick="seedDefaultResources()">🌱 Seed Default Resources</button>
+      </div>`;
+      return;
+    }
     renderResourceFilters();
     renderResources();
   } catch (e) { console.error("loadResources error:", e); }
+}
+
+async function seedDefaultResources() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const defaults = [
+    { emoji:"🏗️", title:"Website Update Batching", description:"Plan and batch a month of site updates in one focused session", tags:["Strategy","Workflow"], source:"WAC Resource Library",
+      body:`Batching your website updates is one of the highest-leverage habits you can build as a solopreneur.\n\nInstead of scrambling each week to figure out what to change, block a single 2–3 hour session to plan, write, and stage content for the entire month.\n\nWhy it works:\nYour brain operates differently in "creation mode" vs "execution mode." Batching keeps you in creation mode longer, which produces better work with less mental fatigue.\n\nThe WAC Batching Framework:\n1. Pick one day per month as your website day\n2. Review your content goals and upcoming season/offers\n3. Draft all page copy in one sitting — don't edit yet\n4. Gather or create all images and assets\n5. Edit, upload, and schedule before the month starts\n\nFor WAC members:\nUse your batching session to plan all 4 weeks of updates at once. Then execution becomes a 20-minute job each week instead of a 2-hour decision.` },
+    { emoji:"✍️", title:"Homepage Copy Formula", description:"A proven structure for writing homepage copy that converts visitors", tags:["Copywriting","Strategy"], source:"WAC Resource Library",
+      body:`Your homepage has one job: get the right person to take the next step. Here's a formula that works for most solopreneur sites.\n\n1. The Headline — What do you do and for whom?\nExample: "I help wedding photographers fill their calendar without running ads."\n\n2. The Sub-headline — What problem do you solve?\nExample: "Most photographers waste hours on social media and still feel invisible. Here's a better way."\n\n3. Social Proof — One or two quick testimonials or client logos up top.\n\n4. The Bridge — How do you deliver the result?\nTwo to three short sentences on your process or approach.\n\n5. The CTA — One clear next step.\nNot "Learn More." Not three options. One: "Book a Free Call" or "See My Work."\n\n6. The Secondary CTA — A lower-friction option.\n"Not ready? Join my newsletter for weekly tips."\n\nWAC Action Step: Audit your homepage against this formula this week. Even updating just your headline is a meaningful update worth submitting.` },
+    { emoji:"🔍", title:"SEO Basics for Solopreneurs", description:"The only SEO concepts you actually need to know to get found", tags:["SEO","Strategy"], source:"WAC Resource Library",
+      body:`SEO doesn't have to be complicated. Here are the five things that matter most for a solopreneur site.\n\n1. One Page, One Topic\nEach page should be focused on a single keyword or theme. Trying to rank for everything on one page ranks you for nothing.\n\n2. Title Tags and Meta Descriptions\nThese are what show up in Google results. Your title tag should include your target keyword. Your meta description should be compelling — it drives the click.\n\n3. Page Speed\nSlow sites lose rankings and visitors. Run your site through PageSpeed Insights (free) and fix the top issues.\n\n4. Internal Linking\nLink from your blog posts to your services pages and vice versa. This helps Google understand your site structure and distributes authority.\n\n5. Fresh Content Wins\nGoogle rewards sites that are regularly updated. That's exactly what WAC is designed to help you build. Every update you submit is a signal to search engines that your site is alive and relevant.\n\nWAC Action: Pick one page this week and optimize its title tag and meta description for a keyword your ideal client would actually search.` },
+    { emoji:"📸", title:"Photography & Visuals That Convert", description:"How to use images strategically on your site to build trust and drive action", tags:["Design","Strategy"], source:"WAC Resource Library",
+      body:`Most solopreneur sites either have no photos of themselves or use stock images that look nothing like their brand. Both are trust killers.\n\nHere's what to prioritize:\n\n1. A Professional Headshot\nPeople buy from people. Get a good headshot — it doesn't need to be expensive. Natural light, clean background, genuine expression.\n\n2. Your Work, Not Just Your Gear\nIf you're a service provider, show the outcomes. If you're a photographer, show final images. If you're a coach, show client results or yourself doing the work.\n\n3. Consistent Color and Tone\nImages should feel like they belong together. A simple filter preset applied to all photos makes a huge difference.\n\n4. Compress Everything\nLarge images are the number one cause of slow sites. Use Squoosh.app or TinyPNG to compress before uploading. Aim for under 200KB per image.\n\n5. Alt Text\nEvery image should have a descriptive alt tag — this helps with SEO and accessibility.\n\nWAC Action: This week, update at least one image on your site or add a proper alt tag to every existing image.` },
+    { emoji:"📋", title:"The One-Page Website Audit", description:"A quick checklist to find the most impactful improvements on your site right now", tags:["Strategy","Workflow"], source:"WAC Resource Library",
+      body:`Run through this checklist on your site every quarter — or whenever you're not sure what to update this week.\n\nFundamentals:\n[ ] Does your homepage headline clearly say what you do and for whom?\n[ ] Is there one clear call-to-action above the fold?\n[ ] Is your contact info easy to find?\n[ ] Does your site load in under 3 seconds? (Test at PageSpeed Insights)\n[ ] Is your site mobile-friendly?\n\nCopy:\n[ ] Is your about page about your client's problem, not just your background?\n[ ] Are your service descriptions outcome-focused (what they get) rather than process-focused (what you do)?\n[ ] Do you have at least three testimonials or reviews visible?\n\nSEO:\n[ ] Does every page have a unique title tag?\n[ ] Do all images have alt text?\n[ ] Is there a meta description for your homepage?\n\nTrust:\n[ ] Is your portfolio or work samples up to date?\n[ ] Are there any broken links? (Check with Broken Link Checker)\n[ ] Is the copyright year in your footer current?\n\nWAC Action: Pick one item from this list that you scored "no" on and fix it this week. That's a legitimate update.` },
+    { emoji:"🎯", title:"Content Pillars for Your Website", description:"Define 3–5 core themes so you always know what to update next", tags:["Strategy","Planning"], source:"WAC Resource Library",
+      body:`Content pillars are the 3–5 recurring themes your website covers. They make update planning faster and keep your site coherent.\n\nHow to choose your pillars:\nAsk yourself: What do I know? What does my client need? What do I want to be known for? The overlap of those three answers = your pillars.\n\nExample pillar sets:\n- Wedding Photographer: Portfolio updates | Venue spotlights | Planning advice | Behind the scenes | Real weddings\n- Business Coach: Client case studies | Strategy guides | Resources/tools | FAQ updates | Newsletter archive\n- Fitness Trainer: Program pages | Client results | Nutrition tips | FAQ | Blog\n\nThe WAC Application:\nWhen you're not sure what to update this week, pull from your pillar list. Each pillar becomes a rotation — you never run out of ideas, and your site builds depth over time.\n\nWAC Action: Write down your 3–5 content pillars this week and pin them somewhere visible. Then pick one pillar to update your site from.` },
+  ];
+  try {
+    for (const r of defaults) {
+      await addDoc(collection(db, "resources"), { ...r, timestamp: Date.now() - Math.floor(Math.random() * 10000) });
+    }
+    showToast("Default resources seeded!");
+    loadResources();
+  } catch (e) { showToast("Seed error: " + e.message); }
 }
 
 function getAllTags() {
@@ -2107,7 +2358,7 @@ function updatePtsPreview() {
   const lateWindow = deadline + (24 * 60 * 60 * 1000);
   let pts = isLate ? (now <= lateWindow ? PTS_LATE_24H : 0) : PTS_ON_TIME;
   if (_screenshotData) pts += PTS_SCREENSHOT;
-  if (_selectedFormat === "Video" || _selectedFormat === "Redesign") pts += 2;
+  if (_selectedFormat === "Blog Post" || _selectedFormat === "New Page") pts += PTS_FORMAT_BONUS;
   document.getElementById("pts-num").textContent = pts;
   const label = isLate ? "pts for late update" : "pts for on-time update";
   document.getElementById("pts-preview").innerHTML = `<span class="pts-num" id="pts-num">${pts}</span><span>${label}</span>`;
@@ -2178,7 +2429,7 @@ async function submitUpdate() {
 
     let pts = isLate ? PTS_LATE_24H : PTS_ON_TIME;
     if (_screenshotData) pts += PTS_SCREENSHOT;
-    if (_selectedFormat === "Video" || _selectedFormat === "Redesign") pts += 2;
+    if (_selectedFormat === "Blog Post" || _selectedFormat === "New Page") pts += PTS_FORMAT_BONUS;
 
     await addDoc(collection(db, "submissions"), {
       author: currentUser.name,
@@ -2422,38 +2673,9 @@ async function toggleCheck(weekId) {
     let data = snap.exists() ? snap.data() : { uid: currentUser.uid };
     data[weekId] = !data[weekId];
     await setDoc(ref, data, { merge: true });
-    await checkAndAwardStreak(data);
     await checkAllStar(data);
     buildTracker();
   } catch (e) { showToast("Failed to update tracker."); }
-}
-
-async function checkAndAwardStreak(data) {
-  // 4 consecutive checked weeks → +25 pts (once per streak start)
-  let consecutive = 0;
-  let streakAwarded = data._streakAwarded || [];
-  for (let i = 0; i < WEEKS.length; i++) {
-    if (data[WEEKS[i].id]) {
-      consecutive++;
-      if (consecutive >= 4) {
-        const streakKey = "streak_" + (i - 3);
-        if (!streakAwarded.includes(streakKey)) {
-          streakAwarded.push(streakKey);
-          // Award points
-          const regRef = doc(db, "wac_registry", currentUser.uid);
-          await updateDoc(regRef, { points: increment(PTS_STREAK) });
-          currentUser.points = (currentUser.points || 0) + PTS_STREAK;
-          lsSet("wac_session", currentUser);
-          showToast(`🔥 4-week streak! +${PTS_STREAK} pts`);
-        }
-      }
-    } else {
-      consecutive = 0;
-    }
-  }
-  // Save streak tracking
-  const ref = doc(db, "trackers", currentUser.uid);
-  await setDoc(ref, { _streakAwarded: streakAwarded }, { merge: true });
 }
 
 async function checkAllStar(data) {
@@ -2513,13 +2735,12 @@ async function loadLeaderboard() {
       if (m.isVIP) badges.push("⚡");
       const milestone = getMilestoneBadges(m.totalPosts || 0);
       const initials = getInitials(m.name);
-      const websiteLink = m.website ? `<a href="${esc(m.website)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--gold);">${esc(m.website)}</a>` : "";
+      const proPill = m.isPro ? `<span class="lb-pro-badge">PRO</span>` : "";
       return `<div class="lb-row">
         <div class="lb-rank">${rank}</div>
         <div class="lb-avatar">${initials}</div>
         <div class="lb-info">
-          <div class="lb-name">${esc(m.name)} ${badges.join("")}${milestone}</div>
-          ${websiteLink}
+          <div class="lb-name">${esc(m.name)} ${badges.join("")}${milestone}${proPill}</div>
         </div>
         <div class="lb-pts">${m.points || 0}</div>
       </div>`;
@@ -2555,29 +2776,41 @@ async function renderAdminRegistry() {
   try {
     const snap = await getDocs(collection(db, "wac_registry"));
     const all = [];
-    snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+    snap.forEach(d => all.push(sanitizeMember({ id: d.id, ...d.data() })));
     all.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 
     const el = document.getElementById("admin-registry");
-    el.innerHTML = `<div class="card"><div class="card-title">Full Registry (${all.length})</div>` +
+    el.innerHTML = `<div class="card"><div class="card-title">Full Registry — ${all.length} member${all.length !== 1 ? "s" : ""} · Round ${CURRENT_ROUND.replace("R","")} active</div>` +
       all.map(m => {
+        const docId = m.id || m.uid || "";
         const rounds = (m.rounds || []).join(", ");
-        const flags = [];
-        if (m.isFounder) flags.push("🏅 Founder");
-        if (m.isVIP) flags.push("⚡ VIP");
-        if (m.isAllStar) flags.push("⭐ All-Star");
-        return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
-          <div style="font-weight:600;">${esc(m.name)}</div>
-          <div class="text-sm text-muted">${esc(m.email)} · ${rounds} ${flags.join(" ")}</div>
+        const enrolledNow = m.isFounder || (m.rounds || []).includes(CURRENT_ROUND);
+        const igHandle = m.ig ? m.ig.trim().replace(/^@+/, "") : "";
+        const igUrl = igHandle ? `https://www.instagram.com/${igHandle}` : "";
+        const proBadgeHtml = m.isPro ? `<span class="pro-badge" style="margin-left:0;">PRO</span>` : "";
+        const trialHtml = m.trialUntil && !m.isPro ? `<span style="display:inline-flex;align-items:center;background:#e8f5e9;color:#27ae60;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;margin-left:4px;">Trial until ${new Date(m.trialUntil).toLocaleDateString("en-US",{month:"short",day:"numeric"})}</span>` : "";
+        return `<div style="padding:12px 0;border-bottom:1px solid var(--border);${!enrolledNow ? "opacity:0.55;" : ""}">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
+            <span style="font-weight:600;">${esc(m.name)}</span>
+            ${m.isFounder ? `<span style="font-size:10px;background:var(--gold);color:#000;padding:1px 6px;border-radius:4px;font-weight:700;">🏅 Founder</span>` : ""}
+            ${m.isVIP ? `<span style="font-size:10px;background:#e8f4fd;color:#2980b9;padding:1px 6px;border-radius:4px;font-weight:700;">⚡ VIP</span>` : ""}
+            ${m.isAllStar ? `<span style="font-size:10px;background:#fffbf0;color:var(--gold-dark);padding:1px 6px;border-radius:4px;font-weight:700;">⭐ All-Star</span>` : ""}
+            ${proBadgeHtml}${trialHtml}
+          </div>
+          <div class="text-sm text-muted" style="margin-bottom:6px;">${esc(m.email)} · Rounds: ${rounds || "none"}</div>
+          ${m.website ? `<div style="font-size:11px;margin-bottom:4px;"><a href="${esc(m.website)}" target="_blank" rel="noopener" style="color:var(--gold);">🌐 ${esc(m.website)}</a></div>` : ""}
+          ${igUrl ? `<div style="font-size:11px;margin-bottom:6px;"><a href="${igUrl}" target="_blank" rel="noopener" style="color:var(--text-muted);">📸 ${esc(m.ig)}</a></div>` : ""}
           <div class="admin-member-controls">
-            <button class="${(m.rounds||[]).includes('R1')?'active-flag':''}" onclick="toggleRegistryRound('${m.id}','R1')">R1</button>
-            <button class="${(m.rounds||[]).includes('R2')?'active-flag':''}" onclick="toggleRegistryRound('${m.id}','R2')">R2</button>
-            <button class="${(m.rounds||[]).includes('R3')?'active-flag':''}" onclick="toggleRegistryRound('${m.id}','R3')">R3</button>
-            <button class="${m.isFounder?'active-flag':''}" onclick="toggleRegistryFlag('${m.id}','isFounder')">Founder</button>
-            <button class="${m.isVIP?'active-flag':''}" onclick="toggleRegistryFlag('${m.id}','isVIP')">VIP</button>
-            <button class="${m.isAllStar?'active-flag':''}" onclick="toggleRegistryFlag('${m.id}','isAllStar')">All-Star</button>
-            <button onclick="editRegistryEmail('${m.id}','${esc(m.email)}')">✏️ Email</button>
-            <button onclick="removeRegistryMember('${m.id}','${esc(m.name)}')" style="color:var(--danger);">✕ Remove</button>
+            <button class="${(m.rounds||[]).includes('R1')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R1')">R1 ${(m.rounds||[]).includes("R1")?"✓":""}</button>
+            <button class="${(m.rounds||[]).includes('R2')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R2')">R2 ${(m.rounds||[]).includes("R2")?"✓":""}</button>
+            <button class="${(m.rounds||[]).includes('R3')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R3')">R3 ${(m.rounds||[]).includes("R3")?"✓":""}</button>
+            <button class="${m.isFounder?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isFounder')">🏅 Founder</button>
+            <button class="${m.isVIP?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isVIP')">⚡ VIP</button>
+            <button class="${m.isAllStar?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isAllStar')">⭐ All-Star</button>
+            <button onclick="editRegistryEmail('${docId}','${esc(m.email)}')">✏️ Email</button>
+            <button onclick="toggleProAccess('${docId}',${!!m.isPro})" style="${m.isPro ? "background:#fffbf0;border-color:var(--gold);color:var(--gold-dark);font-weight:600;" : ""}">${m.isPro ? "★ Remove Pro" : "★ Grant Pro"}</button>
+            <button onclick="setTrialAccess('${docId}','${esc(m.name)}')">⏱ Trial Access</button>
+            <button onclick="removeRegistryMember('${docId}','${esc(m.name)}')" style="color:var(--danger);">✕ Remove</button>
           </div>
         </div>`;
       }).join("") + `</div>`;
@@ -2588,17 +2821,29 @@ async function renderMemberGrid() {
   const members = await getRegistryForCurrentRound();
   _memberMap = {};
   members.forEach(m => { _memberMap[m.id] = m; });
-  members.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  // All-Stars first, then alpha
+  members.sort((a, b) => {
+    if (a.isAllStar && !b.isAllStar) return -1;
+    if (!a.isAllStar && b.isAllStar) return 1;
+    return (a.name || "").localeCompare(b.name || "");
+  });
 
   const el = document.getElementById("member-grid");
   el.innerHTML = members.map(m => {
     const initials = getInitials(m.name);
-    const websiteLink = m.website ? `<a href="${esc(m.website)}" target="_blank" rel="noopener" class="member-card-link" onclick="event.stopPropagation()">${esc(m.website)}</a>` : "";
+    const igHandle = m.ig ? m.ig.trim().replace(/^@+/, "") : "";
+    const igUrl = igHandle ? `https://www.instagram.com/${igHandle}` : "";
+    const websiteBtn = m.website
+      ? `<a href="${esc(m.website)}" target="_blank" rel="noopener" class="member-card-link" onclick="event.stopPropagation()" style="display:block;text-align:center;font-size:11px;color:var(--gold);margin-top:4px;word-break:break-all;">🌐 Visit Site</a>`
+      : "";
+    const igBtn = igUrl
+      ? `<a href="${igUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:block;text-align:center;font-size:11px;color:var(--text-muted);margin-top:2px;">📸 ${esc(m.ig)}</a>`
+      : "";
     return `<div class="member-card" data-member-key="${m.id}" onclick="handleMemberCardClick(this)">
       <div class="member-card-avatar">${initials}</div>
       <div class="member-card-name">${esc(m.name)}</div>
       <div class="member-card-biz">${esc(m.business || "")}</div>
-      ${websiteLink}
+      ${websiteBtn}${igBtn}
     </div>`;
   }).join("");
 }
@@ -2861,6 +3106,7 @@ async function createMemberAccount() {
   const name = document.getElementById("cm-name").value.trim();
   const email = document.getElementById("cm-email").value.trim();
   const website = document.getElementById("cm-website").value.trim();
+  const ig = document.getElementById("cm-ig") ? document.getElementById("cm-ig").value.trim() : "";
   const biz = document.getElementById("cm-biz").value.trim();
   const type = document.getElementById("cm-type").value.trim();
   const pass = document.getElementById("cm-pass").value;
@@ -2889,7 +3135,7 @@ async function createMemberAccount() {
     const uid = data.localId;
 
     // Step 2: Create wac_registry doc
-    await addRegistryMember(uid, name, email, website, biz, type, rounds, isFounder, isVIP);
+    await addRegistryMember(uid, name, email, website, ig, biz, type, rounds, isFounder, isVIP);
 
     // Step 3: Show success
     resultEl.innerHTML = `<div class="card" style="background:#f0fdf4;border-color:#86efac;">
@@ -2904,6 +3150,7 @@ async function createMemberAccount() {
     document.getElementById("cm-name").value = "";
     document.getElementById("cm-email").value = "";
     document.getElementById("cm-website").value = "";
+    if (document.getElementById("cm-ig")) document.getElementById("cm-ig").value = "";
     document.getElementById("cm-biz").value = "";
     document.getElementById("cm-type").value = "";
     initPasswordField();
@@ -2915,11 +3162,17 @@ async function createMemberAccount() {
   }
 }
 
-async function addRegistryMember(uid, name, email, website, biz, type, rounds, isFounder, isVIP) {
+async function addRegistryMember(uid, name, email, website, ig, biz, type, rounds, isFounder, isVIP) {
   await setDoc(doc(db, "wac_registry", uid), {
-    name, email, uid, website: website || "", business: biz || "", type: type || "",
+    name, email, uid,
+    website: website || "",
+    ig: ig || "",
+    business: biz || "",
+    type: type || "",
     rounds, points: 0, totalPosts: 0,
     isFounder, isVIP, isAllStar: false,
+    // WAC Pro fields — default inactive
+    isPro: false, proSince: null, proExpiry: null, trialUntil: null,
     addedAt: Date.now()
   });
 }
@@ -2954,11 +3207,13 @@ function loadProfile() {
     document.getElementById("prof-name").value = currentUser.name || "";
     document.getElementById("prof-biz").value = currentUser.business || "";
     document.getElementById("prof-type").value = currentUser.type || "";
+    document.getElementById("prof-ig").value = currentUser.ig || "";
     document.getElementById("prof-website").value = currentUser.website || "";
   } else {
     document.getElementById("prof-name").value = "Nate Templeton";
     document.getElementById("prof-biz").value = "";
     document.getElementById("prof-type").value = "";
+    document.getElementById("prof-ig").value = "";
     document.getElementById("prof-website").value = "";
   }
 }
@@ -2970,6 +3225,7 @@ function renderProfileHero() {
   if (currentUser.isFounder) badges.push("🏅 Founder");
   if (currentUser.isVIP) badges.push("⚡ VIP");
   if (currentUser.isAdmin) badges.push("👑 Admin");
+  if (userHasPro() && !currentUser.isAdmin) badges.push("★ Pro");
   const milestone = getMilestoneBadges(currentUser.totalPosts || 0);
   const subtitle = currentUser.isAdmin ? "Founder of WAC" : (currentUser.business || "");
 
@@ -2989,11 +3245,13 @@ async function saveProfile() {
   if (currentUser.isAdmin) { showToast("Admin profile is read-only."); return; }
   const biz = document.getElementById("prof-biz").value.trim();
   const type = document.getElementById("prof-type").value.trim();
+  const ig = document.getElementById("prof-ig").value.trim();
   const website = document.getElementById("prof-website").value.trim();
   try {
-    await updateDoc(doc(db, "wac_registry", currentUser.uid), { business: biz, type, website });
+    await updateDoc(doc(db, "wac_registry", currentUser.uid), { business: biz, type, ig, website });
     currentUser.business = biz;
     currentUser.type = type;
+    currentUser.ig = ig;
     currentUser.website = website;
     lsSet("wac_session", currentUser);
     renderProfileHero();
@@ -3114,6 +3372,182 @@ if ("serviceWorker" in navigator) {
 }
 
 // ==============================
+// WAC PRO — Render Pro Page
+// ==============================
+function renderProPage() {
+  const trialBanner = document.getElementById("pro-trial-banner");
+  if (trialBanner) {
+    if (userHasTrial()) {
+      trialBanner.style.display = "block";
+      trialBanner.innerHTML = `<strong style="color:#27ae60;">Trial Access Active</strong> — expires ${getTrialExpiryStr()}. Upgrade to keep full access.`;
+    } else {
+      trialBanner.style.display = "none";
+    }
+  }
+}
+
+// ==============================
+// WAC PRO — In-App Notification Sequence
+// STATUS: INACTIVE — _PRO_NOTIFS_ACTIVE controls this
+// ==============================
+const _PRO_NUDGE_DAY3 = 3 * 24 * 60 * 60 * 1000;
+const _PRO_NUDGE_DAY7 = 7 * 24 * 60 * 60 * 1000;
+
+function checkProNotifications() {
+  if (!_PRO_NOTIFS_ACTIVE) return;
+  if (!currentUser || !userHasPro() || currentUser.isAdmin) return;
+  const proSince = currentUser.proSince;
+  if (!proSince) return;
+  const elapsed = Date.now() - proSince;
+  const seenKey = `wac_pro_notif_${currentUser.uid}`;
+  const seen = lsGet(seenKey) || {};
+
+  if (!seen.welcome) {
+    seen.welcome = true; lsSet(seenKey, seen);
+    showProNotification("welcome", "🎉 Welcome to WAC Pro!", "Your Pro features are now active. Head to the PRO tab to explore everything that's unlocked.");
+    return;
+  }
+  if (elapsed >= _PRO_NUDGE_DAY3 && !seen.day3) {
+    seen.day3 = true; lsSet(seenKey, seen);
+    showProNotification("day3", "📅 Your Weekly Action Plan is waiting", "Three days in — have you checked your Website Action Plan Generator yet? Tap PRO to try it.");
+    return;
+  }
+  if (elapsed >= _PRO_NUDGE_DAY7 && !seen.day7) {
+    seen.day7 = true; lsSet(seenKey, seen);
+    showProNotification("day7", "🔥 One week of WAC Pro", "One week down. Check your streak analytics in the PRO tab — consistency compounds.");
+    return;
+  }
+}
+
+function showProNotification(type, title, message) {
+  const dot = document.getElementById("pro-notif-dot");
+  if (dot) dot.style.display = "block";
+  const existing = document.getElementById("pro-notif-banner");
+  if (existing) existing.remove();
+  const banner = document.createElement("div");
+  banner.id = "pro-notif-banner";
+  banner.style.cssText = "position:fixed;bottom:80px;left:12px;right:12px;max-width:500px;margin:0 auto;background:linear-gradient(135deg,#1a1500,#2d2000);border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;z-index:500;box-shadow:0 4px 24px rgba(201,168,76,.25);display:flex;align-items:flex-start;gap:12px;";
+  banner.innerHTML = `
+    <div style="font-size:22px;flex-shrink:0;">⭐</div>
+    <div style="flex:1;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);letter-spacing:0.04em;margin-bottom:3px;">${esc(title)}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.5;">${esc(message)}</div>
+      <button onclick="navTo('pro');this.closest('#pro-notif-banner').remove();document.getElementById('pro-notif-dot').style.display='none';" style="margin-top:8px;background:var(--gold);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;cursor:pointer;">Open PRO ↗</button>
+    </div>
+    <button onclick="this.closest('#pro-notif-banner').remove();document.getElementById('pro-notif-dot').style.display='none';" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:18px;padding:0;flex-shrink:0;">✕</button>`;
+  document.body.appendChild(banner);
+  setTimeout(() => { if (banner.parentNode) { banner.remove(); if (dot) dot.style.display = "none"; } }, 10000);
+}
+
+// ==============================
+// WAC PRO — Admin: Grant/Remove Pro per member
+// ==============================
+async function toggleProAccess(docId, currentlyPro) {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const action = currentlyPro ? "remove Pro access from" : "grant Pro access to";
+  if (!confirm(`Are you sure you want to ${action} this member?`)) return;
+  try {
+    const newVal = !currentlyPro;
+    const update = { isPro: newVal };
+    if (newVal) update.proSince = Date.now();
+    else update.proSince = null;
+    await updateDoc(doc(db, "wac_registry", docId), update);
+    showToast(newVal ? "Pro access granted ★" : "Pro access removed");
+    loadDirectory();
+  } catch (e) { showToast("Error: " + e.message); }
+}
+
+// ==============================
+// WAC PRO — Admin: Set Trial Access
+// ==============================
+async function setTrialAccess(docId, memberName) {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const input = prompt(`Set trial access for ${memberName}.\n\nEnter number of days from today (e.g. 7 for one week), or leave blank to clear trial:`);
+  if (input === null) return;
+  const days = parseInt(input, 10);
+  let trialUntil = null;
+  if (!isNaN(days) && days > 0) {
+    trialUntil = Date.now() + (days * 24 * 60 * 60 * 1000);
+  } else if (input.trim() === "") {
+    trialUntil = null;
+  } else {
+    showToast("Invalid input — enter a number of days or leave blank to clear."); return;
+  }
+  try {
+    await updateDoc(doc(db, "wac_registry", docId), { trialUntil });
+    showToast(trialUntil ? `Trial set — expires ${new Date(trialUntil).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}` : "Trial access cleared");
+    loadDirectory();
+  } catch (e) { showToast("Error: " + e.message); }
+}
+
+// ==============================
+// WAC PRO — Admin: Grant Pro to All Members
+// STATUS: INACTIVE — shown only when _PRO_GLOBAL_ACTIVE = true
+// ==============================
+async function enableProForAll() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  if (!confirm("This will grant Pro access to ALL current members in the registry.\n\nThis action cannot be undone automatically. Confirm?")) return;
+  if (!confirm("Second confirmation: Grant Pro to all members now?")) return;
+  const statusEl = document.getElementById("pro-global-status");
+  if (statusEl) { statusEl.style.display = "block"; statusEl.textContent = "Processing..."; }
+  try {
+    const snap = await getDocs(collection(db, "wac_registry"));
+    let count = 0;
+    for (const d of snap.docs) {
+      const m = d.data();
+      if (!m.isPro) {
+        await updateDoc(doc(db, "wac_registry", d.id), { isPro: true, proSince: Date.now() });
+        count++;
+      }
+    }
+    if (statusEl) statusEl.textContent = `Done — ${count} member${count !== 1 ? "s" : ""} upgraded to Pro.`;
+    showToast(`Pro enabled for ${count} members ★`);
+    loadDirectory();
+  } catch (e) {
+    if (statusEl) statusEl.textContent = "Error: " + e.message;
+    showToast("Error: " + e.message);
+  }
+}
+
+// ==============================
+// ADMIN: Clear Feed Posts by Week
+// ==============================
+async function clearFeedPostsByWeek() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const sel = document.getElementById("clear-feed-week-select");
+  if (!sel || sel.value === "") { showToast("Select a week first."); return; }
+  const weekIdx = parseInt(sel.value, 10);
+  const WEEK_LABELS = ["W1 · Jun 1–7","W2 · Jun 8–14","W3 · Jun 15–21","W4 · Jun 22–30","W5 · Jul 1–7","W6 · Jul 8–14","W7 · Jul 15–21","W8 · Jul 22–31","W9 · Aug 1–7","W10 · Aug 8–14","W11 · Aug 15–21","W12 · Aug 22–31"];
+  const label = WEEK_LABELS[weekIdx] || `Week ${weekIdx + 1}`;
+  if (!confirm(`Delete all feed posts for ${label}?\n\nThis removes feed cards only. Tracker submissions, engagement records, and points are NOT affected.`)) return;
+  const statusEl = document.getElementById("clear-feed-status");
+  if (statusEl) { statusEl.style.display = "block"; statusEl.textContent = "Finding posts..."; }
+  try {
+    const weekStart = WEEK_SCHEDULE[weekIdx] ? WEEK_SCHEDULE[weekIdx][0] : null;
+    const weekEnd = WEEK_SCHEDULE[weekIdx] ? WEEK_SCHEDULE[weekIdx][1] : null;
+    let snap;
+    if (weekStart && weekEnd) {
+      snap = await getDocs(query(collection(db, "posts"), where("timestamp", ">=", weekStart), where("timestamp", "<=", weekEnd)));
+    } else {
+      snap = await getDocs(collection(db, "posts"));
+    }
+    const toDelete = weekStart && weekEnd ? snap.docs : snap.docs.filter(d => { const ts = d.data().timestamp || 0; return ts >= weekStart && ts <= weekEnd; });
+    if (!toDelete.length) {
+      if (statusEl) statusEl.textContent = `No feed posts found for ${label}.`;
+      showToast(`No posts found for ${label}`); return;
+    }
+    let deleted = 0;
+    for (const d of toDelete) { await deleteDoc(doc(db, "posts", d.id)); deleted++; }
+    if (statusEl) statusEl.textContent = `Done — deleted ${deleted} feed post${deleted !== 1 ? "s" : ""} for ${label}.`;
+    showToast(`Cleared ${deleted} feed post${deleted !== 1 ? "s" : ""} for ${label} 🗑`);
+    loadFeed();
+  } catch (e) {
+    if (statusEl) statusEl.textContent = "Error: " + e.message;
+    showToast("Error: " + e.message);
+  }
+}
+
+// ==============================
 // EXPOSE GLOBALS
 // ==============================
 window.handleLogin = handleLogin;
@@ -3164,6 +3598,11 @@ window.installPWA = installPWA;
 window.exportCSV = exportCSV;
 window.filterMembers = filterMembers;
 window.loadLeaderboard = loadLeaderboard;
+window.toggleProAccess = toggleProAccess;
+window.setTrialAccess = setTrialAccess;
+window.enableProForAll = enableProForAll;
+window.clearFeedPostsByWeek = clearFeedPostsByWeek;
+window.seedDefaultResources = seedDefaultResources;
 
 // ==============================
 // INIT COMPLETE
