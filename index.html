@@ -49,46 +49,35 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
 /* ==============================
    APP SHELL
    ============================== */
-#app {
-  display: none;
-  position: fixed;
-  inset: 0;
-  flex-direction: column;
-  overflow: hidden;
-}
-#app.visible { display: flex !important; }
-
-#app-scroll {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-}
+#app { display: none; }
+#app.visible { display: block !important; }
 
 /* ==============================
    TOPNAV
    ============================== */
 .topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 0 20px;
+  height: 60px;
 }
 .topnav-brand {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
+  font-size: 32px;
   color: var(--gold);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
+  cursor: pointer;
 }
 .topnav-user {
   font-size: 13px;
   color: var(--text-muted);
-  max-width: 140px;
+  max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -98,44 +87,71 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
    BOTTOM NAV
    ============================== */
 .bottomnav {
-  position: relative;
-  flex-shrink: 0;
-  height: calc(68px + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 200;
   background: var(--surface);
   border-top: 1px solid var(--border);
-  z-index: 100;
+  display: flex;
+  align-items: stretch;
+  min-height: 68px;
+  height: calc(68px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
 }
-.bottomnav button {
+.nav-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  background: none;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
   border: none;
+  background: transparent;
   color: var(--text-muted);
-  font-size: 10px;
-  padding: 6px 4px;
-  min-width: 0;
+  font-size: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.03em;
   transition: color 0.15s;
+  padding: 8px 2px;
+  position: relative;
 }
-.bottomnav button .nav-icon { font-size: 20px; }
-.bottomnav button.active { color: var(--gold); }
-.bottomnav button:hover { color: var(--gold-dark); }
+.nav-item svg { width: 20px; height: 20px; }
+.nav-item.active { color: var(--gold); }
+.nav-item:hover { color: var(--gold-dark); }
+
+/* ==============================
+   SCROLL WRAPPER
+   ============================== */
+#app-scroll {
+  position: fixed;
+  top: 60px;
+  bottom: calc(68px + env(safe-area-inset-bottom));
+  left: 0; right: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
 
 /* ==============================
    PAGE CONTAINERS
    ============================== */
-.page { display: none; padding: 20px 16px 40px; max-width: 600px; margin: 0 auto; }
+.page { display: none; padding: 20px 20px 40px; max-width: 680px; margin: 0 auto; }
 .page.active { display: block; }
+.page-header { margin-bottom: 24px; }
 .page-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
-  margin-bottom: 16px;
+  font-size: 40px;
+  letter-spacing: 0.04em;
+  line-height: 1;
   color: var(--text);
+  margin-bottom: 0;
+}
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
 }
 
 /* ==============================
@@ -433,12 +449,30 @@ textarea.form-input { resize: vertical; min-height: 80px; }
    ADMIN COMPOSE
    ============================== */
 .admin-compose {
-  background: linear-gradient(135deg, rgba(184,134,11,0.06), var(--surface));
-  border: 1.5px solid var(--gold-light);
+  background: #fffbf0;
+  border: 1.5px dashed var(--gold);
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 16px;
 }
+.admin-banner {
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-banner-icon { font-size: 22px; flex-shrink: 0; }
+.admin-banner-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+.admin-banner-sub { font-size: 12px; opacity: 0.7; margin-top: 2px; }
 .admin-compose .admin-tag {
   display: inline-block;
   background: var(--gold);
@@ -1106,12 +1140,19 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- PAGE: FEED -->
     <div class="page" id="page-feed">
-      <div class="page-title">Community Feed</div>
-      <p class="text-sm text-muted" style="margin:-4px 0 16px;">Post a win, share an update with a link, or give encouragement.</p>
+      <div class="page-header">
+        <div class="page-title">Community Feed</div>
+        <div class="page-subtitle">Post a win, share an update with a link, or give encouragement.</div>
+      </div>
       <!-- Admin announcement compose -->
       <div class="admin-compose" id="admin-announce-box" style="display:none;">
-        <div class="admin-tag">ADMIN</div>
-        <div class="card-title">Post Announcement</div>
+        <div class="admin-banner">
+          <span class="admin-banner-icon">🔐</span>
+          <div>
+            <div class="admin-banner-title">Post Announcement</div>
+            <div class="admin-banner-sub">Visible to all members at the top of the feed</div>
+          </div>
+        </div>
         <div class="form-group">
           <input type="text" id="ann-title" class="form-input" placeholder="Announcement title" />
         </div>
@@ -1136,11 +1177,19 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- PAGE: RESOURCES -->
     <div class="page" id="page-resources">
-      <div class="page-title">Resources</div>
+      <div class="page-header">
+        <div class="page-title">Resources</div>
+        <div class="page-subtitle">Website strategy guides and tools — tap any card to read.</div>
+      </div>
       <!-- Admin resource compose -->
       <div class="admin-compose" id="admin-resource-box" style="display:none;">
-        <div class="admin-tag">ADMIN</div>
-        <div class="card-title">Add Resource</div>
+        <div class="admin-banner">
+          <span class="admin-banner-icon">📚</span>
+          <div>
+            <div class="admin-banner-title">Add Resource</div>
+            <div class="admin-banner-sub">Appears in the resource library for all members</div>
+          </div>
+        </div>
         <div class="form-group"><input type="text" id="res-emoji" class="form-input" placeholder="Emoji icon (e.g. 📖)" /></div>
         <div class="form-group"><input type="text" id="res-title" class="form-input" placeholder="Title" /></div>
         <div class="form-group"><input type="text" id="res-desc" class="form-input" placeholder="Short description" /></div>
@@ -1157,7 +1206,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- PAGE: SUBMIT -->
     <div class="page" id="page-submit">
-      <div class="page-title">Submit Update</div>
+      <div class="page-header">
+        <div class="page-title">Submit Update</div>
+        <div class="page-subtitle">Log your weekly website update for points.</div>
+      </div>
       <div id="round-ended-banner" class="round-ended-banner" style="display:none;">
         <div class="round-ended-icon">🏁</div>
         <div>
@@ -1239,7 +1291,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- PAGE: RANKS (Leaderboard) -->
     <div class="page" id="page-ranks">
-      <div class="page-title">Leaderboard</div>
+      <div class="page-header">
+        <div class="page-title">Leaderboard</div>
+        <div class="page-subtitle">Real-time points standings.</div>
+      </div>
       <div class="text-sm text-muted mb-16">Round 1 · May–July 2026</div>
       <div id="leaderboard-list"></div>
       <div class="points-card">
@@ -1254,7 +1309,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- PAGE: TRACKER -->
     <div class="page" id="page-tracker">
-      <div class="page-title">Tracker</div>
+      <div class="page-header">
+        <div class="page-title">Tracker</div>
+        <div class="page-subtitle">Your 12-week accountability record.</div>
+      </div>
       <div class="card">
         <div id="tracker-header" class="mb-16"></div>
         <div id="tracker-body"></div>
@@ -1267,7 +1325,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- PAGE: REPORTS -->
     <div class="page" id="page-reports">
-      <div class="page-title">All-Star Reports</div>
+      <div class="page-header">
+        <div class="page-title">Reports</div>
+        <div class="page-subtitle">All-Star progress, engagement activity, and admin tools.</div>
+      </div>
       <button class="btn btn-outline btn-sm export-btn" onclick="exportCSV()">📥 Export CSV</button>
       <div id="report-table-wrap" class="report-table-wrap"></div>
       <div class="card mt-16">
@@ -1325,13 +1386,20 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- PAGE: MEMBERS -->
     <div class="page" id="page-members">
-      <div class="page-title">Members</div>
-      <p class="text-sm text-muted mb-16">Tap any card to visit their website.</p>
+      <div class="page-header">
+        <div class="page-title">Members</div>
+        <div class="page-subtitle">Tap any card to visit their website.</div>
+      </div>
       <input type="text" class="search-bar" id="member-search" placeholder="Search members..." oninput="filterMembers()" />
       <!-- Admin create member -->
       <div class="admin-compose" id="admin-create-box" style="display:none;">
-        <div class="admin-tag">ADMIN</div>
-        <div class="card-title">Create Member Account</div>
+        <div class="admin-banner">
+          <span class="admin-banner-icon">👤</span>
+          <div>
+            <div class="admin-banner-title">Create Member Account</div>
+            <div class="admin-banner-sub">Creates Firebase Auth + registry doc in one step</div>
+          </div>
+        </div>
         <div class="form-group"><input type="text" id="cm-name" class="form-input" placeholder="Full Name" /></div>
         <div class="form-group"><input type="email" id="cm-email" class="form-input" placeholder="Email" /></div>
         <div class="form-group"><input type="url" id="cm-website" class="form-input" placeholder="Website URL" /></div>
@@ -1368,7 +1436,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
     <!-- PAGE: PROFILE -->
     <div class="page" id="page-profile">
-      <div class="page-title">Profile</div>
+      <div class="page-header">
+        <div class="page-title">Profile</div>
+      </div>
       <div id="profile-hero" class="profile-hero"></div>
       <!-- Push notifications card -->
       <div class="push-notif-card" id="push-notif-card">
@@ -1493,15 +1563,43 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
   <!-- BOTTOM NAV -->
   <nav class="bottomnav" id="bottomnav" style="display:none;">
-    <button onclick="navTo('feed')" data-page="feed"><span class="nav-icon">💬</span><span>Feed</span></button>
-    <button onclick="navTo('resources')" data-page="resources"><span class="nav-icon">📚</span><span>Resources</span></button>
-    <button onclick="navTo('submit')" data-page="submit"><span class="nav-icon">📤</span><span>Submit</span></button>
-    <button onclick="navTo('ranks')" data-page="ranks"><span class="nav-icon">🏆</span><span>Ranks</span></button>
-    <button onclick="navTo('tracker')" data-page="tracker"><span class="nav-icon">✅</span><span>Tracker</span></button>
-    <button onclick="navTo('reports')" data-page="reports"><span class="nav-icon">📊</span><span>Reports</span></button>
-    <button onclick="navTo('members')" data-page="members"><span class="nav-icon">👥</span><span>Members</span></button>
-    <button onclick="navTo('profile')" data-page="profile"><span class="nav-icon">👤</span><span>Profile</span></button>
-    <button id="nav-pro" onclick="navTo('pro')" data-page="pro" style="display:none;position:relative;"><span class="nav-icon">⭐</span><span style="background:linear-gradient(135deg,var(--gold),var(--gold-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700;">PRO</span><span id="pro-notif-dot" class="pro-notif-dot" style="display:none;"></span></button>
+    <button class="nav-item active" id="nav-feed" onclick="navTo('feed')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Feed
+    </button>
+    <button class="nav-item" id="nav-resources" onclick="navTo('resources')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Resources
+    </button>
+    <button class="nav-item" id="nav-submit" onclick="navTo('submit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Submit
+    </button>
+    <button class="nav-item" id="nav-ranks" onclick="navTo('ranks')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      Ranks
+    </button>
+    <button class="nav-item" id="nav-tracker" onclick="navTo('tracker')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Tracker
+    </button>
+    <button class="nav-item" id="nav-reports" onclick="navTo('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+      Reports
+    </button>
+    <button class="nav-item" id="nav-members" onclick="navTo('members')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Members
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="navTo('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </button>
+    <button class="nav-item" id="nav-pro" onclick="navTo('pro')" style="display:none;position:relative;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span style="background:linear-gradient(135deg,var(--gold),var(--gold-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:600;">PRO</span>
+      <span id="pro-notif-dot" class="pro-notif-dot" style="display:none;"></span>
+    </button>
   </nav>
 </div>
 
@@ -2010,6 +2108,8 @@ function bootApp() {
 
   // 7. Default to feed
   navTo("feed");
+  const feedNav = document.getElementById("nav-feed");
+  if (feedNav) feedNav.classList.add("active");
 
   // 8. Delayed features
   setTimeout(showWelcomeModal, 600);
@@ -2029,8 +2129,8 @@ function navTo(page) {
   const target = document.getElementById("page-" + page);
   if (target) target.classList.add("active");
 
-  document.querySelectorAll(".bottomnav button").forEach(b => b.classList.remove("active"));
-  const navBtn = document.querySelector(`.bottomnav button[data-page="${page}"]`);
+  document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+  const navBtn = document.getElementById("nav-" + page);
   if (navBtn) navBtn.classList.add("active");
 
   // Scroll to top
