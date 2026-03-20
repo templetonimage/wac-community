@@ -2035,8 +2035,11 @@ function navTo(page) {
   if (scroller) scroller.scrollTop = 0;
 
   // Page-specific loads
+  if (page === "feed") { loadFeed(); loadAnnouncements(); }
   if (page === "submit") loadSubmitPage();
   if (page === "ranks") loadLeaderboard();
+  if (page === "resources") loadResources();
+  if (page === "members") loadDirectory();
   if (page === "reports") { loadTrackerReport(); }
   if (page === "pro") renderProPage();
 }
@@ -2076,11 +2079,11 @@ async function submitPost() {
 
 async function loadFeed() {
   try {
-    const q = query(collection(db, "posts"), orderBy("timestamp", "desc"), limit(50));
-    const snap = await getDocs(q);
+    const snap = await getDocs(collection(db, "posts"));
     const posts = [];
     snap.forEach(d => posts.push({ id: d.id, ...d.data() }));
-    renderFeed(posts);
+    posts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    renderFeed(posts.slice(0, 50));
   } catch (e) {
     console.error("loadFeed error:", e);
   }
@@ -2188,11 +2191,11 @@ async function submitAnnouncement() {
 
 async function loadAnnouncements() {
   try {
-    const q = query(collection(db, "announcements"), orderBy("timestamp", "desc"), limit(10));
-    const snap = await getDocs(q);
+    const snap = await getDocs(collection(db, "announcements"));
     const anns = [];
     snap.forEach(d => anns.push({ id: d.id, ...d.data() }));
-    renderAnnouncements(anns);
+    anns.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    renderAnnouncements(anns.slice(0, 10));
   } catch (e) { console.error("loadAnnouncements error:", e); }
 }
 
@@ -2246,16 +2249,12 @@ async function submitResource() {
 
 async function loadResources() {
   try {
-    let snap;
-    try {
-      const q = query(collection(db, "resources"), orderBy("timestamp", "desc"));
-      snap = await getDocs(q);
-    } catch (indexErr) {
-      // Index may not exist yet — fall back to unordered fetch
-      snap = await getDocs(collection(db, "resources"));
-    }
+    // Fetch without orderBy to avoid requiring a Firestore composite index
+    const snap = await getDocs(collection(db, "resources"));
     _allResources = [];
     snap.forEach(d => _allResources.push({ id: d.id, ...d.data() }));
+    // Sort client-side by timestamp descending
+    _allResources.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     // If empty and admin, show seed prompt
     if (!_allResources.length && currentUser && currentUser.isAdmin) {
       document.getElementById("resource-grid").innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:24px 0;">
@@ -2264,9 +2263,16 @@ async function loadResources() {
       </div>`;
       return;
     }
+    if (!_allResources.length) {
+      document.getElementById("resource-grid").innerHTML = '<p class="text-sm text-muted" style="padding:24px 0;">No resources yet.</p>';
+      return;
+    }
     renderResourceFilters();
     renderResources();
-  } catch (e) { console.error("loadResources error:", e); }
+  } catch (e) {
+    console.error("loadResources error:", e);
+    document.getElementById("resource-grid").innerHTML = `<p class="text-sm text-muted" style="padding:24px 0;">Could not load resources: ${esc(e.message)}</p>`;
+  }
 }
 
 async function seedDefaultResources() {
@@ -2544,21 +2550,18 @@ async function submitEngagement() {
 
 async function loadEngHistory() {
   try {
-    const weekIdx = getWeekIndex();
     const count = await getWeeklyEngCount();
     const el = document.getElementById("eng-count-display");
     if (el) el.textContent = `${count}/${MAX_ENG_PER_WEEK} engagements this week`;
 
-    const q = query(collection(db, "engagements"),
-      where("authorUid", "==", currentUser.uid),
-      orderBy("timestamp", "desc"),
-      limit(20));
+    const q = query(collection(db, "engagements"), where("authorUid", "==", currentUser.uid));
     const snap = await getDocs(q);
     const items = [];
     snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     const el2 = document.getElementById("eng-history");
     if (!items.length) { el2.innerHTML = '<p class="text-sm text-muted">No engagements yet.</p>'; return; }
-    el2.innerHTML = items.map(e => `<div class="eng-history-item">
+    el2.innerHTML = items.slice(0, 20).map(e => `<div class="eng-history-item">
       <div style="font-weight:600;">${esc(e.type)} — <a href="${esc(e.targetUrl)}" target="_blank" rel="noopener">${esc(e.targetUrl)}</a></div>
       ${e.note ? `<div class="text-muted">${esc(e.note)}</div>` : ""}
       <div class="text-muted" style="font-size:11px;">${timeAgo(e.timestamp)} · +${e.pts} pts</div>
@@ -2572,12 +2575,11 @@ async function loadEngHistory() {
 async function loadMySubmissions() {
   if (currentUser.isAdmin) { document.getElementById("my-submissions").innerHTML = ""; return; }
   try {
-    const q = query(collection(db, "submissions"),
-      where("authorUid", "==", currentUser.uid),
-      orderBy("timestamp", "desc"));
+    const q = query(collection(db, "submissions"), where("authorUid", "==", currentUser.uid));
     const snap = await getDocs(q);
     const items = [];
     snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     const el = document.getElementById("my-submissions");
     if (!items.length) { el.innerHTML = '<p class="text-sm text-muted">No submissions yet.</p>'; return; }
     el.innerHTML = items.map(s => `<div class="submission-item">
