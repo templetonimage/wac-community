@@ -59,8 +59,8 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 200;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -76,12 +76,32 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
 }
 .topnav-user {
   font-size: 13px;
-  color: var(--text-muted);
+  font-weight: 600;
+  color: #fff;
   max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Profile avatar in topnav */
+.topnav-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: 2px solid var(--gold);
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.topnav-avatar:hover { opacity: 0.85; }
 
 /* ==============================
    BOTTOM NAV
@@ -90,8 +110,8 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   position: fixed;
   bottom: 0; left: 0; right: 0;
   z-index: 200;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
+  background: #1a1a1a;
+  border-top: 1px solid #333;
   display: flex;
   align-items: stretch;
   min-height: 68px;
@@ -108,7 +128,7 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   cursor: pointer;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.45);
   font-size: 9px;
   font-family: 'DM Sans', sans-serif;
   font-weight: 500;
@@ -119,7 +139,7 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
 }
 .nav-item svg { width: 20px; height: 20px; }
 .nav-item.active { color: var(--gold); }
-.nav-item:hover { color: var(--gold-dark); }
+.nav-item:hover { color: rgba(255,255,255,0.8); }
 
 /* ==============================
    SCROLL WRAPPER
@@ -241,13 +261,14 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   background: #fbf9f5;
 }
 .auth-card-wrap {
-  background: var(--surface);
+  background: #1a1a1a;
   border-radius: 20px;
   padding: 48px 32px 40px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 40px rgba(0,0,0,0.4);
   text-align: center;
+  border: 1px solid #2e2e2e;
 }
 .auth-logo {
   font-family: 'Bebas Neue', sans-serif;
@@ -262,7 +283,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   font-family: 'DM Sans', sans-serif;
   font-weight: 400;
   font-size: 16px;
-  color: var(--text);
+  color: rgba(255,255,255,0.6);
   letter-spacing: 0.06em;
   text-align: center;
   text-transform: uppercase;
@@ -290,22 +311,22 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   font-family: 'Bebas Neue', sans-serif;
   font-size: 14px;
   letter-spacing: 0.08em;
-  color: var(--text);
+  color: rgba(255,255,255,0.75);
   margin-bottom: 8px;
 }
 .auth-form-input {
   width: 100%;
   padding: 16px 18px;
-  border: 1px solid var(--border);
+  border: 1px solid #333;
   border-radius: 10px;
-  background: var(--surface2);
+  background: #111;
   font-size: 16px;
-  color: var(--text);
+  color: #fff;
   outline: none;
   transition: border-color 0.15s;
 }
 .auth-form-input:focus { border-color: var(--gold); }
-.auth-form-input::placeholder { color: #aaa; }
+.auth-form-input::placeholder { color: rgba(255,255,255,0.3); }
 .auth-form-group { margin-bottom: 20px; }
 .auth-btn {
   width: 100%;
@@ -323,7 +344,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .auth-btn:hover { background: var(--gold-dark); }
 .auth-error {
   display: none;
-  color: var(--danger);
+  color: #e74c3c;
   font-size: 13px;
   margin-top: 12px;
   text-align: center;
@@ -332,7 +353,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   text-align: center;
   margin-top: 20px;
   font-size: 14px;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.45);
 }
 .auth-forgot a {
   color: var(--gold);
@@ -1134,7 +1155,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div style="display:flex;align-items:center;gap:10px;">
         <span class="topnav-user" id="topnav-user"></span>
         <span id="topnav-pro-badge" style="display:none;" class="pro-badge">PRO</span>
-        <button class="btn btn-outline btn-sm" onclick="handleLogout()" style="white-space:nowrap;">Sign Out</button>
+        <button id="topnav-avatar-btn" class="topnav-avatar" onclick="navTo('profile')" title="My Profile" style="background:none;border:none;padding:0;">
+          <div id="topnav-avatar" class="topnav-avatar">?</div>
+        </button>
       </div>
     </nav>
 
@@ -1590,10 +1613,6 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <button class="nav-item" id="nav-members" onclick="navTo('members')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Members
-    </button>
-    <button class="nav-item" id="nav-profile" onclick="navTo('profile')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Profile
     </button>
     <button class="nav-item" id="nav-pro" onclick="navTo('pro')" style="display:none;position:relative;">
       <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -2057,8 +2076,13 @@ function bootApp() {
   document.getElementById("app").classList.add("visible");
   document.getElementById("bottomnav").style.display = "flex";
 
-  // 2. Set topnav username
+  // 2. Set topnav username and avatar
   document.getElementById("topnav-user").textContent = currentUser.name;
+  const _avatarEl = document.getElementById("topnav-avatar");
+  if (_avatarEl) {
+    const _initials = (currentUser.name || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+    _avatarEl.textContent = _initials;
+  }
 
   // 3. Pro topnav badge
   const _proBadgeEl = document.getElementById("topnav-pro-badge");
