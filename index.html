@@ -128,7 +128,7 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   cursor: pointer;
   border: none;
   background: transparent;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.7);
   font-size: 9px;
   font-family: 'DM Sans', sans-serif;
   font-weight: 500;
@@ -139,7 +139,7 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
 }
 .nav-item svg { width: 20px; height: 20px; }
 .nav-item.active { color: var(--gold); }
-.nav-item:hover { color: rgba(255,255,255,0.8); }
+.nav-item:hover { color: #fff; }
 
 /* ==============================
    SCROLL WRAPPER
@@ -1155,6 +1155,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div style="display:flex;align-items:center;gap:10px;">
         <span class="topnav-user" id="topnav-user"></span>
         <span id="topnav-pro-badge" style="display:none;" class="pro-badge">PRO</span>
+        <button onclick="handleLogout()" style="padding:6px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--gold);background:transparent;color:var(--gold);transition:all .15s;white-space:nowrap;">Sign Out</button>
         <button id="topnav-avatar-btn" class="topnav-avatar" onclick="navTo('profile')" title="My Profile" style="background:none;border:none;padding:0;">
           <div id="topnav-avatar" class="topnav-avatar">?</div>
         </button>
