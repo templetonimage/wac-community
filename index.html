@@ -1113,6 +1113,72 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
 /* Export CSV btn */
 .export-btn { margin-bottom: 16px; }
+
+/* ── DASHBOARD PAGE ── */
+@keyframes dashFadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.dash-animate{opacity:0;animation:dashFadeUp 0.42s ease forwards;}
+.dash-welcome{margin-bottom:20px;}
+.dash-welcome-sub{font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
+.dash-welcome-name{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:var(--text);letter-spacing:0.03em;}
+.dash-welcome-name span{color:var(--gold);}
+.dash-welcome-meta{font-size:13px;color:var(--text-muted);margin-top:5px;}
+.dash-status-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.dash-status-pill{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:600;border:1.5px solid;white-space:nowrap;}
+.dash-status-pill.done{background:rgba(39,174,96,0.08);border-color:rgba(39,174,96,0.3);color:#27ae60;}
+.dash-status-pill.pending{background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.3);color:var(--gold-dark);}
+.dash-status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.dash-status-pill.done .dash-status-dot{animation:dashPulseGreen 2s infinite;}
+.dash-status-pill.pending .dash-status-dot{animation:dashPulseGold 2s infinite;}
+@keyframes dashPulseGreen{0%,100%{box-shadow:0 0 0 0 rgba(39,174,96,0.5);}50%{box-shadow:0 0 0 5px rgba(39,174,96,0);}}
+@keyframes dashPulseGold{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.5);}50%{box-shadow:0 0 0 5px rgba(201,168,76,0);}}
+.dash-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.dash-stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;}
+.dash-stat-card:hover{border-color:var(--gold-light);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.1);}
+.dash-stat-card.highlight{background:linear-gradient(135deg,#fffbf0,#fff8e6);border-color:var(--gold-light);}
+.dash-stat-icon{font-size:22px;margin-bottom:12px;display:block;}
+.dash-stat-value{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;letter-spacing:0.02em;color:var(--text);margin-bottom:4px;}
+.dash-stat-card.highlight .dash-stat-value{color:var(--gold);}
+.dash-stat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);}
+.dash-stat-delta{position:absolute;top:16px;right:16px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(39,174,96,0.1);color:#27ae60;}
+.dash-quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.dash-quick-btn{display:flex;align-items:center;gap:10px;padding:16px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;box-shadow:var(--shadow);transition:all 0.15s;text-align:left;}
+.dash-quick-btn:hover{border-color:var(--gold);color:var(--gold);background:#fffbf0;}
+.dash-quick-btn-icon{font-size:20px;flex-shrink:0;}
+.dash-quick-btn-label{line-height:1.3;}
+.dash-quick-btn-sub{font-size:11px;font-weight:400;color:var(--text-muted);margin-top:1px;display:block;}
+.dash-allstar-banner{background:linear-gradient(135deg,#fffbf0,#fdf5e0);border:1.5px solid var(--gold-light);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.dash-allstar-banner::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));}
+.dash-allstar-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.dash-allstar-star{font-size:30px;flex-shrink:0;}
+.dash-allstar-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.04em;}
+.dash-allstar-sub{font-size:12px;color:var(--text-muted);margin-top:1px;}
+.dash-prog-track{background:var(--border);border-radius:999px;height:10px;overflow:hidden;margin-bottom:8px;}
+.dash-prog-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));transition:width 1.4s cubic-bezier(0.22,1,0.36,1);position:relative;}
+.dash-prog-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45));border-radius:999px;animation:dashShimmer 1.8s ease-in-out infinite;}
+@keyframes dashShimmer{0%,100%{opacity:0.4}50%{opacity:1}}
+.dash-prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px;}
+.dash-week-dots{display:flex;gap:5px;flex-wrap:wrap;}
+.dash-week-dot{width:30px;height:30px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text-muted);transition:all 0.25s;}
+.dash-week-dot.complete{background:rgba(201,168,76,0.15);border-color:var(--gold-light);color:var(--gold-dark);}
+.dash-week-dot.current{background:var(--gold);border-color:var(--gold-dark);color:#fff;box-shadow:0 2px 8px rgba(201,168,76,0.4);}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);}
+.dash-card-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.dash-card-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;display:flex;align-items:center;gap:8px;}
+.dash-card-meta{font-size:12px;color:var(--text-muted);font-weight:500;}
+.dash-lb-row{display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:10px;transition:background 0.15s;cursor:default;}
+.dash-lb-row:hover{background:var(--surface2);}
+.dash-lb-row.you{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);margin:3px 0;}
+.dash-lb-rank{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text-muted);width:30px;text-align:center;flex-shrink:0;}
+.dash-lb-rank.top3{color:var(--gold);}
+.dash-lb-info{flex:1;min-width:0;}
+.dash-lb-name{font-weight:700;font-size:14px;}
+.dash-lb-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.dash-lb-pts{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);flex-shrink:0;}
+.dash-you-badge{display:inline-block;background:var(--gold);color:#fff;font-size:10px;font-weight:700;letter-spacing:0.08em;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:middle;}
+.dash-lb-divider{height:1px;background:var(--border);margin:4px 0;}
+.dash-view-all-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:14px;padding:11px;border:1.5px solid var(--border);border-radius:var(--radius);background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all 0.15s;}
+.dash-view-all-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.04);}
+.dash-lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.04em;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -1151,7 +1217,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   <div id="app-scroll">
     <!-- TOPNAV -->
     <nav class="topnav">
-      <div class="topnav-brand" onclick="navTo('feed')" style="cursor:pointer;">WAC</div>
+      <div class="topnav-brand" onclick="navTo('dashboard')" style="cursor:pointer;">WAC</div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span class="topnav-user" id="topnav-user"></span>
         <span id="topnav-pro-badge" style="display:none;" class="pro-badge">PRO</span>
@@ -1161,6 +1227,81 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         </button>
       </div>
     </nav>
+
+    <!-- PAGE: DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-welcome dash-animate" style="animation-delay:0.05s;">
+        <div class="dash-welcome-sub">Round 1 · <span id="dash-week-label">Week —</span></div>
+        <div class="dash-welcome-name">Welcome back,<br><span id="dash-name">—</span></div>
+        <div class="dash-welcome-meta" id="dash-date-meta"></div>
+      </div>
+      <div class="dash-status-strip dash-animate" id="dash-status-strip" style="animation-delay:0.15s;"></div>
+      <div class="dash-stats-grid">
+        <div class="dash-stat-card highlight dash-animate" style="animation-delay:0.25s;">
+          <span class="dash-stat-icon">⚡</span>
+          <div class="dash-stat-value" id="dash-val-total">0</div>
+          <div class="dash-stat-label">Total Points</div>
+          <div class="dash-stat-delta" id="dash-delta" style="display:none;"></div>
+        </div>
+        <div class="dash-stat-card dash-animate" style="animation-delay:0.32s;">
+          <span class="dash-stat-icon">🌐</span>
+          <div class="dash-stat-value" id="dash-val-posts">0</div>
+          <div class="dash-stat-label">Post Points</div>
+        </div>
+        <div class="dash-stat-card dash-animate" style="animation-delay:0.39s;">
+          <span class="dash-stat-icon">🤝</span>
+          <div class="dash-stat-value" id="dash-val-eng">0</div>
+          <div class="dash-stat-label">Engage Points</div>
+        </div>
+        <div class="dash-stat-card dash-animate" style="animation-delay:0.46s;">
+          <span class="dash-stat-icon">📅</span>
+          <div class="dash-stat-value" id="dash-val-count">0</div>
+          <div class="dash-stat-label">Posts Made</div>
+        </div>
+      </div>
+      <div class="dash-quick-actions dash-animate" style="animation-delay:0.5s;">
+        <button class="dash-quick-btn" onclick="navTo('submit');loadSubmitPage();">
+          <span class="dash-quick-btn-icon">📤</span>
+          <span class="dash-quick-btn-label">Submit Post<span class="dash-quick-btn-sub">Log this week's update</span></span>
+        </button>
+        <button class="dash-quick-btn" onclick="navTo('tracker');">
+          <span class="dash-quick-btn-icon">✅</span>
+          <span class="dash-quick-btn-label">My Tracker<span class="dash-quick-btn-sub">Mark week complete</span></span>
+        </button>
+      </div>
+      <div class="dash-allstar-banner dash-animate" style="animation-delay:0.55s;">
+        <div class="dash-allstar-top">
+          <div class="dash-allstar-star">⭐</div>
+          <div>
+            <div class="dash-allstar-title">All-Star Progress</div>
+            <div class="dash-allstar-sub" id="dash-allstar-sub">Loading...</div>
+          </div>
+        </div>
+        <div class="dash-prog-track"><div class="dash-prog-fill" id="dash-prog-fill"></div></div>
+        <div class="dash-prog-labels">
+          <span>0 posts</span>
+          <span id="dash-prog-pct">0%</span>
+          <span>24 posts</span>
+        </div>
+        <div class="dash-week-dots" id="dash-week-dots"></div>
+      </div>
+      <div class="dash-card dash-animate" style="animation-delay:0.62s;">
+        <div class="dash-card-title-row">
+          <div class="dash-card-title">🏆 Top 10 Standings</div>
+          <div class="dash-card-meta">Live · Round 1</div>
+        </div>
+        <div id="dash-lb-list">
+          <div style="padding:24px;text-align:center;">
+            <div style="font-size:32px;">🏆</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:8px;">Loading...</div>
+          </div>
+        </div>
+        <button class="dash-view-all-btn" onclick="navTo('ranks');loadLeaderboard();">
+          View Full Leaderboard
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
 
     <!-- PAGE: FEED -->
     <div class="page" id="page-feed">
@@ -1587,7 +1728,11 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
   <!-- BOTTOM NAV -->
   <nav class="bottomnav" id="bottomnav" style="display:none;">
-    <button class="nav-item active" id="nav-feed" onclick="navTo('feed')">
+    <button class="nav-item active" id="nav-dashboard" onclick="navTo('dashboard');">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" id="nav-feed" onclick="navTo('feed')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Feed
     </button>
@@ -2130,11 +2275,12 @@ function bootApp() {
   loadLeaderboard();
   loadTrackerReport();
   loadEngHistory();
+  loadDashboard();
 
-  // 7. Default to feed
-  navTo("feed");
-  const feedNav = document.getElementById("nav-feed");
-  if (feedNav) feedNav.classList.add("active");
+  // 7. Default to dashboard
+  navTo("dashboard");
+  const dashNav = document.getElementById("nav-dashboard");
+  if (dashNav) dashNav.classList.add("active");
 
   // 8. Delayed features
   setTimeout(showWelcomeModal, 600);
@@ -2163,6 +2309,7 @@ function navTo(page) {
   if (scroller) scroller.scrollTop = 0;
 
   // Page-specific loads
+  if (page === "dashboard") loadDashboard();
   if (page === "feed") { loadFeed(); loadAnnouncements(); }
   if (page === "submit") loadSubmitPage();
   if (page === "ranks") loadLeaderboard();
@@ -2176,6 +2323,198 @@ function loadSubmitPage() {
   updatePtsPreview();
   loadEngHistory();
   loadMySubmissions();
+}
+
+// ─────────────────────────────────────────────
+//  DASHBOARD
+// ─────────────────────────────────────────────
+function _dashAvatarHTML(name) {
+  const initials = (name || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  return `<div class="dash-lb-avatar">${initials}</div>`;
+}
+
+window.loadDashboard = async function() {
+  if (!currentUser) return;
+
+  // Reset animations so they replay on every visit
+  document.querySelectorAll('#page-dashboard .dash-animate').forEach(el => {
+    el.style.animation = 'none';
+    void el.offsetHeight;
+    el.style.animation = '';
+  });
+  ['dash-val-total','dash-val-posts','dash-val-eng','dash-val-count'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '0';
+  });
+  const progFill = document.getElementById('dash-prog-fill');
+  if (progFill) { progFill.style.transition = 'none'; progFill.style.width = '0%'; void progFill.offsetHeight; }
+
+  // Static header fields
+  const firstName = (currentUser.name || '').split(' ')[0] || currentUser.name;
+  const nameEl = document.getElementById('dash-name');
+  if (nameEl) nameEl.textContent = firstName;
+
+  const now = Date.now();
+  const weekIdx = getWeekIndex();
+  const weekEl = document.getElementById('dash-week-label');
+  if (weekEl) weekEl.textContent = weekIdx >= 0 ? 'Week ' + (weekIdx + 1) + ' of 12' : '—';
+
+  const metaEl = document.getElementById('dash-date-meta');
+  if (metaEl) metaEl.textContent = new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+
+  if (!db || useLocalFallback) {
+    _renderDashboard({total:0, postPts:0, engPts:0, trackerPostCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
+    return;
+  }
+
+  try {
+    const {getDocs, collection:col, query:q, where, orderBy:ob, limit:lim, getDoc, doc:dc} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const uid = currentUser.uid;
+    const registryId = currentUser.registryId || uid;
+
+    const [regSnap, subSnap, engSnap, trackerSnap, lbSnap] = await Promise.all([
+      getDoc(dc(db, 'wac_registry', registryId)),
+      getDocs(q(col(db, 'submissions'), where('authorUid', '==', uid))),
+      getDocs(q(col(db, 'engagements'), where('authorUid', '==', uid))),
+      getDoc(dc(db, 'trackers', uid)),
+      (async () => {
+        try { return await getDocs(q(col(db, 'wac_registry'), ob('points', 'desc'), lim(12))); }
+        catch(e) { return await getDocs(col(db, 'wac_registry')); }
+      })()
+    ]);
+
+    const regData = regSnap.exists() ? regSnap.data() : {};
+    const totalPts = regData.points || 0;
+    const subs = subSnap.docs.map(d => ({...d.data(), id:d.id}));
+    const engs = engSnap.docs.map(d => ({...d.data(), id:d.id}));
+    const postPts = subs.reduce((a, s) => a + (s.pts || 0), 0);
+    const engPts = engs.reduce((a, e) => a + (e.pts || 0), 0);
+
+    // Tracker-based post count
+    const trackerData = trackerSnap.exists() ? trackerSnap.data() : {};
+    const tracked = trackerData.tracked || {};
+    const trackerPostCount = WEEKS.reduce((sum, w) => {
+      return sum + (tracked[w.id] || []).filter(Boolean).length;
+    }, 0);
+
+    // This-week submission check
+    const currentWeekIdx = getWeekIndex();
+    const weekSubmitted = currentWeekIdx >= 0 && subs.some(s => s.weekIdx === currentWeekIdx);
+
+    // Tracker updated this week
+    const currentWeekId = currentWeekIdx >= 0 ? WEEKS[currentWeekIdx].id : null;
+    const trackerThisWeek = currentWeekId ? ((tracked[currentWeekId] || []).some(Boolean)) : false;
+
+    // Week dots
+    const trackerDots = WEEKS.map((w, i) => {
+      const checks = tracked[w.id] || [];
+      const met = checks.filter(Boolean).length >= w.required;
+      if (i === currentWeekIdx) return 'current';
+      if (met && i < currentWeekIdx) return 'complete';
+      return 'future';
+    });
+
+    // Leaderboard top 10 (exclude admin)
+    const lbMembers = lbSnap.docs
+      .map(d => sanitizeMember({id:d.id, ...d.data()}))
+      .filter(m => m.isFounder || (m.rounds || []).includes(CURRENT_ROUND))
+      .sort((a, b) => (b.points || 0) - (a.points || 0))
+      .filter(m => !m.isAdmin && m.email !== ADMIN_EMAIL)
+      .slice(0, 10);
+
+    _renderDashboard({total:totalPts, postPts, engPts, trackerPostCount, weekSubmitted, trackerThisWeek, trackerDots, leaderboard:lbMembers, myUid:uid});
+
+  } catch(e) {
+    console.error('Dashboard load error:', e);
+    _renderDashboard({total:0, postPts:0, engPts:0, trackerPostCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
+  }
+};
+
+function _dashCountUp(el, target, delay=0, duration=900) {
+  if (!el) return;
+  setTimeout(() => {
+    const start = performance.now();
+    function frame(now) {
+      const p = Math.min((now - start) / duration, 1);
+      el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target);
+      if (p < 1) requestAnimationFrame(frame);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(frame);
+  }, delay);
+}
+
+function _renderDashboard({total, postPts, engPts, trackerPostCount, weekSubmitted, trackerThisWeek, trackerDots, leaderboard, myUid}) {
+  // Status pills
+  const strip = document.getElementById('dash-status-strip');
+  if (strip) {
+    strip.innerHTML =
+      (weekSubmitted
+        ? `<div class="dash-status-pill done"><div class="dash-status-dot"></div>Update submitted this week</div>`
+        : `<div class="dash-status-pill pending"><div class="dash-status-dot"></div>No update submitted yet</div>`)
+      + (trackerThisWeek
+        ? `<div class="dash-status-pill done"><div class="dash-status-dot"></div>Tracker updated</div>`
+        : `<div class="dash-status-pill pending"><div class="dash-status-dot"></div>Tracker not updated yet</div>`);
+  }
+
+  // Count-up stats
+  _dashCountUp(document.getElementById('dash-val-total'), total,            120);
+  _dashCountUp(document.getElementById('dash-val-posts'), postPts,          200);
+  _dashCountUp(document.getElementById('dash-val-eng'),   engPts,           280);
+  _dashCountUp(document.getElementById('dash-val-count'), trackerPostCount, 360);
+
+  // All-Star progress bar (24 total required updates across 12 weeks)
+  const totalRequired = 24;
+  const pct = Math.min(Math.round((trackerPostCount / totalRequired) * 100), 100);
+  const subEl = document.getElementById('dash-allstar-sub');
+  if (subEl) subEl.textContent = `${trackerPostCount} of ${totalRequired} updates completed`;
+  const pctEl = document.getElementById('dash-prog-pct');
+  if (pctEl) pctEl.textContent = pct + '%';
+  setTimeout(() => {
+    const fill = document.getElementById('dash-prog-fill');
+    if (fill) { fill.style.transition = 'width 1.4s cubic-bezier(0.22,1,0.36,1)'; fill.style.width = pct + '%'; }
+  }, 500);
+
+  // Week dots
+  const dotsEl = document.getElementById('dash-week-dots');
+  if (dotsEl) {
+    dotsEl.innerHTML = '';
+    (trackerDots.length ? trackerDots : WEEKS.map(() => 'future')).forEach((s, i) => {
+      const dot = document.createElement('div');
+      if (s === 'complete') { dot.className = 'dash-week-dot complete'; dot.textContent = '✓'; }
+      else if (s === 'current') { dot.className = 'dash-week-dot current'; dot.textContent = 'W' + (i + 1); }
+      else { dot.className = 'dash-week-dot'; dot.textContent = 'W' + (i + 1); }
+      dotsEl.appendChild(dot);
+    });
+  }
+
+  // Leaderboard top 10
+  const lbEl = document.getElementById('dash-lb-list');
+  if (!lbEl) return;
+  if (!leaderboard.length) {
+    lbEl.innerHTML = '<div style="padding:24px;text-align:center;"><div style="font-size:32px;">🏆</div><div style="font-size:13px;color:var(--text-muted);margin-top:8px;">No scores yet</div></div>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  let html = '';
+  let youInserted = false;
+  leaderboard.forEach((m, i) => {
+    const isYou = m.uid === myUid || m.id === currentUser.registryId;
+    if (i === 3 && !youInserted) html += '<div class="dash-lb-divider"></div>';
+    const rankDisplay = i < 3 ? medals[i] : '#' + (i + 1);
+    const posts = m.totalPosts || 0;
+    html += `<div class="dash-lb-row${isYou ? ' you' : ''}">
+      <div class="dash-lb-rank${i < 3 ? ' top3' : ''}">${rankDisplay}</div>
+      ${_dashAvatarHTML(m.name)}
+      <div class="dash-lb-info">
+        <div class="dash-lb-name">${esc(m.name)}${isYou ? '<span class="dash-you-badge">YOU</span>' : ''}${m.isAllStar ? ' ⭐' : ''}</div>
+        <div class="dash-lb-sub">${posts} update${posts !== 1 ? 's' : ''}</div>
+      </div>
+      <div class="dash-lb-pts">${m.points || 0}</div>
+    </div>`;
+    if (isYou && i !== 3) { html += '<div class="dash-lb-divider"></div>'; youInserted = true; }
+  });
+  lbEl.innerHTML = html;
 }
 
 // ==============================
