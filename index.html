@@ -1179,6 +1179,22 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .dash-view-all-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:14px;padding:11px;border:1.5px solid var(--border);border-radius:var(--radius);background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all 0.15s;}
 .dash-view-all-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.04);}
 .dash-lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.04em;flex-shrink:0;}
+
+/* ── WEEKLY CHALLENGE BANNER ── */
+.weekly-challenge-banner{background:linear-gradient(135deg,#1a1a1a,#2a2000);border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;position:relative;overflow:hidden;}
+.weekly-challenge-banner::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));}
+.wc-inner{display:flex;align-items:flex-start;gap:12px;}
+.wc-icon{font-size:26px;flex-shrink:0;margin-top:2px;}
+.wc-body{flex:1;}
+.wc-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:3px;}
+.wc-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.04em;color:var(--gold);line-height:1.1;margin-bottom:4px;}
+.wc-desc{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;}
+.wc-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold);color:#fff;font-size:11px;font-weight:700;letter-spacing:0.06em;padding:3px 10px;border-radius:999px;margin-top:8px;}
+
+/* Engagement screenshot */
+.eng-screenshot-area{border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface2);margin-bottom:8px;}
+.eng-screenshot-area:hover{border-color:var(--gold-light);}
+.eng-screenshot-preview{max-width:100%;max-height:180px;border-radius:8px;margin-top:8px;}
 </style>
 </head>
 <body>
@@ -1236,6 +1252,17 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="dash-welcome-meta" id="dash-date-meta"></div>
       </div>
       <div class="dash-status-strip dash-animate" id="dash-status-strip" style="animation-delay:0.15s;"></div>
+      <div class="weekly-challenge-banner dash-animate" id="dash-challenge-banner" style="animation-delay:0.2s;">
+        <div class="wc-inner">
+          <div class="wc-icon">⚡</div>
+          <div class="wc-body">
+            <div class="wc-eyebrow">This Week's Challenge</div>
+            <div class="wc-title" id="dash-challenge-title">Loading...</div>
+            <div class="wc-desc" id="dash-challenge-desc"></div>
+            <div class="wc-badge">+5 pts bonus</div>
+          </div>
+        </div>
+      </div>
       <div class="dash-stats-grid">
         <div class="dash-stat-card highlight dash-animate" style="animation-delay:0.25s;">
           <span class="dash-stat-icon">⚡</span>
@@ -1246,7 +1273,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="dash-stat-card dash-animate" style="animation-delay:0.32s;">
           <span class="dash-stat-icon">🌐</span>
           <div class="dash-stat-value" id="dash-val-posts">0</div>
-          <div class="dash-stat-label">Post Points</div>
+          <div class="dash-stat-label">Update Points</div>
         </div>
         <div class="dash-stat-card dash-animate" style="animation-delay:0.39s;">
           <span class="dash-stat-icon">🤝</span>
@@ -1256,7 +1283,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="dash-stat-card dash-animate" style="animation-delay:0.46s;">
           <span class="dash-stat-icon">📅</span>
           <div class="dash-stat-value" id="dash-val-count">0</div>
-          <div class="dash-stat-label">Posts Made</div>
+          <div class="dash-stat-label">Updates Made</div>
         </div>
       </div>
       <div class="dash-quick-actions dash-animate" style="animation-delay:0.5s;">
@@ -1337,6 +1364,17 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <button class="btn btn-gold btn-sm" onclick="submitPost()">Post</button>
       </div>
       <div id="announcements-list"></div>
+      <div class="weekly-challenge-banner" id="feed-challenge-banner">
+        <div class="wc-inner">
+          <div class="wc-icon">⚡</div>
+          <div class="wc-body">
+            <div class="wc-eyebrow">This Week's Challenge</div>
+            <div class="wc-title" id="feed-challenge-title">Loading...</div>
+            <div class="wc-desc" id="feed-challenge-desc"></div>
+            <div class="wc-badge">+5 pts bonus</div>
+          </div>
+        </div>
+      </div>
       <div id="feed-list"></div>
     </div>
 
@@ -1404,14 +1442,14 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <button class="format-btn" onclick="selectFormat(this,'New Page')">🆕 New Page +2pts</button>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Screenshot (optional, +2 pts)</label>
-          <div class="screenshot-area" id="screenshot-area" onclick="document.getElementById('screenshot-input').click()">
-            <div id="screenshot-placeholder">📷 Tap to add screenshot</div>
-            <img id="screenshot-preview" class="screenshot-preview" style="display:none;" />
-            <input type="file" id="screenshot-input" accept="image/*" style="display:none;" onchange="handleScreenshotSelect(event)" />
-          </div>
-          <button class="btn btn-sm btn-outline mt-8" id="clear-screenshot-btn" style="display:none;" onclick="clearScreenshot()">Remove screenshot</button>
+        <div class="form-group" id="weekly-challenge-opt" style="background:linear-gradient(135deg,#1a1a1a,#2a2000);border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;">
+          <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+            <input type="checkbox" id="submit-challenge" style="margin-top:3px;accent-color:var(--gold);width:16px;height:16px;flex-shrink:0;" onchange="updatePtsPreview()" />
+            <div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.04em;color:var(--gold);margin-bottom:2px;">⚡ Weekly Challenge <span style="font-size:12px;font-weight:700;background:var(--gold);color:#fff;padding:1px 8px;border-radius:999px;vertical-align:middle;">+5 pts</span></div>
+              <div id="submit-challenge-label" style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;">Loading this week's challenge...</div>
+            </div>
+          </label>
         </div>
         <button class="btn btn-gold btn-block btn-post" onclick="submitUpdate()">Submit Update</button>
       </div>
@@ -1438,6 +1476,15 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div class="form-group">
             <label class="form-label">Note (optional)</label>
             <textarea id="eng-note" class="form-input" placeholder="Describe your engagement..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Screenshot (optional, +2 pts)</label>
+            <div class="eng-screenshot-area" id="eng-screenshot-area" onclick="document.getElementById('eng-screenshot-input').click()">
+              <div id="eng-screenshot-placeholder">📷 Tap to add screenshot</div>
+              <img id="eng-screenshot-preview" class="eng-screenshot-preview" style="display:none;" />
+              <input type="file" id="eng-screenshot-input" accept="image/*" style="display:none;" onchange="handleEngScreenshotSelect(event)" />
+            </div>
+            <button class="btn btn-sm btn-outline mt-8" id="clear-eng-screenshot-btn" style="display:none;" onclick="clearEngScreenshot()">Remove screenshot</button>
           </div>
           <button class="btn btn-gold btn-block" id="eng-submit-btn" onclick="submitEngagement()">Submit Engagement +2 pts</button>
         </div>
@@ -1467,6 +1514,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="points-row"><span>On-time update</span><span class="pts-val">+10 pts</span></div>
         <div class="points-row"><span>Late update (within 24h)</span><span class="pts-val">+5 pts</span></div>
         <div class="points-row"><span>Blog Post or New Page</span><span class="pts-val">+2 pts</span></div>
+        <div class="points-row"><span>Weekly Challenge bonus</span><span class="pts-val">+5 pts</span></div>
         <div class="points-row"><span>Engagement (per member site)</span><span class="pts-val">+2 pts</span></div>
         <div class="points-row"><span>Max engagements/week</span><span class="pts-val">5</span></div>
       </div>
@@ -1475,7 +1523,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <!-- PAGE: TRACKER -->
     <div class="page" id="page-tracker">
       <div class="page-header">
-        <div class="page-title">Tracker</div>
+        <div class="page-title">⭐ All-Star Tracker</div>
         <div class="page-subtitle">Your 12-week accountability record.</div>
       </div>
       <div class="card">
@@ -1863,7 +1911,24 @@ const PTS_LATE_24H  = 5;
 const PTS_SCREENSHOT = 2;
 const PTS_FORMAT_BONUS = 2; // Blog Post or New Page
 const PTS_ENGAGEMENT = 2;
+const PTS_CHALLENGE  = 5;
 const MAX_ENG_PER_WEEK = 5;
+
+// Weekly Challenge Modifiers — one per week, keyed by weekIdx (0–11)
+const WEEKLY_CHALLENGES = [
+  { title: "Add a Testimonial",        desc: "Add at least one real client testimonial to any page on your site." },
+  { title: "Update Your Homepage Hero",desc: "Refresh your headline, subheadline, or hero image on your homepage." },
+  { title: "Write a Blog Post",        desc: "Publish a new blog post — any length, any topic relevant to your audience." },
+  { title: "Add a New Page",           desc: "Create and publish a brand new page on your site." },
+  { title: "Fix Your Mobile Layout",   desc: "Review your site on a phone and fix at least one mobile display issue." },
+  { title: "Update Your About Page",   desc: "Refresh your About page copy, photo, or both." },
+  { title: "Add a Clear CTA",          desc: "Ensure every page has one clear, visible call-to-action above the fold." },
+  { title: "Optimize Page Speed",      desc: "Run your site through PageSpeed Insights and fix at least one issue." },
+  { title: "Add Alt Text to Images",   desc: "Add descriptive alt text to every image on at least one page." },
+  { title: "Update Your Services Page",desc: "Refresh your services or offerings page with current pricing or copy." },
+  { title: "Add Social Proof",         desc: "Add a review, case study, or client logo to any page." },
+  { title: "Final Push — Any Update",  desc: "Complete any meaningful update to your site and finish strong." },
+];
 
 // WAC Pro launch flags — flip both to true at Pro launch
 const _PRO_GLOBAL_ACTIVE = false; // shows WAC Pro Management panel in Reports
@@ -2276,6 +2341,7 @@ function bootApp() {
   loadTrackerReport();
   loadEngHistory();
   loadDashboard();
+  loadWeeklyChallenge();
 
   // 7. Default to dashboard
   navTo("dashboard");
@@ -2309,9 +2375,9 @@ function navTo(page) {
   if (scroller) scroller.scrollTop = 0;
 
   // Page-specific loads
-  if (page === "dashboard") loadDashboard();
-  if (page === "feed") { loadFeed(); loadAnnouncements(); }
-  if (page === "submit") loadSubmitPage();
+  if (page === "dashboard") { loadDashboard(); loadWeeklyChallenge(); }
+  if (page === "feed") { loadFeed(); loadAnnouncements(); loadWeeklyChallenge(); }
+  if (page === "submit") { loadSubmitPage(); loadWeeklyChallenge(); }
   if (page === "ranks") loadLeaderboard();
   if (page === "resources") loadResources();
   if (page === "members") loadDirectory();
@@ -2323,6 +2389,26 @@ function loadSubmitPage() {
   updatePtsPreview();
   loadEngHistory();
   loadMySubmissions();
+}
+
+// ─────────────────────────────────────────────
+//  WEEKLY CHALLENGE
+// ─────────────────────────────────────────────
+function loadWeeklyChallenge() {
+  const weekIdx = getWeekIndex();
+  const challenge = WEEKLY_CHALLENGES[weekIdx] || WEEKLY_CHALLENGES[0];
+
+  // Populate all challenge UI elements
+  ["dash-challenge-title", "feed-challenge-title", "submit-challenge-label"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = id === "submit-challenge-label"
+      ? `${challenge.title} — ${challenge.desc}`
+      : challenge.title;
+  });
+  ["dash-challenge-desc", "feed-challenge-desc"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = challenge.desc;
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -2745,18 +2831,24 @@ async function loadResources() {
 async function seedDefaultResources() {
   if (!currentUser || !currentUser.isAdmin) return;
   const defaults = [
-    { emoji:"🏗️", title:"Website Update Batching", description:"Plan and batch a month of site updates in one focused session", tags:["Strategy","Workflow"], source:"WAC Resource Library",
+    { emoji:"🏗️", title:"Website Update Batching", description:"Plan and batch a month of site updates in one focused session", tags:["Strategy","Workflow"], source:"WAC Resource Library", url:"", linkLabel:"",
       body:`Batching your website updates is one of the highest-leverage habits you can build as a solopreneur.\n\nInstead of scrambling each week to figure out what to change, block a single 2–3 hour session to plan, write, and stage content for the entire month.\n\nWhy it works:\nYour brain operates differently in "creation mode" vs "execution mode." Batching keeps you in creation mode longer, which produces better work with less mental fatigue.\n\nThe WAC Batching Framework:\n1. Pick one day per month as your website day\n2. Review your content goals and upcoming season/offers\n3. Draft all page copy in one sitting — don't edit yet\n4. Gather or create all images and assets\n5. Edit, upload, and schedule before the month starts\n\nFor WAC members:\nUse your batching session to plan all 4 weeks of updates at once. Then execution becomes a 20-minute job each week instead of a 2-hour decision.` },
-    { emoji:"✍️", title:"Homepage Copy Formula", description:"A proven structure for writing homepage copy that converts visitors", tags:["Copywriting","Strategy"], source:"WAC Resource Library",
+    { emoji:"✍️", title:"Homepage Copy Formula", description:"A proven structure for writing homepage copy that converts visitors", tags:["Copywriting","Strategy"], source:"WAC Resource Library", url:"", linkLabel:"",
       body:`Your homepage has one job: get the right person to take the next step. Here's a formula that works for most solopreneur sites.\n\n1. The Headline — What do you do and for whom?\nExample: "I help wedding photographers fill their calendar without running ads."\n\n2. The Sub-headline — What problem do you solve?\nExample: "Most photographers waste hours on social media and still feel invisible. Here's a better way."\n\n3. Social Proof — One or two quick testimonials or client logos up top.\n\n4. The Bridge — How do you deliver the result?\nTwo to three short sentences on your process or approach.\n\n5. The CTA — One clear next step.\nNot "Learn More." Not three options. One: "Book a Free Call" or "See My Work."\n\n6. The Secondary CTA — A lower-friction option.\n"Not ready? Join my newsletter for weekly tips."\n\nWAC Action Step: Audit your homepage against this formula this week. Even updating just your headline is a meaningful update worth submitting.` },
-    { emoji:"🔍", title:"SEO Basics for Solopreneurs", description:"The only SEO concepts you actually need to know to get found", tags:["SEO","Strategy"], source:"WAC Resource Library",
+    { emoji:"🔍", title:"SEO Basics for Solopreneurs", description:"The only SEO concepts you actually need to know to get found", tags:["SEO","Strategy"], source:"WAC Resource Library", url:"", linkLabel:"",
       body:`SEO doesn't have to be complicated. Here are the five things that matter most for a solopreneur site.\n\n1. One Page, One Topic\nEach page should be focused on a single keyword or theme. Trying to rank for everything on one page ranks you for nothing.\n\n2. Title Tags and Meta Descriptions\nThese are what show up in Google results. Your title tag should include your target keyword. Your meta description should be compelling — it drives the click.\n\n3. Page Speed\nSlow sites lose rankings and visitors. Run your site through PageSpeed Insights (free) and fix the top issues.\n\n4. Internal Linking\nLink from your blog posts to your services pages and vice versa. This helps Google understand your site structure and distributes authority.\n\n5. Fresh Content Wins\nGoogle rewards sites that are regularly updated. That's exactly what WAC is designed to help you build. Every update you submit is a signal to search engines that your site is alive and relevant.\n\nWAC Action: Pick one page this week and optimize its title tag and meta description for a keyword your ideal client would actually search.` },
-    { emoji:"📸", title:"Photography & Visuals That Convert", description:"How to use images strategically on your site to build trust and drive action", tags:["Design","Strategy"], source:"WAC Resource Library",
+    { emoji:"📸", title:"Photography & Visuals That Convert", description:"How to use images strategically on your site to build trust and drive action", tags:["Design","Strategy"], source:"WAC Resource Library", url:"", linkLabel:"",
       body:`Most solopreneur sites either have no photos of themselves or use stock images that look nothing like their brand. Both are trust killers.\n\nHere's what to prioritize:\n\n1. A Professional Headshot\nPeople buy from people. Get a good headshot — it doesn't need to be expensive. Natural light, clean background, genuine expression.\n\n2. Your Work, Not Just Your Gear\nIf you're a service provider, show the outcomes. If you're a photographer, show final images. If you're a coach, show client results or yourself doing the work.\n\n3. Consistent Color and Tone\nImages should feel like they belong together. A simple filter preset applied to all photos makes a huge difference.\n\n4. Compress Everything\nLarge images are the number one cause of slow sites. Use Squoosh.app or TinyPNG to compress before uploading. Aim for under 200KB per image.\n\n5. Alt Text\nEvery image should have a descriptive alt tag — this helps with SEO and accessibility.\n\nWAC Action: This week, update at least one image on your site or add a proper alt tag to every existing image.` },
-    { emoji:"📋", title:"The One-Page Website Audit", description:"A quick checklist to find the most impactful improvements on your site right now", tags:["Strategy","Workflow"], source:"WAC Resource Library",
+    { emoji:"📋", title:"The One-Page Website Audit", description:"A quick checklist to find the most impactful improvements on your site right now", tags:["Strategy","Workflow"], source:"WAC Resource Library", url:"", linkLabel:"",
       body:`Run through this checklist on your site every quarter — or whenever you're not sure what to update this week.\n\nFundamentals:\n[ ] Does your homepage headline clearly say what you do and for whom?\n[ ] Is there one clear call-to-action above the fold?\n[ ] Is your contact info easy to find?\n[ ] Does your site load in under 3 seconds? (Test at PageSpeed Insights)\n[ ] Is your site mobile-friendly?\n\nCopy:\n[ ] Is your about page about your client's problem, not just your background?\n[ ] Are your service descriptions outcome-focused (what they get) rather than process-focused (what you do)?\n[ ] Do you have at least three testimonials or reviews visible?\n\nSEO:\n[ ] Does every page have a unique title tag?\n[ ] Do all images have alt text?\n[ ] Is there a meta description for your homepage?\n\nTrust:\n[ ] Is your portfolio or work samples up to date?\n[ ] Are there any broken links? (Check with Broken Link Checker)\n[ ] Is the copyright year in your footer current?\n\nWAC Action: Pick one item from this list that you scored "no" on and fix it this week. That's a legitimate update.` },
-    { emoji:"🎯", title:"Content Pillars for Your Website", description:"Define 3–5 core themes so you always know what to update next", tags:["Strategy","Planning"], source:"WAC Resource Library",
+    { emoji:"🎯", title:"Content Pillars for Your Website", description:"Define 3–5 core themes so you always know what to update next", tags:["Strategy","Planning"], source:"WAC Resource Library", url:"", linkLabel:"",
       body:`Content pillars are the 3–5 recurring themes your website covers. They make update planning faster and keep your site coherent.\n\nHow to choose your pillars:\nAsk yourself: What do I know? What does my client need? What do I want to be known for? The overlap of those three answers = your pillars.\n\nExample pillar sets:\n- Wedding Photographer: Portfolio updates | Venue spotlights | Planning advice | Behind the scenes | Real weddings\n- Business Coach: Client case studies | Strategy guides | Resources/tools | FAQ updates | Newsletter archive\n- Fitness Trainer: Program pages | Client results | Nutrition tips | FAQ | Blog\n\nThe WAC Application:\nWhen you're not sure what to update this week, pull from your pillar list. Each pillar becomes a rotation — you never run out of ideas, and your site builds depth over time.\n\nWAC Action: Write down your 3–5 content pillars this week and pin them somewhere visible. Then pick one pillar to update your site from.` },
+    { emoji:"📱", title:"Mobile-First: What It Means for Your Site", description:"Over 60% of web traffic is mobile. Here's how to make sure your site holds up.", tags:["Design","SEO"], source:"BrowserStack — Mobile-First Design Guide", url:"https://www.browserstack.com/guide/how-to-implement-mobile-first-design", linkLabel:"Read the Full Guide",
+      body:`More than 60% of global web traffic now comes from mobile devices — and Google's algorithm ranks the mobile version of your site, not the desktop version. If your site was designed for a big screen and never tested on a phone, you're likely losing visitors and rankings.\n\nWhat mobile-first means in practice:\nIt doesn't mean you need a separate mobile site. It means designing and testing with small screens as the priority, then scaling up.\n\nFive things to check on your site right now:\n1. Tap targets — Are buttons and links easy to tap without zooming? They should be at least 44x44px.\n2. Font size — Can you read your body copy without pinching? 16px minimum.\n3. Navigation — Is your menu usable on a phone? Hamburger menus are fine; dropdowns that require hover are not.\n4. Images — Are they compressed and loading fast? Aim for under 200KB per image.\n5. Layout — Does content stack cleanly in a single column on mobile, or does it break?\n\nTools to use:\n- Google's Mobile-Friendly Test (free, instant)\n- PageSpeed Insights for mobile speed score\n- Chrome DevTools device emulator\n\nWAC Action: Pull up your site on your actual phone right now. Note one thing that feels broken or awkward. Fix it this week.` },
+    { emoji:"🏆", title:"Social Proof: The Trust Signal Your Site Is Missing", description:"Real reviews and testimonials are your most powerful conversion tool. Here's how to use them.", tags:["Copywriting","Strategy"], source:"Squarespace — Guide to Social Proof", url:"https://www.squarespace.com/blog/guide-to-social-proof", linkLabel:"Read the Full Guide",
+      body:`Visitors don't arrive on your site assuming you're credible. They arrive assuming risk. Your job is to remove that doubt — and nothing does it faster than social proof.\n\nWhat counts as social proof:\n- Client testimonials (the most powerful)\n- Case studies with specific outcomes\n- Star ratings or review counts\n- Client logos ("Trusted by...")\n- Press mentions or media features\n- Before/after results\n\nWhat makes a testimonial actually work:\nGeneric praise ("Great to work with!") does almost nothing. Specific proof does everything.\n\nWeak: "Jane is an amazing photographer."\nStrong: "Jane delivered our gallery in 48 hours and our clients keep saying it's the best wedding photography they've ever seen. We've booked three referrals from her work."\n\nThe difference? Specifics, results, and a named person.\n\nWhere to put social proof:\n- Homepage hero section (above the fold)\n- Services or pricing page\n- Contact/booking page (right before the ask)\n- About page\n\nWAC Action: Reach out to one past client this week and ask for a specific testimonial. Give them a prompt: "What result did you get, and what would you tell someone considering working with me?" Then put it on your site.` },
+    { emoji:"⚡", title:"Conversion Rate Basics: Getting More from the Traffic You Have", description:"Small changes to your site can dramatically increase how many visitors take action.", tags:["Strategy","Copywriting"], source:"Backlinko — Conversion Rate Optimization Guide", url:"https://backlinko.com/conversion-rate-optimization", linkLabel:"Read the Full Guide",
+      body:`Conversion rate optimization (CRO) is the process of getting more of your existing visitors to take a desired action — book a call, fill a form, make a purchase. You don't need more traffic. You need your current traffic to convert better.\n\nThe most impactful things to optimize on a solopreneur site:\n\n1. Your headline\nIf visitors can't tell what you do in 5 seconds, they leave. Your headline should say who you help and what outcome they get — not what you call yourself.\n\n2. Your CTA\nOne clear action per page. Not three. Not "Learn More" — something specific: "Book a Free 30-Minute Call" or "See Pricing." The button color, placement, and copy all matter.\n\n3. Your above-the-fold section\nThis is everything visible before scrolling. Most visitors never scroll. Lead with your strongest headline, a supporting line, and one CTA.\n\n4. Your testimonials\nMove them up. Most sites bury them at the bottom. Place at least one testimonial near every major CTA.\n\n5. Page speed\nA one-second delay in load time can reduce conversions by 7%. Test yours at PageSpeed Insights and fix the top issues.\n\nWAC Action: Pick one page with a CTA this week. Rewrite the button text to be more specific and move the nearest testimonial closer to it. That's a measurable update.` },
   ];
   try {
     for (const r of defaults) {
@@ -2840,8 +2932,9 @@ function updatePtsPreview() {
   const isLate = now > deadline;
   const lateWindow = deadline + (24 * 60 * 60 * 1000);
   let pts = isLate ? (now <= lateWindow ? PTS_LATE_24H : 0) : PTS_ON_TIME;
-  if (_screenshotData) pts += PTS_SCREENSHOT;
   if (_selectedFormat === "Blog Post" || _selectedFormat === "New Page") pts += PTS_FORMAT_BONUS;
+  const challengeChecked = document.getElementById("submit-challenge");
+  if (challengeChecked && challengeChecked.checked) pts += PTS_CHALLENGE;
   document.getElementById("pts-num").textContent = pts;
   const label = isLate ? "pts for late update" : "pts for on-time update";
   document.getElementById("pts-preview").innerHTML = `<span class="pts-num" id="pts-num">${pts}</span><span>${label}</span>`;
@@ -2888,6 +2981,28 @@ function clearScreenshot() {
   updatePtsPreview();
 }
 
+async function handleEngScreenshotSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  _engScreenshotData = await compressImage(file);
+  document.getElementById("eng-screenshot-preview").src = _engScreenshotData;
+  document.getElementById("eng-screenshot-preview").style.display = "block";
+  document.getElementById("eng-screenshot-placeholder").style.display = "none";
+  document.getElementById("clear-eng-screenshot-btn").style.display = "inline-flex";
+}
+
+function clearEngScreenshot() {
+  _engScreenshotData = null;
+  const prev = document.getElementById("eng-screenshot-preview");
+  const ph = document.getElementById("eng-screenshot-placeholder");
+  const btn = document.getElementById("clear-eng-screenshot-btn");
+  const inp = document.getElementById("eng-screenshot-input");
+  if (prev) { prev.style.display = "none"; prev.src = ""; }
+  if (ph) ph.style.display = "block";
+  if (btn) btn.style.display = "none";
+  if (inp) inp.value = "";
+}
+
 async function submitUpdate() {
   const url = document.getElementById("submit-url").value.trim();
   const note = document.getElementById("submit-note").value.trim();
@@ -2911,8 +3026,10 @@ async function submitUpdate() {
     if (snap.size >= required) { showToast(`You've already submitted ${required} update(s) this week.`); return; }
 
     let pts = isLate ? PTS_LATE_24H : PTS_ON_TIME;
-    if (_screenshotData) pts += PTS_SCREENSHOT;
     if (_selectedFormat === "Blog Post" || _selectedFormat === "New Page") pts += PTS_FORMAT_BONUS;
+    const challengeEl = document.getElementById("submit-challenge");
+    const challengeCompleted = challengeEl && challengeEl.checked;
+    if (challengeCompleted) pts += PTS_CHALLENGE;
 
     await addDoc(collection(db, "submissions"), {
       author: currentUser.name,
@@ -2922,7 +3039,7 @@ async function submitUpdate() {
       url,
       note,
       format: _selectedFormat || "Static",
-      hasScreenshot: !!_screenshotData,
+      challengeCompleted,
       pts,
       isLate,
       timestamp: Date.now()
@@ -2945,7 +3062,8 @@ async function submitUpdate() {
     document.getElementById("submit-note").value = "";
     _selectedFormat = "";
     document.querySelectorAll("#format-btns .format-btn").forEach(b => b.classList.remove("selected"));
-    clearScreenshot();
+    const _challengeEl = document.getElementById("submit-challenge");
+    if (_challengeEl) _challengeEl.checked = false;
     showToast(`Update submitted! +${pts} pts`);
     loadMySubmissions();
     updatePtsPreview();
@@ -2986,6 +3104,7 @@ async function submitEngagement() {
 
   const weekIdx = getWeekIndex();
   const note = document.getElementById("eng-note").value.trim();
+  const engPts = PTS_ENGAGEMENT;
   try {
     await addDoc(collection(db, "engagements"), {
       author: currentUser.name,
@@ -2994,20 +3113,22 @@ async function submitEngagement() {
       targetUrl: url,
       note,
       type: _selectedEngType,
-      pts: PTS_ENGAGEMENT,
+      hasScreenshot: !!_engScreenshotData,
+      pts: engPts,
       timestamp: Date.now()
     });
     // Update registry points
     const regRef = doc(db, "wac_registry", currentUser.uid);
-    await updateDoc(regRef, { points: increment(PTS_ENGAGEMENT) });
-    currentUser.points = (currentUser.points || 0) + PTS_ENGAGEMENT;
+    await updateDoc(regRef, { points: increment(engPts) });
+    currentUser.points = (currentUser.points || 0) + engPts;
     lsSet("wac_session", currentUser);
 
     document.getElementById("eng-url").value = "";
     document.getElementById("eng-note").value = "";
     _selectedEngType = "";
     document.querySelectorAll("#eng-type-btns .eng-type-btn").forEach(b => b.classList.remove("selected"));
-    showToast(`Engagement submitted! +${PTS_ENGAGEMENT} pts`);
+    clearEngScreenshot();
+    showToast(`Engagement submitted! +${engPts} pts`);
     loadEngHistory();
   } catch (e) {
     console.error("submitEngagement error:", e);
@@ -4086,6 +4207,8 @@ window.closeResModalDirect = closeResModalDirect;
 window.selectFormat = selectFormat;
 window.handleScreenshotSelect = handleScreenshotSelect;
 window.clearScreenshot = clearScreenshot;
+window.handleEngScreenshotSelect = handleEngScreenshotSelect;
+window.clearEngScreenshot = clearEngScreenshot;
 window.submitUpdate = submitUpdate;
 window.selectEngType = selectEngType;
 window.submitEngagement = submitEngagement;
