@@ -102,6 +102,86 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   transition: opacity 0.15s;
 }
 .topnav-avatar:hover { opacity: 0.85; }
+.topnav-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+
+/* Profile photo upload */
+.profile-photo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.profile-photo-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  border: 3px solid var(--gold);
+  flex-shrink: 0;
+}
+.profile-photo-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.profile-photo-actions { display: flex; gap: 8px; align-items: center; }
+.profile-photo-upload-btn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  background: none;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.profile-photo-upload-btn:hover { background: var(--gold); color: #fff; }
+.profile-photo-remove-btn {
+  font-size: 13px;
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  display: none;
+}
+.profile-photo-remove-btn:hover { color: var(--danger); border-color: var(--danger); }
+#profile-photo-input { display: none; }
+
+/* Avatar image utility — any avatar can hold an <img> */
+.feed-avatar img,
+.lb-avatar img,
+.member-card-avatar img,
+.member-profile-avatar img,
+.dash-lb-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Nav notification badge dot */
+.nav-badge {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 14px);
+  width: 8px;
+  height: 8px;
+  background: #e74c3c;
+  border-radius: 50%;
+  border: 2px solid #1a1a1a;
+  display: none;
+  pointer-events: none;
+}
 
 /* ==============================
    BOTTOM NAV
@@ -1674,6 +1754,16 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <!-- Edit profile -->
       <div class="card">
         <div class="card-title">Edit Profile</div>
+        <!-- Profile photo upload -->
+        <div class="profile-photo-wrap">
+          <div class="profile-photo-preview" id="prof-photo-preview"></div>
+          <div class="profile-photo-actions">
+            <button class="profile-photo-upload-btn" onclick="document.getElementById('profile-photo-input').click()">Upload Photo</button>
+            <button class="profile-photo-remove-btn" id="prof-photo-remove-btn" onclick="removeProfilePhoto()">Remove</button>
+          </div>
+          <input type="file" id="profile-photo-input" accept="image/*" onchange="handleProfilePhotoSelect(event)" />
+          <div style="font-size:11px;color:var(--text-muted);">JPG or PNG, max 1MB</div>
+        </div>
         <div class="form-group">
           <label class="form-label">Name (contact Nate to change)</label>
           <input type="text" id="prof-name" class="form-input" readonly style="opacity:0.6;" />
@@ -1780,9 +1870,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Dashboard
     </button>
-    <button class="nav-item" id="nav-feed" onclick="navTo('feed')">
+    <button class="nav-item" id="nav-feed" onclick="navTo('feed')" style="position:relative;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Feed
+      <span id="feed-notif-dot" class="nav-badge"></span>
     </button>
     <button class="nav-item" id="nav-resources" onclick="navTo('resources')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -1792,9 +1883,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
       Submit
     </button>
-    <button class="nav-item" id="nav-ranks" onclick="navTo('ranks')">
+    <button class="nav-item" id="nav-ranks" onclick="navTo('ranks')" style="position:relative;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
       Ranks
+      <span id="ranks-notif-dot" class="nav-badge"></span>
     </button>
     <button class="nav-item" id="nav-tracker" onclick="navTo('tracker')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
@@ -2289,11 +2381,7 @@ function bootApp() {
 
   // 2. Set topnav username and avatar
   document.getElementById("topnav-user").textContent = currentUser.name;
-  const _avatarEl = document.getElementById("topnav-avatar");
-  if (_avatarEl) {
-    const _initials = (currentUser.name || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-    _avatarEl.textContent = _initials;
-  }
+  updateTopnavAvatar();
 
   // 3. Pro topnav badge
   const _proBadgeEl = document.getElementById("topnav-pro-badge");
@@ -2376,9 +2464,10 @@ function navTo(page) {
 
   // Page-specific loads
   if (page === "dashboard") { loadDashboard(); loadWeeklyChallenge(); }
-  if (page === "feed") { loadFeed(); loadAnnouncements(); loadWeeklyChallenge(); }
+  if (page === "feed") { loadFeed(); loadAnnouncements(); loadWeeklyChallenge(); clearFeedBadge(); }
   if (page === "submit") { loadSubmitPage(); loadWeeklyChallenge(); }
-  if (page === "ranks") loadLeaderboard();
+  if (page === "ranks") { loadLeaderboard(); clearRanksBadge(); }
+  if (page === "profile") { initProfilePhotoPreview(); }
   if (page === "resources") loadResources();
   if (page === "members") loadDirectory();
   if (page === "reports") { loadTrackerReport(); }
@@ -2414,9 +2503,12 @@ function loadWeeklyChallenge() {
 // ─────────────────────────────────────────────
 //  DASHBOARD
 // ─────────────────────────────────────────────
-function _dashAvatarHTML(name) {
+function _dashAvatarHTML(name, photoURL) {
   const initials = (name || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-  return `<div class="dash-lb-avatar">${initials}</div>`;
+  const content = photoURL
+    ? `<img src="${esc(photoURL)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
+    : initials;
+  return `<div class="dash-lb-avatar">${content}</div>`;
 }
 
 window.loadDashboard = async function() {
@@ -2591,7 +2683,7 @@ function _renderDashboard({total, postPts, engPts, trackerPostCount, weekSubmitt
     const posts = m.totalPosts || 0;
     html += `<div class="dash-lb-row${isYou ? ' you' : ''}">
       <div class="dash-lb-rank${i < 3 ? ' top3' : ''}">${rankDisplay}</div>
-      ${_dashAvatarHTML(m.name)}
+      ${_dashAvatarHTML(m.name, m.photoURL || "")}
       <div class="dash-lb-info">
         <div class="dash-lb-name">${esc(m.name)}${isYou ? '<span class="dash-you-badge">YOU</span>' : ''}${m.isAllStar ? ' ⭐' : ''}</div>
         <div class="dash-lb-sub">${posts} update${posts !== 1 ? 's' : ''}</div>
@@ -2636,7 +2728,9 @@ async function loadFeed() {
     const posts = [];
     snap.forEach(d => posts.push({ id: d.id, ...d.data() }));
     posts.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    renderFeed(posts.slice(0, 50));
+    const sliced = posts.slice(0, 50);
+    renderFeed(sliced);
+    checkFeedBadge(sliced);
   } catch (e) {
     console.error("loadFeed error:", e);
   }
@@ -2647,12 +2741,18 @@ function renderFeed(posts) {
   if (!posts.length) { el.innerHTML = '<p class="text-sm text-muted text-center">No posts yet. Be the first!</p>'; return; }
   el.innerHTML = posts.map(p => {
     const initials = getInitials(p.author);
+    // Look up member photo from memberMap by authorUid
+    const memberData = _memberMap[p.authorUid];
+    const photoURL = (p.authorUid === currentUser.uid ? currentUser.photoURL : (memberData && memberData.photoURL)) || "";
+    const avatarContent = photoURL
+      ? `<img src="${esc(photoURL)}" alt="${esc(p.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
+      : initials;
     const urlHtml = p.url ? `<div style="margin-bottom:8px;"><a href="${esc(p.url)}" target="_blank" rel="noopener" style="font-size:13px;word-break:break-all;">${esc(p.url)}</a></div>` : "";
     const isOwner = p.authorUid === currentUser.uid || currentUser.isAdmin;
     const propsNames = (p.props || []).join(", ");
     return `<div class="feed-post">
       <div class="feed-post-header">
-        <div class="feed-avatar">${initials}</div>
+        <div class="feed-avatar">${avatarContent}</div>
         <div class="feed-meta">
           <div class="feed-author">${esc(p.author)}</div>
           <div class="feed-time">${timeAgo(p.timestamp)}</div>
@@ -3343,16 +3443,20 @@ async function loadLeaderboard() {
       if (m.isVIP) badges.push("⚡");
       const milestone = getMilestoneBadges(m.totalPosts || 0);
       const initials = getInitials(m.name);
+      const lbAvatarContent = m.photoURL
+        ? `<img src="${esc(m.photoURL)}" alt="${esc(m.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
+        : initials;
       const proPill = m.isPro ? `<span class="lb-pro-badge">PRO</span>` : "";
       return `<div class="lb-row">
         <div class="lb-rank">${rank}</div>
-        <div class="lb-avatar">${initials}</div>
+        <div class="lb-avatar">${lbAvatarContent}</div>
         <div class="lb-info">
           <div class="lb-name">${esc(m.name)} ${badges.join("")}${milestone}${proPill}</div>
         </div>
         <div class="lb-pts">${m.points || 0}</div>
       </div>`;
     }).join("");
+    checkRanksBadge(members);
   } catch (e) { console.error("loadLeaderboard error:", e); }
 }
 
@@ -3439,6 +3543,9 @@ async function renderMemberGrid() {
   const el = document.getElementById("member-grid");
   el.innerHTML = members.map(m => {
     const initials = getInitials(m.name);
+    const memberAvatarContent = m.photoURL
+      ? `<img src="${esc(m.photoURL)}" alt="${esc(m.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
+      : initials;
     const igHandle = m.ig ? m.ig.trim().replace(/^@+/, "") : "";
     const igUrl = igHandle ? `https://www.instagram.com/${igHandle}` : "";
     const websiteBtn = m.website
@@ -3448,7 +3555,7 @@ async function renderMemberGrid() {
       ? `<a href="${igUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:block;text-align:center;font-size:11px;color:var(--text-muted);margin-top:2px;">📸 ${esc(m.ig)}</a>`
       : "";
     return `<div class="member-card" data-member-key="${m.id}" onclick="handleMemberCardClick(this)">
-      <div class="member-card-avatar">${initials}</div>
+      <div class="member-card-avatar">${memberAvatarContent}</div>
       <div class="member-card-name">${esc(m.name)}</div>
       <div class="member-card-biz">${esc(m.business || "")}</div>
       ${websiteBtn}${igBtn}
@@ -3491,9 +3598,12 @@ async function openMemberProfile(member) {
 
   const dots = WEEKS.map(w => `<div class="member-dot ${trackerData[w.id] ? 'done' : ''}"></div>`).join("");
   const websiteBtn = member.website ? `<a href="${esc(member.website)}" target="_blank" rel="noopener" class="btn btn-gold btn-block btn-sm mt-16">Visit Website</a>` : "";
+  const modalAvatarContent = member.photoURL
+    ? `<img src="${esc(member.photoURL)}" alt="${esc(member.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
+    : getInitials(member.name);
 
   document.getElementById("member-modal-content").innerHTML = `
-    <div class="member-profile-avatar">${initials}</div>
+    <div class="member-profile-avatar" style="${member.photoURL ? 'padding:0;overflow:hidden;' : ''}">${modalAvatarContent}</div>
     <div class="member-profile-name">${esc(member.name)}</div>
     <div class="member-profile-biz">${esc(member.business || "")}</div>
     <div class="member-profile-badges">${badges.join(" · ")} ${milestone}</div>
@@ -3820,6 +3930,9 @@ function loadProfile() {
 
 function renderProfileHero() {
   const initials = getInitials(currentUser.name);
+  const avatarHtml = currentUser.photoURL
+    ? `<div class="profile-avatar" style="padding:0;overflow:hidden;"><img src="${currentUser.photoURL}" alt="${esc(currentUser.name)}" /></div>`
+    : `<div class="profile-avatar">${initials}</div>`;
   const badges = [];
   if (currentUser.isAllStar) badges.push("⭐ All-Star");
   if (currentUser.isFounder) badges.push("🏅 Founder");
@@ -3830,7 +3943,7 @@ function renderProfileHero() {
   const subtitle = currentUser.isAdmin ? (currentUser.business || "Founder of WAC") : (currentUser.business || "");
 
   document.getElementById("profile-hero").innerHTML = `
-    <div class="profile-avatar">${initials}</div>
+    ${avatarHtml}
     <div class="profile-name">${esc(currentUser.name)}</div>
     <div class="profile-subtitle">${esc(subtitle)}</div>
     <div class="profile-badges">${badges.join(" · ")} ${milestone}</div>
@@ -3846,32 +3959,197 @@ async function saveProfile() {
   const type = document.getElementById("prof-type").value.trim();
   const ig = document.getElementById("prof-ig").value.trim();
   const website = document.getElementById("prof-website").value.trim();
+  // photoURL is managed separately by saveProfilePhoto / removeProfilePhoto
+  // but we keep it in the update payload so it's never accidentally wiped
+  const photoURL = currentUser.photoURL || "";
 
   if (currentUser.isAdmin) {
-    // Admin: save to session only (no registry doc)
     currentUser.business = biz;
     currentUser.type = type;
     currentUser.ig = ig;
     currentUser.website = website;
     lsSet("wac_session", currentUser);
     renderProfileHero();
+    updateTopnavAvatar();
     showToast("Profile updated!");
     return;
   }
 
   try {
-    await updateDoc(doc(db, "wac_registry", currentUser.uid), { business: biz, type, ig, website });
+    await updateDoc(doc(db, "wac_registry", currentUser.uid), { business: biz, type, ig, website, photoURL });
     currentUser.business = biz;
     currentUser.type = type;
     currentUser.ig = ig;
     currentUser.website = website;
     lsSet("wac_session", currentUser);
     renderProfileHero();
+    updateTopnavAvatar();
     showToast("Profile saved!");
   } catch (e) {
     console.error("saveProfile error:", e);
     showToast("Failed to save profile: " + (e.code || e.message));
   }
+}
+
+// ==============================
+// TOPNAV AVATAR HELPER
+// ==============================
+function updateTopnavAvatar() {
+  const el = document.getElementById("topnav-avatar");
+  if (!el) return;
+  if (currentUser.photoURL) {
+    el.innerHTML = `<img src="${esc(currentUser.photoURL)}" alt="${esc(currentUser.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`;
+    el.style.background = "transparent";
+    el.style.fontSize = "0";
+  } else {
+    const initials = (currentUser.name || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+    el.innerHTML = initials;
+    el.style.background = "";
+    el.style.fontSize = "";
+  }
+}
+
+// ==============================
+// PROFILE PHOTO UPLOAD
+// ==============================
+function initProfilePhotoPreview() {
+  const preview = document.getElementById("prof-photo-preview");
+  const removeBtn = document.getElementById("prof-photo-remove-btn");
+  if (!preview) return;
+  if (currentUser.photoURL) {
+    preview.innerHTML = `<img src="${esc(currentUser.photoURL)}" alt="Profile photo" />`;
+    if (removeBtn) removeBtn.style.display = "inline-block";
+  } else {
+    preview.textContent = getInitials(currentUser.name);
+    if (removeBtn) removeBtn.style.display = "none";
+  }
+}
+
+function handleProfilePhotoSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 1.2 * 1024 * 1024) {
+    showToast("Image too large. Please use a photo under 1MB.");
+    event.target.value = "";
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    compressAndSetPhoto(e.target.result);
+  };
+  reader.readAsDataURL(file);
+  event.target.value = "";
+}
+
+function compressAndSetPhoto(dataUrl) {
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.createElement("canvas");
+    const MAX = 300;
+    let w = img.width, h = img.height;
+    if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+    else { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, w, h);
+    const compressed = canvas.toDataURL("image/jpeg", 0.82);
+    // Rough size check after compression
+    if (compressed.length > 200000) {
+      showToast("Image still too large after compression. Try a smaller photo.");
+      return;
+    }
+    saveProfilePhoto(compressed);
+  };
+  img.src = dataUrl;
+}
+
+async function saveProfilePhoto(photoURL) {
+  const preview = document.getElementById("prof-photo-preview");
+  const removeBtn = document.getElementById("prof-photo-remove-btn");
+  currentUser.photoURL = photoURL;
+  lsSet("wac_session", currentUser);
+  if (preview) {
+    preview.innerHTML = `<img src="${esc(photoURL)}" alt="Profile photo" />`;
+  }
+  if (removeBtn) removeBtn.style.display = "inline-block";
+  updateTopnavAvatar();
+  renderProfileHero();
+  if (!currentUser.isAdmin) {
+    try {
+      await updateDoc(doc(db, "wac_registry", currentUser.uid), { photoURL });
+      showToast("Photo saved!");
+    } catch (e) {
+      console.error("saveProfilePhoto error:", e);
+      showToast("Photo saved locally. Sync failed: " + (e.code || e.message));
+    }
+  } else {
+    showToast("Photo updated!");
+  }
+}
+
+async function removeProfilePhoto() {
+  const preview = document.getElementById("prof-photo-preview");
+  const removeBtn = document.getElementById("prof-photo-remove-btn");
+  currentUser.photoURL = "";
+  lsSet("wac_session", currentUser);
+  if (preview) preview.textContent = getInitials(currentUser.name);
+  if (removeBtn) removeBtn.style.display = "none";
+  updateTopnavAvatar();
+  renderProfileHero();
+  if (!currentUser.isAdmin) {
+    try {
+      await updateDoc(doc(db, "wac_registry", currentUser.uid), { photoURL: "" });
+      showToast("Photo removed.");
+    } catch (e) {
+      console.error("removeProfilePhoto error:", e);
+      showToast("Photo removed locally. Sync failed.");
+    }
+  } else {
+    showToast("Photo removed.");
+  }
+}
+
+// ==============================
+// NAV NOTIFICATION BADGES
+// ==============================
+const _BADGE_KEY_FEED  = "wac_last_seen_feed";
+const _BADGE_KEY_RANKS = "wac_last_seen_ranks";
+
+function checkFeedBadge(posts) {
+  if (!posts || !posts.length) return;
+  const dot = document.getElementById("feed-notif-dot");
+  if (!dot) return;
+  const lastSeen = lsGet(_BADGE_KEY_FEED) || 0;
+  // Find newest post timestamp that isn't the current user's own post
+  const hasNew = posts.some(p => {
+    const ts = (p.timestamp && p.timestamp.toMillis) ? p.timestamp.toMillis() : (p.timestamp || 0);
+    return ts > lastSeen && p.authorUid !== currentUser.uid;
+  });
+  dot.style.display = hasNew ? "block" : "none";
+}
+
+function checkRanksBadge(members) {
+  if (!members || !members.length) return;
+  const dot = document.getElementById("ranks-notif-dot");
+  if (!dot) return;
+  const lastSeen = lsGet(_BADGE_KEY_RANKS) || 0;
+  const now = Date.now();
+  // Show badge if ranks haven't been viewed in more than 24h and there are active members
+  const stale = (now - lastSeen) > 24 * 60 * 60 * 1000;
+  dot.style.display = (stale && members.length > 0) ? "block" : "none";
+}
+
+function clearFeedBadge() {
+  lsSet(_BADGE_KEY_FEED, Date.now());
+  const dot = document.getElementById("feed-notif-dot");
+  if (dot) dot.style.display = "none";
+}
+
+function clearRanksBadge() {
+  lsSet(_BADGE_KEY_RANKS, Date.now());
+  const dot = document.getElementById("ranks-notif-dot");
+  if (dot) dot.style.display = "none";
 }
 
 function showFirebaseSetupCard() {
@@ -4239,6 +4517,10 @@ window.createMemberAccount = createMemberAccount;
 window.initPasswordField = initPasswordField;
 window.copyWelcomeEmail = copyWelcomeEmail;
 window.saveProfile = saveProfile;
+window.handleProfilePhotoSelect = handleProfilePhotoSelect;
+window.removeProfilePhoto = removeProfilePhoto;
+window.initProfilePhotoPreview = initProfilePhotoPreview;
+window.updateTopnavAvatar = updateTopnavAvatar;
 window.closeWelcomeModal = closeWelcomeModal;
 window.requestPushPermission = requestPushPermission;
 window.installPWA = installPWA;
