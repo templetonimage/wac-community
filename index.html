@@ -3108,8 +3108,9 @@ function _renderDashboard({total, postPts, engPts, trackerPostCount, weekSubmitt
 // ==============================
 async function submitPost() {
   const text = document.getElementById("feed-compose").value.trim();
-  const url = document.getElementById("feed-url").value.trim();
+  let url = document.getElementById("feed-url").value.trim();
   if (!text) { showToast("Write something first."); return; }
+  if (url && !/^https?:\/\//i.test(url)) url = "https://" + url;
   try {
     await addDoc(collection(db, "posts"), {
       author: currentUser.name,
@@ -3513,9 +3514,10 @@ async function getWeeklyPVRCount() {
 }
 
 async function submitPVR() {
-  const url = document.getElementById("pvr-url").value.trim();
+  let url = document.getElementById("pvr-url").value.trim();
   const prompt = document.getElementById("pvr-prompt").value.trim();
   if (!url) { showToast("Enter the page URL."); return; }
+  if (!/^https?:\/\//i.test(url)) url = "https://" + url;
   if (!prompt) { showToast("Describe the feedback you're looking for."); return; }
   if (isRoundOver()) { showToast("Round has ended."); return; }
   const weekIdx = getWeekIndex();
@@ -3919,9 +3921,10 @@ function clearEngScreenshot() {
 }
 
 async function submitUpdate() {
-  const url = document.getElementById("submit-url").value.trim();
+  let url = document.getElementById("submit-url").value.trim();
   const note = document.getElementById("submit-note").value.trim();
   if (!url || !note) { showToast("URL and description are required."); return; }
+  if (!/^https?:\/\//i.test(url)) url = "https://" + url;
   if (isRoundOver()) { showToast("Round has ended."); return; }
 
   const weekIdx = getWeekIndex();
