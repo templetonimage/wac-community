@@ -732,6 +732,176 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 
 /* ==============================
+   FEED POST THREADS (light mode)
+   ============================== */
+.post-replies-section {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 8px;
+}
+.post-replies-toggle {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.post-replies-toggle:hover { color: var(--text); }
+.post-reply {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+.post-reply-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface2);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.post-reply-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.post-reply-bubble {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  flex: 1;
+}
+.post-reply-author { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.post-reply-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+.post-reply-time { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.post-reply-compose {
+  display: none;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 6px;
+}
+.post-reply-compose.open { display: flex; }
+.post-reply-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  resize: none;
+  min-height: 60px;
+}
+.post-reply-input:focus { outline: none; border-color: var(--gold); }
+.post-reply-send {
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  align-self: flex-end;
+}
+.post-reply-send:hover { opacity: 0.85; }
+.post-reply-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.post-reply-btn:hover { background: var(--surface2); color: var(--text); }
+.see-more-btn {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  padding: 2px 0;
+  margin-bottom: 6px;
+}
+.see-more-btn:hover { opacity: 0.8; }
+/* Edit overlay */
+.feed-edit-overlay {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.feed-edit-overlay.open { display: flex; }
+.feed-edit-textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  padding: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  resize: none;
+  min-height: 70px;
+}
+.feed-edit-textarea:focus { outline: none; }
+.feed-edit-url {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+}
+.feed-edit-url:focus { outline: none; border-color: var(--gold); }
+.feed-edit-actions { display: flex; gap: 8px; }
+/* PVR edit overlay (prompt only) */
+.pvr-edit-overlay {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.pvr-edit-overlay.open { display: flex; }
+.pvr-edit-textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  padding: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #fff;
+  resize: none;
+  min-height: 70px;
+}
+.pvr-edit-textarea:focus { outline: none; }
+.pvr-edit-actions { display: flex; gap: 8px; }
+
+
    ADMIN COMPOSE
    ============================== */
 .admin-compose {
@@ -1624,7 +1794,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div class="card">
         <div class="feed-compose-tabs">
           <button class="feed-compose-tab active" id="tab-post" onclick="switchComposeTab('post')">💬 Post</button>
-          <button class="feed-compose-tab" id="tab-pvr" onclick="switchComposeTab('pvr')">👁 Peer View Request</button>
+          <button class="feed-compose-tab" id="tab-pvr" onclick="switchComposeTab('pvr')">👁 Peer Review Request</button>
         </div>
         <!-- Regular post fields -->
         <div id="regular-compose-fields" class="regular-compose-fields">
@@ -1647,7 +1817,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <textarea id="pvr-prompt" class="form-input" placeholder="e.g. Does my homepage copy make sense? Is the CTA clear?" style="min-height:70px;"></textarea>
           </div>
           <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">Members who leave feedback earn +2 pts.</div>
-          <button class="btn btn-gold btn-sm" onclick="submitPVR()">Post Peer View Request</button>
+          <button class="btn btn-gold btn-sm" onclick="submitPVR()">Post Peer Review Request</button>
         </div>
       </div>
       <div class="weekly-challenge-banner" id="feed-challenge-banner">
@@ -2979,48 +3149,103 @@ function renderFeed(posts) {
   if (!posts.length) { el.innerHTML = '<p class="text-sm text-muted text-center">No posts yet. Be the first!</p>'; return; }
   el.innerHTML = posts.map(p => {
     if (p.type === "pvr") return renderPVRCard(p);
-    const initials = getInitials(p.author);
     const memberData = _memberMap[p.authorUid];
     const photoURL = (p.authorUid === currentUser.uid ? currentUser.photoURL : (memberData && memberData.photoURL)) || "";
     const avatarContent = photoURL
       ? `<img src="${esc(photoURL)}" alt="${esc(p.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
-      : initials;
+      : getInitials(p.author);
     const urlHtml = p.url ? `<div style="margin-bottom:8px;"><a href="${esc(p.url)}" target="_blank" rel="noopener" style="font-size:13px;word-break:break-all;">${esc(p.url)}</a></div>` : "";
     const isOwner = p.authorUid === currentUser.uid || currentUser.isAdmin;
     const propsNames = (p.props || []).join(", ");
-    return `<div class="feed-post">
+    const replies = p.replies || [];
+    const PREVIEW = 3;
+    const hasMore = replies.length > PREVIEW;
+
+    const replyHtml = (list) => list.map(r => {
+      const rMember = _memberMap[r.uid];
+      const rPhoto = (r.uid === currentUser.uid ? currentUser.photoURL : (rMember && rMember.photoURL)) || "";
+      const rAvatar = rPhoto
+        ? `<img src="${esc(rPhoto)}" alt="${esc(r.name)}" />`
+        : getInitials(r.name);
+      return `<div class="post-reply">
+        <div class="post-reply-avatar">${rAvatar}</div>
+        <div class="post-reply-bubble">
+          <div class="post-reply-author">${esc(r.name)}</div>
+          <div class="post-reply-text">${esc(r.text)}</div>
+          <div class="post-reply-time">${timeAgo(r.timestamp)}</div>
+        </div>
+      </div>`;
+    }).join("");
+
+    const previewReplies = replyHtml(replies.slice(0, PREVIEW));
+    const extraReplies = hasMore ? replyHtml(replies.slice(PREVIEW)) : "";
+    const replyCountLabel = replies.length === 1 ? "1 reply" : `${replies.length} replies`;
+
+    return `<div class="feed-post" id="post-card-${p.id}">
       <div class="feed-post-header">
         <div class="feed-avatar">${avatarContent}</div>
         <div class="feed-meta">
           <div class="feed-author">${esc(p.author)}</div>
           <div class="feed-time">${timeAgo(p.timestamp)}</div>
         </div>
+        ${isOwner ? `<div style="display:flex;gap:6px;margin-left:auto;">
+          <button onclick="openPostEdit('${p.id}')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;" title="Edit">✏️</button>
+          <button onclick="deletePost('${p.id}')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;" title="Delete">🗑</button>
+        </div>` : ""}
       </div>
-      <div class="feed-body">${esc(p.text)}</div>
-      ${urlHtml}
+      <div class="feed-edit-overlay" id="post-edit-${p.id}">
+        <textarea class="feed-edit-textarea" id="post-edit-text-${p.id}">${esc(p.text)}</textarea>
+        <input class="feed-edit-url" id="post-edit-url-${p.id}" type="url" value="${esc(p.url || "")}" placeholder="Link URL (optional)" />
+        <div class="feed-edit-actions">
+          <button class="btn btn-gold btn-sm" onclick="savePostEdit('${p.id}')">Save</button>
+          <button class="btn btn-outline btn-sm" onclick="closePostEdit('${p.id}')">Cancel</button>
+        </div>
+      </div>
+      <div id="post-body-${p.id}">
+        <div class="feed-body">${esc(p.text)}</div>
+        ${urlHtml}
+      </div>
       <div class="feed-actions">
         <button onclick="giveProps('${p.id}')">👏 ${p.propsCount || 0}</button>
         <button onclick="togglePropsList('${p.id}')">👥</button>
-        ${isOwner ? `<button onclick="deletePost('${p.id}')" style="color:var(--danger);">🗑</button>` : ""}
+        <button class="post-reply-btn" onclick="togglePostCompose('${p.id}')">💬 Reply</button>
       </div>
       <div class="props-list" id="props-${p.id}">${propsNames || "No props yet"}</div>
+      ${replies.length > 0 ? `<div class="post-replies-section">
+        <button class="post-replies-toggle" onclick="togglePostReplies('${p.id}')">
+          💬 ${replyCountLabel} <span id="post-toggle-icon-${p.id}">▸</span>
+        </button>
+        <div id="post-reply-list-${p.id}" style="display:none;">
+          ${previewReplies}
+          ${hasMore ? `<div id="post-extra-replies-${p.id}" style="display:none;">${extraReplies}</div>
+          <button class="see-more-btn" id="post-see-more-btn-${p.id}" onclick="toggleSeeMore('${p.id}')" data-open="false">See ${replies.length - PREVIEW} more</button>` : ""}
+          <div class="post-reply-compose" id="post-compose-${p.id}">
+            <textarea class="post-reply-input" id="post-input-${p.id}" placeholder="Write a reply..."></textarea>
+            <button class="post-reply-send" onclick="submitPostReply('${p.id}')">Reply</button>
+          </div>
+        </div>
+      </div>` : `<div class="post-reply-compose" id="post-compose-${p.id}" style="margin-top:8px;">
+        <textarea class="post-reply-input" id="post-input-${p.id}" placeholder="Write a reply..."></textarea>
+        <button class="post-reply-send" onclick="submitPostReply('${p.id}')">Reply</button>
+      </div>`}
     </div>`;
   }).join("");
 }
 
 function renderPVRCard(p) {
-  const initials = getInitials(p.author);
   const memberData = _memberMap[p.authorUid];
   const photoURL = (p.authorUid === currentUser.uid ? currentUser.photoURL : (memberData && memberData.photoURL)) || "";
   const avatarContent = photoURL
     ? `<img src="${esc(photoURL)}" alt="${esc(p.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
-    : initials;
+    : getInitials(p.author);
   const isOwner = p.authorUid === currentUser.uid || currentUser.isAdmin;
   const replies = p.replies || [];
   const replyCount = replies.length;
   const canReply = p.authorUid !== currentUser.uid;
+  const PREVIEW = 3;
+  const hasMore = replies.length > PREVIEW;
 
-  const repliesHtml = replies.map(r => {
+  const replyHtml = (list) => list.map(r => {
     const rMember = _memberMap[r.uid];
     const rPhoto = (r.uid === currentUser.uid ? currentUser.photoURL : (rMember && rMember.photoURL)) || "";
     const rAvatarContent = rPhoto
@@ -3036,29 +3261,46 @@ function renderPVRCard(p) {
     </div>`;
   }).join("");
 
+  const previewReplies = replyHtml(replies.slice(0, PREVIEW));
+  const extraReplies = hasMore ? replyHtml(replies.slice(PREVIEW)) : "";
+  const replyCountLabel = replyCount === 1 ? "1 reply" : `${replyCount} replies`;
+
   return `<div class="feed-post pvr" id="pvr-card-${p.id}">
-    <div class="pvr-eyebrow">👁 Peer View Request</div>
+    <div class="pvr-eyebrow">👁 Peer Review Request</div>
     <div class="feed-post-header" style="margin-bottom:8px;">
       <div class="feed-avatar" style="border:2px solid rgba(201,168,76,0.4);">${avatarContent}</div>
       <div class="feed-meta">
         <div class="feed-author" style="color:#fff;">${esc(p.author)}</div>
         <div class="feed-time">${timeAgo(p.timestamp)}</div>
       </div>
-      ${isOwner ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:14px;margin-left:auto;">🗑</button>` : ""}
+      ${isOwner ? `<div style="display:flex;gap:6px;margin-left:auto;">
+        <button onclick="openPVREdit('${p.id}')" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;" title="Edit">✏️</button>
+        <button onclick="deletePost('${p.id}')" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;" title="Delete">🗑</button>
+      </div>` : ""}
     </div>
-    ${p.pvr_prompt ? `<div class="pvr-prompt">${esc(p.pvr_prompt)}</div>` : ""}
-    <a href="${esc(p.pvr_url)}" target="_blank" rel="noopener" class="pvr-visit-btn">
-      🌐 Visit Page
-    </a>
+    <div class="pvr-edit-overlay" id="pvr-edit-${p.id}">
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;">URL cannot be changed after posting.</div>
+      <textarea class="pvr-edit-textarea" id="pvr-edit-prompt-${p.id}">${esc(p.pvr_prompt || "")}</textarea>
+      <div class="pvr-edit-actions">
+        <button class="btn btn-gold btn-sm" onclick="savePVREdit('${p.id}')">Save</button>
+        <button class="btn btn-sm" style="border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.6);border-radius:8px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;" onclick="closePVREdit('${p.id}')">Cancel</button>
+      </div>
+    </div>
+    <div id="pvr-body-${p.id}">
+      ${p.pvr_prompt ? `<div class="pvr-prompt">${esc(p.pvr_prompt)}</div>` : ""}
+    </div>
+    <a href="${esc(p.pvr_url)}" target="_blank" rel="noopener" class="pvr-visit-btn">🌐 Visit Page</a>
     <div class="pvr-replies-section">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <button class="pvr-replies-toggle" onclick="togglePVRReplies('${p.id}')">
-          💬 ${replyCount} ${replyCount === 1 ? "reply" : "replies"} <span id="pvr-toggle-icon-${p.id}">▸</span>
+          💬 ${replyCountLabel} <span id="pvr-toggle-icon-${p.id}">▸</span>
         </button>
         <span class="pvr-pts-pill">+2 pts for feedback</span>
       </div>
       <div id="pvr-reply-list-${p.id}" style="display:none;">
-        <div class="pvr-reply-list">${repliesHtml}</div>
+        ${previewReplies}
+        ${hasMore ? `<div id="pvr-extra-replies-${p.id}" style="display:none;">${extraReplies}</div>
+        <button class="see-more-btn" id="pvr-see-more-btn-${p.id}" onclick="togglePVRSeeMore('${p.id}')" data-open="false">See ${replies.length - PREVIEW} more</button>` : ""}
         ${canReply ? `
         <div class="pvr-reply-compose" id="pvr-compose-${p.id}">
           <textarea class="pvr-reply-input" id="pvr-input-${p.id}" placeholder="Leave your feedback..."></textarea>
@@ -3120,6 +3362,121 @@ async function deletePost(postId) {
 }
 
 // ==============================
+// FEED POST EDIT
+// ==============================
+function openPostEdit(postId) {
+  document.getElementById("post-edit-" + postId)?.classList.add("open");
+  document.getElementById("post-body-" + postId)?.style && (document.getElementById("post-body-" + postId).style.display = "none");
+}
+function closePostEdit(postId) {
+  document.getElementById("post-edit-" + postId)?.classList.remove("open");
+  document.getElementById("post-body-" + postId)?.style && (document.getElementById("post-body-" + postId).style.display = "");
+}
+async function savePostEdit(postId) {
+  const textEl = document.getElementById("post-edit-text-" + postId);
+  const urlEl = document.getElementById("post-edit-url-" + postId);
+  const text = textEl ? textEl.value.trim() : "";
+  const url = urlEl ? urlEl.value.trim() : "";
+  if (!text) { showToast("Post can't be empty."); return; }
+  try {
+    await updateDoc(doc(db, "posts", postId), { text, url: url || "" });
+    showToast("Post updated.");
+    loadFeed();
+  } catch (e) { showToast("Failed to save edit."); }
+}
+
+// PVR EDIT
+function openPVREdit(postId) {
+  document.getElementById("pvr-edit-" + postId)?.classList.add("open");
+  document.getElementById("pvr-body-" + postId)?.style && (document.getElementById("pvr-body-" + postId).style.display = "none");
+}
+function closePVREdit(postId) {
+  document.getElementById("pvr-edit-" + postId)?.classList.remove("open");
+  document.getElementById("pvr-body-" + postId)?.style && (document.getElementById("pvr-body-" + postId).style.display = "");
+}
+async function savePVREdit(postId) {
+  const promptEl = document.getElementById("pvr-edit-prompt-" + postId);
+  const prompt = promptEl ? promptEl.value.trim() : "";
+  if (!prompt) { showToast("Feedback question can't be empty."); return; }
+  try {
+    await updateDoc(doc(db, "posts", postId), { pvr_prompt: prompt });
+    showToast("Request updated.");
+    loadFeed();
+  } catch (e) { showToast("Failed to save edit."); }
+}
+
+// ==============================
+// FEED POST REPLIES
+// ==============================
+function togglePostReplies(postId) {
+  const list = document.getElementById("post-reply-list-" + postId);
+  const icon = document.getElementById("post-toggle-icon-" + postId);
+  if (!list) return;
+  const open = list.style.display === "block";
+  list.style.display = open ? "none" : "block";
+  if (icon) icon.textContent = open ? "▸" : "▾";
+}
+
+function togglePostCompose(postId) {
+  // If replies section exists, open it first then show compose
+  const replyList = document.getElementById("post-reply-list-" + postId);
+  if (replyList && replyList.style.display !== "block") {
+    replyList.style.display = "block";
+    const icon = document.getElementById("post-toggle-icon-" + postId);
+    if (icon) icon.textContent = "▾";
+  }
+  const compose = document.getElementById("post-compose-" + postId);
+  if (!compose) return;
+  const open = compose.classList.contains("open");
+  compose.classList.toggle("open", !open);
+  if (!open) {
+    const input = document.getElementById("post-input-" + postId);
+    if (input) input.focus();
+  }
+}
+
+function toggleSeeMore(postId) {
+  const extra = document.getElementById("post-extra-replies-" + postId);
+  const btn = document.getElementById("post-see-more-btn-" + postId);
+  if (!extra || !btn) return;
+  const isOpen = btn.dataset.open === "true";
+  extra.style.display = isOpen ? "none" : "block";
+  btn.dataset.open = isOpen ? "false" : "true";
+  btn.textContent = isOpen ? `See ${extra.querySelectorAll(".post-reply").length} more` : "See less";
+}
+
+function togglePVRSeeMore(postId) {
+  const extra = document.getElementById("pvr-extra-replies-" + postId);
+  const btn = document.getElementById("pvr-see-more-btn-" + postId);
+  if (!extra || !btn) return;
+  const isOpen = btn.dataset.open === "true";
+  extra.style.display = isOpen ? "none" : "block";
+  btn.dataset.open = isOpen ? "false" : "true";
+  btn.textContent = isOpen ? `See ${extra.querySelectorAll(".pvr-reply").length} more` : "See less";
+}
+
+async function submitPostReply(postId) {
+  const input = document.getElementById("post-input-" + postId);
+  const text = input ? input.value.trim() : "";
+  if (!text) { showToast("Write a reply first."); return; }
+  const reply = {
+    name: currentUser.name,
+    uid: currentUser.uid,
+    text,
+    timestamp: Date.now()
+  };
+  try {
+    await updateDoc(doc(db, "posts", postId), { replies: arrayUnion(reply) });
+    if (input) input.value = "";
+    showToast("Reply posted!");
+    loadFeed();
+  } catch (e) {
+    console.error("submitPostReply error:", e);
+    showToast("Failed to post reply.");
+  }
+}
+
+// ==============================
 // COMPOSE TAB TOGGLE
 // ==============================
 function switchComposeTab(tab) {
@@ -3163,7 +3520,7 @@ async function submitPVR() {
   if (isRoundOver()) { showToast("Round has ended."); return; }
   const weekIdx = getWeekIndex();
   const count = await getWeeklyPVRCount();
-  if (count >= 1) { showToast("One Peer View Request per week."); return; }
+  if (count >= 1) { showToast("One Peer Review Request per week."); return; }
   try {
     await addDoc(collection(db, "posts"), {
       author: currentUser.name,
@@ -3180,7 +3537,7 @@ async function submitPVR() {
     document.getElementById("pvr-url").value = "";
     document.getElementById("pvr-prompt").value = "";
     switchComposeTab("post");
-    showToast("Peer View Request posted!");
+    showToast("Peer Review Request posted!");
     loadFeed();
   } catch (e) {
     console.error("submitPVR error:", e);
@@ -4916,6 +5273,17 @@ window.confirmProps = confirmProps;
 window.togglePropsList = togglePropsList;
 window.toggleLike = toggleLike;
 window.deletePost = deletePost;
+window.openPostEdit = openPostEdit;
+window.closePostEdit = closePostEdit;
+window.savePostEdit = savePostEdit;
+window.openPVREdit = openPVREdit;
+window.closePVREdit = closePVREdit;
+window.savePVREdit = savePVREdit;
+window.togglePostReplies = togglePostReplies;
+window.togglePostCompose = togglePostCompose;
+window.toggleSeeMore = toggleSeeMore;
+window.togglePVRSeeMore = togglePVRSeeMore;
+window.submitPostReply = submitPostReply;
 window.switchComposeTab = switchComposeTab;
 window.submitPVR = submitPVR;
 window.togglePVRReplies = togglePVRReplies;
