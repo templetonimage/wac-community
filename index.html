@@ -547,6 +547,191 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 
 /* ==============================
+   PEER VIEW REQUEST
+   ============================== */
+.feed-compose-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.feed-compose-tab {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.feed-compose-tab.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,168,76,0.06);
+}
+.pvr-compose-fields { display: none; }
+.pvr-compose-fields.visible { display: block; }
+.regular-compose-fields.hidden { display: none; }
+
+.feed-post.pvr {
+  border: 1.5px solid var(--gold);
+  background: linear-gradient(135deg, #1a1a00 0%, #1a1500 100%);
+  color: #fff;
+}
+.pvr-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.pvr-prompt {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.pvr-visit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  margin-bottom: 12px;
+  transition: opacity 0.15s;
+}
+.pvr-visit-btn:hover { opacity: 0.85; text-decoration: none; }
+.pvr-replies-section {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+.pvr-replies-toggle {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pvr-replies-toggle:hover { color: rgba(255,255,255,0.8); }
+.pvr-reply-list { margin-bottom: 10px; }
+.pvr-reply {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+.pvr-reply-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.3);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.pvr-reply-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.pvr-reply-bubble {
+  background: rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 8px 10px;
+  flex: 1;
+}
+.pvr-reply-author { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.9); margin-bottom: 2px; }
+.pvr-reply-text { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+.pvr-reply-time { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 3px; }
+.pvr-reply-compose {
+  display: none;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 6px;
+}
+.pvr-reply-compose.open { display: flex; }
+.pvr-reply-input {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #fff;
+  resize: none;
+  min-height: 60px;
+}
+.pvr-reply-input::placeholder { color: rgba(255,255,255,0.3); }
+.pvr-reply-input:focus { outline: none; border-color: var(--gold); }
+.pvr-reply-send {
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  align-self: flex-end;
+}
+.pvr-reply-send:hover { opacity: 0.85; }
+.pvr-feedback-btn {
+  background: none;
+  border: 1.5px solid rgba(201,168,76,0.5);
+  color: var(--gold);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+}
+.pvr-feedback-btn:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+.pvr-pts-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(201,168,76,0.15);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+/* ==============================
    ADMIN COMPOSE
    ============================== */
 .admin-compose {
@@ -1437,13 +1622,33 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       </div>
       <!-- Member compose -->
       <div class="card">
-        <div class="form-group">
-          <textarea id="feed-compose" class="form-input" placeholder="Share something with the community..."></textarea>
+        <div class="feed-compose-tabs">
+          <button class="feed-compose-tab active" id="tab-post" onclick="switchComposeTab('post')">💬 Post</button>
+          <button class="feed-compose-tab" id="tab-pvr" onclick="switchComposeTab('pvr')">👁 Peer View Request</button>
         </div>
-        <div class="form-group">
-          <input type="url" id="feed-url" class="form-input" placeholder="Link URL (optional)" />
+        <!-- Regular post fields -->
+        <div id="regular-compose-fields" class="regular-compose-fields">
+          <div class="form-group">
+            <textarea id="feed-compose" class="form-input" placeholder="Share something with the community..."></textarea>
+          </div>
+          <div class="form-group">
+            <input type="url" id="feed-url" class="form-input" placeholder="Link URL (optional)" />
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="submitPost()">Post</button>
         </div>
-        <button class="btn btn-gold btn-sm" onclick="submitPost()">Post</button>
+        <!-- PVR fields -->
+        <div id="pvr-compose-fields" class="pvr-compose-fields">
+          <div class="form-group">
+            <label class="form-label">Page URL <span style="color:var(--danger);font-size:11px;">required</span></label>
+            <input type="url" id="pvr-url" class="form-input" placeholder="https://yoursite.com/page-to-review" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">What feedback are you looking for?</label>
+            <textarea id="pvr-prompt" class="form-input" placeholder="e.g. Does my homepage copy make sense? Is the CTA clear?" style="min-height:70px;"></textarea>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">Members who leave feedback earn +2 pts.</div>
+          <button class="btn btn-gold btn-sm" onclick="submitPVR()">Post Peer View Request</button>
+        </div>
       </div>
       <div class="weekly-challenge-banner" id="feed-challenge-banner">
         <div class="wc-inner">
@@ -1988,7 +2193,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
-  deleteDoc, query, where, orderBy, limit, increment, Timestamp
+  deleteDoc, query, where, orderBy, limit, increment, arrayUnion, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ==============================
@@ -2773,8 +2978,8 @@ function renderFeed(posts) {
   const el = document.getElementById("feed-list");
   if (!posts.length) { el.innerHTML = '<p class="text-sm text-muted text-center">No posts yet. Be the first!</p>'; return; }
   el.innerHTML = posts.map(p => {
+    if (p.type === "pvr") return renderPVRCard(p);
     const initials = getInitials(p.author);
-    // Look up member photo from memberMap by authorUid
     const memberData = _memberMap[p.authorUid];
     const photoURL = (p.authorUid === currentUser.uid ? currentUser.photoURL : (memberData && memberData.photoURL)) || "";
     const avatarContent = photoURL
@@ -2801,6 +3006,69 @@ function renderFeed(posts) {
       <div class="props-list" id="props-${p.id}">${propsNames || "No props yet"}</div>
     </div>`;
   }).join("");
+}
+
+function renderPVRCard(p) {
+  const initials = getInitials(p.author);
+  const memberData = _memberMap[p.authorUid];
+  const photoURL = (p.authorUid === currentUser.uid ? currentUser.photoURL : (memberData && memberData.photoURL)) || "";
+  const avatarContent = photoURL
+    ? `<img src="${esc(photoURL)}" alt="${esc(p.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
+    : initials;
+  const isOwner = p.authorUid === currentUser.uid || currentUser.isAdmin;
+  const replies = p.replies || [];
+  const replyCount = replies.length;
+  const canReply = p.authorUid !== currentUser.uid;
+
+  const repliesHtml = replies.map(r => {
+    const rMember = _memberMap[r.uid];
+    const rPhoto = (r.uid === currentUser.uid ? currentUser.photoURL : (rMember && rMember.photoURL)) || "";
+    const rAvatarContent = rPhoto
+      ? `<img src="${esc(rPhoto)}" alt="${esc(r.name)}" />`
+      : getInitials(r.name);
+    return `<div class="pvr-reply">
+      <div class="pvr-reply-avatar">${rAvatarContent}</div>
+      <div class="pvr-reply-bubble">
+        <div class="pvr-reply-author">${esc(r.name)}</div>
+        <div class="pvr-reply-text">${esc(r.text)}</div>
+        <div class="pvr-reply-time">${timeAgo(r.timestamp)}</div>
+      </div>
+    </div>`;
+  }).join("");
+
+  return `<div class="feed-post pvr" id="pvr-card-${p.id}">
+    <div class="pvr-eyebrow">👁 Peer View Request</div>
+    <div class="feed-post-header" style="margin-bottom:8px;">
+      <div class="feed-avatar" style="border:2px solid rgba(201,168,76,0.4);">${avatarContent}</div>
+      <div class="feed-meta">
+        <div class="feed-author" style="color:#fff;">${esc(p.author)}</div>
+        <div class="feed-time">${timeAgo(p.timestamp)}</div>
+      </div>
+      ${isOwner ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-size:14px;margin-left:auto;">🗑</button>` : ""}
+    </div>
+    ${p.pvr_prompt ? `<div class="pvr-prompt">${esc(p.pvr_prompt)}</div>` : ""}
+    <a href="${esc(p.pvr_url)}" target="_blank" rel="noopener" class="pvr-visit-btn">
+      🌐 Visit Page
+    </a>
+    <div class="pvr-replies-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <button class="pvr-replies-toggle" onclick="togglePVRReplies('${p.id}')">
+          💬 ${replyCount} ${replyCount === 1 ? "reply" : "replies"} <span id="pvr-toggle-icon-${p.id}">▸</span>
+        </button>
+        <span class="pvr-pts-pill">+2 pts for feedback</span>
+      </div>
+      <div id="pvr-reply-list-${p.id}" style="display:none;">
+        <div class="pvr-reply-list">${repliesHtml}</div>
+        ${canReply ? `
+        <div class="pvr-reply-compose" id="pvr-compose-${p.id}">
+          <textarea class="pvr-reply-input" id="pvr-input-${p.id}" placeholder="Leave your feedback..."></textarea>
+          <button class="pvr-reply-send" onclick="submitPVRReply('${p.id}', '${esc(p.authorUid)}')">Send +2pts</button>
+        </div>
+        <button class="pvr-feedback-btn" id="pvr-feedback-btn-${p.id}" onclick="togglePVRCompose('${p.id}')">✏️ Leave Feedback</button>
+        ` : `<div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;">You can't reply to your own request.</div>`}
+      </div>
+    </div>
+  </div>`;
 }
 
 async function giveProps(postId) {
@@ -2850,6 +3118,153 @@ async function deletePost(postId) {
     loadFeed();
   } catch { showToast("Failed to delete."); }
 }
+
+// ==============================
+// COMPOSE TAB TOGGLE
+// ==============================
+function switchComposeTab(tab) {
+  const regularFields = document.getElementById("regular-compose-fields");
+  const pvrFields = document.getElementById("pvr-compose-fields");
+  const tabPost = document.getElementById("tab-post");
+  const tabPvr = document.getElementById("tab-pvr");
+  if (tab === "post") {
+    regularFields.classList.remove("hidden");
+    pvrFields.classList.remove("visible");
+    tabPost.classList.add("active");
+    tabPvr.classList.remove("active");
+  } else {
+    regularFields.classList.add("hidden");
+    pvrFields.classList.add("visible");
+    tabPost.classList.remove("active");
+    tabPvr.classList.add("active");
+  }
+}
+
+// ==============================
+// PEER VIEW REQUEST
+// ==============================
+async function getWeeklyPVRCount() {
+  const weekIdx = getWeekIndex();
+  try {
+    const q = query(collection(db, "posts"),
+      where("authorUid", "==", currentUser.uid),
+      where("weekIdx", "==", weekIdx),
+      where("type", "==", "pvr"));
+    const snap = await getDocs(q);
+    return snap.size;
+  } catch { return 0; }
+}
+
+async function submitPVR() {
+  const url = document.getElementById("pvr-url").value.trim();
+  const prompt = document.getElementById("pvr-prompt").value.trim();
+  if (!url) { showToast("Enter the page URL."); return; }
+  if (!prompt) { showToast("Describe the feedback you're looking for."); return; }
+  if (isRoundOver()) { showToast("Round has ended."); return; }
+  const weekIdx = getWeekIndex();
+  const count = await getWeeklyPVRCount();
+  if (count >= 1) { showToast("One Peer View Request per week."); return; }
+  try {
+    await addDoc(collection(db, "posts"), {
+      author: currentUser.name,
+      authorUid: currentUser.uid,
+      type: "pvr",
+      pvr_url: url,
+      pvr_prompt: prompt,
+      weekIdx,
+      replies: [],
+      props: [],
+      propsCount: 0,
+      timestamp: Date.now()
+    });
+    document.getElementById("pvr-url").value = "";
+    document.getElementById("pvr-prompt").value = "";
+    switchComposeTab("post");
+    showToast("Peer View Request posted!");
+    loadFeed();
+  } catch (e) {
+    console.error("submitPVR error:", e);
+    showToast("Failed to post: " + (e.code || e.message));
+  }
+}
+
+function togglePVRReplies(postId) {
+  const list = document.getElementById("pvr-reply-list-" + postId);
+  const icon = document.getElementById("pvr-toggle-icon-" + postId);
+  if (!list) return;
+  const open = list.style.display === "block";
+  list.style.display = open ? "none" : "block";
+  if (icon) icon.textContent = open ? "▸" : "▾";
+}
+
+function togglePVRCompose(postId) {
+  const compose = document.getElementById("pvr-compose-" + postId);
+  const btn = document.getElementById("pvr-feedback-btn-" + postId);
+  if (!compose) return;
+  const open = compose.classList.contains("open");
+  if (open) {
+    compose.classList.remove("open");
+    if (btn) btn.style.display = "inline-flex";
+  } else {
+    compose.classList.add("open");
+    if (btn) btn.style.display = "none";
+    const input = document.getElementById("pvr-input-" + postId);
+    if (input) input.focus();
+  }
+}
+
+async function submitPVRReply(postId, postAuthorUid) {
+  const input = document.getElementById("pvr-input-" + postId);
+  const text = input ? input.value.trim() : "";
+  if (!text) { showToast("Write your feedback first."); return; }
+  if (postAuthorUid === currentUser.uid) { showToast("You can't reply to your own request."); return; }
+  if (isRoundOver()) { showToast("Round has ended."); return; }
+
+  // Check weekly engagement cap
+  const engCount = await getWeeklyEngCount();
+  if (engCount >= MAX_ENG_PER_WEEK) { showToast(`Max ${MAX_ENG_PER_WEEK} engagements per week.`); return; }
+
+  const weekIdx = getWeekIndex();
+  const reply = {
+    name: currentUser.name,
+    uid: currentUser.uid,
+    text,
+    timestamp: Date.now()
+  };
+
+  try {
+    // Write reply to post doc
+    await updateDoc(doc(db, "posts", postId), {
+      replies: arrayUnion(reply)
+    });
+    // Log engagement for points
+    await addDoc(collection(db, "engagements"), {
+      author: currentUser.name,
+      authorUid: currentUser.uid,
+      weekIdx,
+      targetUrl: "",
+      note: `PVR feedback on ${postAuthorUid}`,
+      type: "PVR Feedback",
+      hasScreenshot: false,
+      pts: PTS_ENGAGEMENT,
+      isPVR: true,
+      timestamp: Date.now()
+    });
+    // Update points
+    const regRef = doc(db, "wac_registry", currentUser.uid);
+    await updateDoc(regRef, { points: increment(PTS_ENGAGEMENT) });
+    currentUser.points = (currentUser.points || 0) + PTS_ENGAGEMENT;
+    lsSet("wac_session", currentUser);
+    if (input) input.value = "";
+    showToast(`Feedback sent! +${PTS_ENGAGEMENT} pts`);
+    loadFeed();
+  } catch (e) {
+    console.error("submitPVRReply error:", e);
+    showToast("Failed to send feedback.");
+  }
+}
+
+
 
 // ==============================
 // ANNOUNCEMENTS
@@ -4501,6 +4916,11 @@ window.confirmProps = confirmProps;
 window.togglePropsList = togglePropsList;
 window.toggleLike = toggleLike;
 window.deletePost = deletePost;
+window.switchComposeTab = switchComposeTab;
+window.submitPVR = submitPVR;
+window.togglePVRReplies = togglePVRReplies;
+window.togglePVRCompose = togglePVRCompose;
+window.submitPVRReply = submitPVRReply;
 window.submitAnnouncement = submitAnnouncement;
 window.deleteAnn = deleteAnn;
 window.submitResource = submitResource;
