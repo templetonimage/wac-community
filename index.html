@@ -1310,19 +1310,20 @@ textarea.form-input { resize: vertical; min-height: 80px; }
      APP SHELL
      ============================== -->
 <div id="app">
+  <!-- TOPNAV -->
+  <nav class="topnav">
+    <div class="topnav-brand" onclick="navTo('dashboard')" style="cursor:pointer;">WAC</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="topnav-user" id="topnav-user"></span>
+      <span id="topnav-pro-badge" style="display:none;" class="pro-badge">PRO</span>
+      <button onclick="handleLogout()" onmouseover="this.style.background='var(--gold)';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';" style="padding:6px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--gold);background:transparent;color:var(--gold);transition:all .15s;white-space:nowrap;">Sign Out</button>
+      <button id="topnav-avatar-btn" onclick="navTo('profile')" title="My Profile" style="background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;">
+        <div id="topnav-avatar" class="topnav-avatar">?</div>
+      </button>
+    </div>
+  </nav>
+
   <div id="app-scroll">
-    <!-- TOPNAV -->
-    <nav class="topnav">
-      <div class="topnav-brand" onclick="navTo('dashboard')" style="cursor:pointer;">WAC</div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span class="topnav-user" id="topnav-user"></span>
-        <span id="topnav-pro-badge" style="display:none;" class="pro-badge">PRO</span>
-        <button onclick="handleLogout()" onmouseover="this.style.background='var(--gold)';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';" style="padding:6px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--gold);background:transparent;color:var(--gold);transition:all .15s;white-space:nowrap;">Sign Out</button>
-        <button id="topnav-avatar-btn" class="topnav-avatar" onclick="navTo('profile')" title="My Profile" style="background:none;border:none;padding:0;">
-          <div id="topnav-avatar" class="topnav-avatar">?</div>
-        </button>
-      </div>
-    </nav>
 
     <!-- PAGE: DASHBOARD -->
     <div class="page active" id="page-dashboard">
@@ -2025,8 +2026,6 @@ const WEEKLY_CHALLENGES = [
 // WAC Pro launch flags — flip both to true at Pro launch
 const _PRO_GLOBAL_ACTIVE = false; // shows WAC Pro Management panel in Reports
 const _PRO_NOTIFS_ACTIVE = false; // activates in-app notification sequence
-
-const GRACE_WEEKS = ["w1", "w2"];
 
 // ==============================
 // MEMBER SANITIZER
@@ -3311,25 +3310,7 @@ async function deleteSubmission(id, pts) {
 // ==============================
 // TRACKER
 // ==============================
-async function initGracePeriod() {
-  if (currentUser.isAdmin) return; // admin uses test tracker, no grace period needed
-  try {
-    const ref = doc(db, "trackers", currentUser.uid);
-    const snap = await getDoc(ref);
-    let data = snap.exists() ? snap.data() : {};
-    let changed = false;
-    for (const wk of GRACE_WEEKS) {
-      if (!data[wk]) { data[wk] = true; changed = true; }
-    }
-    if (changed) {
-      await setDoc(ref, { uid: currentUser.uid, ...data }, { merge: true });
-    }
-  } catch (e) { console.error("initGracePeriod error:", e); }
-}
-
 async function buildTracker() {
-  await initGracePeriod();
-
   let trackerData = {};
   const trackerUid = currentUser.isAdmin ? "admin-test" : currentUser.uid;
   try {
@@ -3359,10 +3340,9 @@ async function buildTracker() {
       <div class="tracker-month-req">${MONTH_REQS[month]}</div>`;
     for (const w of monthWeeks) {
       const checked = trackerData[w.id] ? "checked" : "";
-      const grace = GRACE_WEEKS.includes(w.id) ? ' <span style="font-size:11px;color:var(--text-muted);">(grace)</span>' : "";
       html += `<div class="tracker-week ${checked}" data-week="${w.id}" onclick="toggleCheck('${w.id}')">
         <div>
-          <div class="tracker-week-label">${w.label}${grace}</div>
+          <div class="tracker-week-label">${w.label}</div>
           <div class="tracker-week-dates">${w.dates}</div>
         </div>
         <div class="tracker-check">${trackerData[w.id] ? "✓" : ""}</div>
@@ -3730,10 +3710,9 @@ function renderAdminTrackerModal(name, data) {
   let html = `<h3 style="font-size:18px;font-weight:700;margin-bottom:16px;">Edit Tracker: ${esc(name)}</h3>`;
   WEEKS.forEach(w => {
     const checked = data[w.id] ? "checked" : "";
-    const grace = GRACE_WEEKS.includes(w.id) ? " (grace)" : "";
     html += `<label style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;cursor:pointer;">
       <input type="checkbox" ${checked} onchange="adminToggleCheck('${w.id}', this.checked)" />
-      <span>${w.label} — ${w.dates}${grace}</span>
+      <span>${w.label} — ${w.dates}</span>
     </label>`;
   });
   document.getElementById("admin-tracker-content").innerHTML = html;
