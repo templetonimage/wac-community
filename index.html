@@ -1286,7 +1286,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   <div class="auth-card-wrap">
     <div class="auth-logo">WAC</div>
     <div class="auth-subtitle">Website Accountability<br>Challenge</div>
-    <div class="auth-round-badge">Round 1 · May–July 2026</div>
+    <div class="auth-round-badge">Free Trial · April 1–30</div>
     <div class="auth-form-area">
       <div class="auth-form-group">
         <label class="auth-form-label">EMAIL ADDRESS</label>
@@ -1341,6 +1341,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <div class="wc-title" id="dash-challenge-title">Loading...</div>
             <div class="wc-desc" id="dash-challenge-desc"></div>
             <div class="wc-badge">+5 pts bonus</div>
+            <div id="dash-next-challenge" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.4;"></div>
           </div>
         </div>
       </div>
@@ -1529,10 +1530,21 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <div>
               <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.04em;color:var(--gold);margin-bottom:2px;">⚡ Weekly Challenge <span style="font-size:12px;font-weight:700;background:var(--gold);color:#fff;padding:1px 8px;border-radius:999px;vertical-align:middle;">+5 pts</span></div>
               <div id="submit-challenge-label" style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;">Loading this week's challenge...</div>
+              <div id="submit-next-challenge" style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.4;"></div>
             </div>
           </label>
         </div>
-        <button class="btn btn-gold btn-block btn-post" onclick="submitUpdate()">Submit Update</button>
+        <div class="form-group">
+          <label class="form-label">Screenshot <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(optional)</span></label>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;line-height:1.5;">Required for: improving SEO titles, alt text, picture filenames, meta descriptions, fixing broken links.</div>
+          <div class="screenshot-area" id="screenshot-area" onclick="document.getElementById('screenshot-input').click()">
+            <div id="screenshot-placeholder">📷 Tap to add screenshot</div>
+            <img id="screenshot-preview" class="screenshot-preview" style="display:none;" />
+            <input type="file" id="screenshot-input" accept="image/*" style="display:none;" onchange="handleScreenshotSelect(event)" />
+          </div>
+          <button class="btn btn-sm btn-outline mt-8" id="clear-screenshot-btn" style="display:none;" onclick="clearScreenshot()">Remove screenshot</button>
+        </div>
+        <button class="btn btn-gold btn-block btn-post" id="submit-update-btn" onclick="submitUpdate()" disabled style="opacity:0.45;cursor:not-allowed;" title="Submissions open April 1">Submit Update <span style="font-size:11px;font-weight:500;opacity:0.8;">(Opens April 1)</span></button>
       </div>
 
       <!-- Engagement section -->
@@ -1551,7 +1563,6 @@ textarea.form-input { resize: vertical; min-height: 80px; }
               <button class="eng-type-btn" onclick="selectEngType(this,'Commented')">💬 Commented</button>
               <button class="eng-type-btn" onclick="selectEngType(this,'Shared')">📤 Shared</button>
               <button class="eng-type-btn" onclick="selectEngType(this,'Left Feedback')">📝 Left Feedback</button>
-              <button class="eng-type-btn" onclick="selectEngType(this,'Reviewed')">⭐ Reviewed</button>
             </div>
           </div>
           <div class="form-group">
@@ -1559,7 +1570,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <textarea id="eng-note" class="form-input" placeholder="Describe your engagement..."></textarea>
           </div>
           <div class="form-group">
-            <label class="form-label">Screenshot (optional, +2 pts)</label>
+            <label class="form-label">Screenshot <span style="color:var(--danger);font-size:11px;font-weight:600;">required</span></label>
             <div class="eng-screenshot-area" id="eng-screenshot-area" onclick="document.getElementById('eng-screenshot-input').click()">
               <div id="eng-screenshot-placeholder">📷 Tap to add screenshot</div>
               <img id="eng-screenshot-preview" class="eng-screenshot-preview" style="display:none;" />
@@ -1567,7 +1578,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             </div>
             <button class="btn btn-sm btn-outline mt-8" id="clear-eng-screenshot-btn" style="display:none;" onclick="clearEngScreenshot()">Remove screenshot</button>
           </div>
-          <button class="btn btn-gold btn-block" id="eng-submit-btn" onclick="submitEngagement()">Submit Engagement +2 pts</button>
+          <button class="btn btn-gold btn-block" id="eng-submit-btn" onclick="submitEngagement()" disabled style="opacity:0.45;cursor:not-allowed;" title="Submissions open April 1">Submit Engagement +2 pts <span style="font-size:11px;font-weight:500;opacity:0.8;">(Opens April 1)</span></button>
         </div>
         <div class="card mt-16">
           <div class="card-title">Engagement History</div>
@@ -2378,6 +2389,21 @@ function bootApp() {
   document.getElementById("app").classList.add("visible");
   document.getElementById("bottomnav").style.display = "flex";
 
+  // 1b. Unlock submit buttons on/after April 1, 2026
+  const _submitOpen = new Date("2026-04-01T00:00:00").getTime();
+  if (Date.now() >= _submitOpen || (currentUser && currentUser.isAdmin)) {
+    ["submit-update-btn", "eng-submit-btn"].forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.disabled = false;
+      btn.style.opacity = "";
+      btn.style.cursor = "";
+      btn.title = "";
+      // Strip the "(Opens April 1)" label from button text
+      btn.innerHTML = btn.innerHTML.replace(/<span[^>]*>\(Opens April 1\)<\/span>/g, "").trim();
+    });
+  }
+
   // 2. Set topnav username and avatar
   document.getElementById("topnav-user").textContent = currentUser.name;
   updateTopnavAvatar();
@@ -2485,6 +2511,8 @@ function loadSubmitPage() {
 function loadWeeklyChallenge() {
   const weekIdx = getWeekIndex();
   const challenge = WEEKLY_CHALLENGES[weekIdx] || WEEKLY_CHALLENGES[0];
+  const nextChallenge = WEEKLY_CHALLENGES[weekIdx + 1] || null;
+  const nextText = nextChallenge ? `Next week: ${nextChallenge.title}` : "";
 
   // Populate all challenge UI elements
   ["dash-challenge-title", "feed-challenge-title", "submit-challenge-label"].forEach(id => {
@@ -2496,6 +2524,12 @@ function loadWeeklyChallenge() {
   ["dash-challenge-desc", "feed-challenge-desc"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = challenge.desc;
+  });
+
+  // Populate next-week subtext
+  ["dash-next-challenge", "submit-next-challenge"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = nextText;
   });
 }
 
@@ -3149,6 +3183,7 @@ async function submitUpdate() {
       note,
       format: _selectedFormat || "Static",
       challengeCompleted,
+      hasScreenshot: !!_screenshotData,
       pts,
       isLate,
       timestamp: Date.now()
@@ -3173,6 +3208,7 @@ async function submitUpdate() {
     document.querySelectorAll("#format-btns .format-btn").forEach(b => b.classList.remove("selected"));
     const _challengeEl = document.getElementById("submit-challenge");
     if (_challengeEl) _challengeEl.checked = false;
+    clearScreenshot();
     showToast(`Update submitted! +${pts} pts`);
     loadMySubmissions();
     updatePtsPreview();
@@ -3206,6 +3242,7 @@ async function submitEngagement() {
   const url = document.getElementById("eng-url").value.trim();
   if (!url) { showToast("Enter the member's website URL."); return; }
   if (!_selectedEngType) { showToast("Select engagement type."); return; }
+  if (!_engScreenshotData) { showToast("A screenshot is required."); return; }
   if (isRoundOver()) { showToast("Round has ended."); return; }
 
   const count = await getWeeklyEngCount();
