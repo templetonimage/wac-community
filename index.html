@@ -1980,15 +1980,22 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <div class="page" id="page-tracker">
       <div class="page-header">
         <div class="page-title">⭐ All-Star Tracker</div>
-        <div class="page-subtitle">Your 12-week accountability record.</div>
+        <div class="page-subtitle">Your 12-week accountability record — May through July.</div>
       </div>
+      <!-- April Free Trial section (local only) -->
+      <div class="card mb-16">
+        <div class="card-title" style="font-size:16px;margin-bottom:4px;">🗓 April Free Trial</div>
+        <p class="text-sm text-muted" style="margin-bottom:14px;">Personal check-in only — does not count toward All-Star or points.</p>
+        <div id="trial-tracker-body"></div>
+      </div>
+      <!-- Main Round 1 tracker -->
       <div class="card">
         <div id="tracker-header" class="mb-16"></div>
         <div id="tracker-body"></div>
       </div>
       <div class="card mt-16" style="background:linear-gradient(135deg,rgba(184,134,11,0.06),var(--surface));">
         <div class="card-title">⭐ WAC All-Star</div>
-        <p class="text-sm text-muted">Complete all 12 weekly requirements across June, July, and August to earn All-Star status. That's 24 total updates over 90 days.</p>
+        <p class="text-sm text-muted">Complete all 12 weekly requirements across May, June, and July to earn All-Star status. That's 24 total updates over 90 days.</p>
       </div>
     </div>
 
@@ -2471,21 +2478,28 @@ const WEEK_SCHEDULE = [
 WEEK_SCHEDULE[11][1] = Date.UTC(2026, 8, 1, 3, 59, 59, 999);
 
 const WEEKS = [
-  {id:"w1",  label:"Week 1", dates:"Jun 1–7",   month:"June",   required:1},
-  {id:"w2",  label:"Week 2", dates:"Jun 8–14",  month:"June",   required:1},
-  {id:"w3",  label:"Week 3", dates:"Jun 15–21", month:"June",   required:1},
-  {id:"w4",  label:"Week 4", dates:"Jun 22–30", month:"June",   required:1},
-  {id:"w5",  label:"Week 1", dates:"Jul 1–7",   month:"July",   required:2},
-  {id:"w6",  label:"Week 2", dates:"Jul 8–14",  month:"July",   required:2},
-  {id:"w7",  label:"Week 3", dates:"Jul 15–21", month:"July",   required:2},
-  {id:"w8",  label:"Week 4", dates:"Jul 22–31", month:"July",   required:2},
-  {id:"w9",  label:"Week 1", dates:"Aug 1–7",   month:"August", required:3},
-  {id:"w10", label:"Week 2", dates:"Aug 8–14",  month:"August", required:3},
-  {id:"w11", label:"Week 3", dates:"Aug 15–21", month:"August", required:3},
-  {id:"w12", label:"Week 4", dates:"Aug 22–31", month:"August", required:3},
+  {id:"w1",  label:"Week 1", dates:"May 1–7",    month:"May",  required:1},
+  {id:"w2",  label:"Week 2", dates:"May 8–14",   month:"May",  required:1},
+  {id:"w3",  label:"Week 3", dates:"May 15–21",  month:"May",  required:1},
+  {id:"w4",  label:"Week 4", dates:"May 22–31",  month:"May",  required:1},
+  {id:"w5",  label:"Week 1", dates:"Jun 1–7",    month:"June", required:2},
+  {id:"w6",  label:"Week 2", dates:"Jun 8–14",   month:"June", required:2},
+  {id:"w7",  label:"Week 3", dates:"Jun 15–21",  month:"June", required:2},
+  {id:"w8",  label:"Week 4", dates:"Jun 22–30",  month:"June", required:2},
+  {id:"w9",  label:"Week 1", dates:"Jul 1–7",    month:"July", required:3},
+  {id:"w10", label:"Week 2", dates:"Jul 8–14",   month:"July", required:3},
+  {id:"w11", label:"Week 3", dates:"Jul 15–21",  month:"July", required:3},
+  {id:"w12", label:"Week 4", dates:"Jul 22–31",  month:"July", required:3},
 ];
-const MONTHS = ["June", "July", "August"];
-const MONTH_REQS = {"June":"1 update/week", "July":"2 updates/week", "August":"3 updates/week"};
+const MONTHS = ["May", "June", "July"];
+const MONTH_REQS = {"May":"1 update/week", "June":"2 updates/week", "July":"3 updates/week"};
+
+const TRIAL_WEEKS = [
+  {id:"t1", label:"T1", dates:"Apr 1–7"},
+  {id:"t2", label:"T2", dates:"Apr 8–14"},
+  {id:"t3", label:"T3", dates:"Apr 15–21"},
+  {id:"t4", label:"T4", dates:"Apr 22–30"},
+];
 
 // ==============================
 // APP STATE
@@ -4112,6 +4126,32 @@ async function deleteSubmission(id, pts) {
 // TRACKER
 // ==============================
 async function buildTracker() {
+  // ── April trial section (localStorage only, no Firestore) ──
+  const trialKey = "wac_trial_tracker";
+  let trialData = {};
+  try { trialData = JSON.parse(localStorage.getItem(trialKey) || "{}"); } catch {}
+
+  const trialEl = document.getElementById("trial-tracker-body");
+  if (trialEl) {
+    let trialHtml = `<div class="tracker-month-group">`;
+    for (const w of TRIAL_WEEKS) {
+      const checked = trialData[w.id] ? "checked" : "";
+      trialHtml += `<div class="tracker-week ${checked}" data-week="${w.id}" onclick="toggleTrialCheck('${w.id}')">
+        <div>
+          <div class="tracker-week-label">${w.label}</div>
+          <div class="tracker-week-dates">${w.dates}</div>
+        </div>
+        <div class="tracker-check">${trialData[w.id] ? "✓" : ""}</div>
+      </div>`;
+    }
+    trialHtml += `</div>`;
+    trialEl.innerHTML = trialHtml;
+  }
+
+  // ── Main Round 1 tracker (May–July) ──
+  const MAY1 = new Date("2026-05-01T00:00:00").getTime();
+  const isLocked = Date.now() < MAY1 && !(currentUser && currentUser.isAdmin);
+
   let trackerData = {};
   const trackerUid = currentUser.isAdmin ? "admin-test" : currentUser.uid;
   try {
@@ -4130,18 +4170,19 @@ async function buildTracker() {
       <span class="text-sm text-muted">${pct}%</span>
     </div>
     <div class="tracker-progress"><div class="tracker-progress-bar" style="width:${pct}%"></div></div>
+    ${isLocked ? `<div style="font-size:12px;color:var(--text-muted);margin-top:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;text-align:center;">🔒 Round 1 begins May 1, 2026</div>` : ""}
     ${currentUser.isAdmin ? `<div style="font-size:11px;color:var(--text-muted);margin-top:6px;padding:4px 8px;background:var(--surface2);border-radius:4px;">Admin test tracker — use Reports → All-Star Progress to manage member trackers</div>` : ""}
   `;
 
   let html = "";
   for (const month of MONTHS) {
     const monthWeeks = WEEKS.filter(w => w.month === month);
-    html += `<div class="tracker-month-group">
+    html += `<div class="tracker-month-group" style="${isLocked ? "opacity:0.45;pointer-events:none;" : ""}">
       <div class="tracker-month-title">${month}</div>
       <div class="tracker-month-req">${MONTH_REQS[month]}</div>`;
     for (const w of monthWeeks) {
       const checked = trackerData[w.id] ? "checked" : "";
-      html += `<div class="tracker-week ${checked}" data-week="${w.id}" onclick="toggleCheck('${w.id}')">
+      html += `<div class="tracker-week ${checked}" data-week="${w.id}" ${isLocked ? "" : `onclick="toggleCheck('${w.id}')"`}>
         <div>
           <div class="tracker-week-label">${w.label}</div>
           <div class="tracker-week-dates">${w.dates}</div>
@@ -4154,6 +4195,7 @@ async function buildTracker() {
   document.getElementById("tracker-body").innerHTML = html;
 }
 
+
 async function toggleCheck(weekId) {
   const trackerUid = currentUser.isAdmin ? "admin-test" : currentUser.uid;
   try {
@@ -4165,6 +4207,15 @@ async function toggleCheck(weekId) {
     if (!currentUser.isAdmin) await checkAllStar(data);
     buildTracker();
   } catch (e) { showToast("Failed to update tracker."); }
+}
+
+function toggleTrialCheck(weekId) {
+  const trialKey = "wac_trial_tracker";
+  let trialData = {};
+  try { trialData = JSON.parse(localStorage.getItem(trialKey) || "{}"); } catch {}
+  trialData[weekId] = !trialData[weekId];
+  try { localStorage.setItem(trialKey, JSON.stringify(trialData)); } catch {}
+  buildTracker();
 }
 
 async function checkAllStar(data) {
@@ -5298,6 +5349,7 @@ window.selectEngType = selectEngType;
 window.submitEngagement = submitEngagement;
 window.deleteSubmission = deleteSubmission;
 window.toggleCheck = toggleCheck;
+window.toggleTrialCheck = toggleTrialCheck;
 window.handleMemberCardClick = handleMemberCardClick;
 window.closeMemberModal = closeMemberModal;
 window.closeMemberModalDirect = closeMemberModalDirect;
