@@ -1820,17 +1820,6 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <button class="btn btn-gold btn-sm" onclick="submitPVR()">Post Peer Review Request</button>
         </div>
       </div>
-      <div class="weekly-challenge-banner" id="feed-challenge-banner">
-        <div class="wc-inner">
-          <div class="wc-icon">⚡</div>
-          <div class="wc-body">
-            <div class="wc-eyebrow">This Week's Challenge</div>
-            <div class="wc-title" id="feed-challenge-title">Loading...</div>
-            <div class="wc-desc" id="feed-challenge-desc"></div>
-            <div class="wc-badge">+5 pts bonus</div>
-          </div>
-        </div>
-      </div>
       <div id="announcements-list"></div>
       <div id="feed-list"></div>
     </div>
@@ -2864,7 +2853,7 @@ function navTo(page) {
 
   // Page-specific loads
   if (page === "dashboard") { loadDashboard(); loadWeeklyChallenge(); }
-  if (page === "feed") { loadFeed(); loadAnnouncements(); loadWeeklyChallenge(); clearFeedBadge(); }
+  if (page === "feed") { loadFeed(); loadAnnouncements(); clearFeedBadge(); }
   if (page === "submit") { loadSubmitPage(); loadWeeklyChallenge(); }
   if (page === "ranks") { loadLeaderboard(); clearRanksBadge(); }
   if (page === "profile") { initProfilePhotoPreview(); }
@@ -2890,13 +2879,13 @@ function loadWeeklyChallenge() {
   const nextText = nextChallenge ? `Next week: ${nextChallenge.title}` : "";
 
   // Populate all challenge UI elements
-  ["dash-challenge-title", "feed-challenge-title", "submit-challenge-label"].forEach(id => {
+  ["dash-challenge-title", "submit-challenge-label"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = id === "submit-challenge-label"
       ? `${challenge.title} — ${challenge.desc}`
       : challenge.title;
   });
-  ["dash-challenge-desc", "feed-challenge-desc"].forEach(id => {
+  ["dash-challenge-desc"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = challenge.desc;
   });
