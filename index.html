@@ -1864,6 +1864,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="form-group"><input type="text" id="res-source" class="form-input" placeholder="Source (optional)" /></div>
         <button class="btn btn-gold btn-sm" onclick="submitResource()">Add Resource</button>
         <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="seedDefaultResources()">🌱 Seed Missing Resources</button>
+        <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="fixResourceUrls()">🔧 Fix Stale Resource URLs</button>
       </div>
       <div id="filter-bar" class="filter-bar"></div>
       <div id="resource-grid" class="resource-grid"></div>
@@ -5699,6 +5700,34 @@ window.resetAllPoints = async function() {
   }
 };
 window.seedDefaultResources = seedDefaultResources;
+
+// Clears stale url/linkLabel from resource cards that should have none
+window.fixResourceUrls = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const NO_LINK_TITLES = [
+    "30-Day Website Content Strategy Prompt",
+    "Website Update Batching",
+    "Homepage Copy Formula",
+    "SEO Basics for Solopreneurs",
+    "Photography & Visuals That Convert",
+    "The One-Page Website Audit",
+    "Content Pillars for Your Website",
+    "E-E-A-T Playbook",
+  ];
+  try {
+    const snap = await getDocs(collection(db, "resources"));
+    let fixed = 0;
+    for (const d of snap.docs) {
+      const data = d.data();
+      if (NO_LINK_TITLES.includes(data.title) && (data.url || data.linkLabel)) {
+        await updateDoc(doc(db, "resources", d.id), { url: "", linkLabel: "" });
+        fixed++;
+      }
+    }
+    showToast(fixed > 0 ? `Fixed ${fixed} resource(s).` : "Nothing to fix.");
+    loadResources();
+  } catch (e) { showToast("Fix error: " + e.message); }
+};
 window.openEEATModal = openEEATModal;
 window.closeEEATModal = closeEEATModal;
 window.closeEEATModalDirect = closeEEATModalDirect;
@@ -6081,7 +6110,7 @@ function renderEEATSlide() {
   wrap.innerHTML = `
     <div style="font-size:40px;margin-bottom:10px;">${slide.emoji}</div>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:14px;color:var(--text);">${esc(slide.title)}</div>
-    <div style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text);">${esc(slide.body)}</div>
+    <div style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text);">${linkify(slide.body)}</div>
     ${copyBtn}
     ${coreUpdateLink}
     <div style="height:8px;"></div>
