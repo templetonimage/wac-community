@@ -1740,6 +1740,14 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div style="font-size:12px;color:var(--gold);font-weight:600;margin-top:2px;">Add to Google Calendar →</div>
         </div>
       </a>
+      <div class="dash-animate" onclick="openEEATModal()" style="animation-delay:0.54s;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(184,134,11,0.07),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);cursor:pointer;">
+        <span style="font-size:26px;flex-shrink:0;">📖</span>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:14px;color:var(--text);">E-E-A-T Playbook</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Google's ranking framework — 7 slides built for your business.</div>
+        </div>
+        <div style="font-size:12px;color:var(--gold);font-weight:700;white-space:nowrap;">View Guide →</div>
+      </div>
       <div class="dash-allstar-banner dash-animate" style="animation-delay:0.55s;">
         <div class="dash-allstar-top">
           <div class="dash-allstar-star">⭐</div>
@@ -2399,6 +2407,26 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   </div>
 </div>
 
+<!-- EEAT CAROUSEL MODAL -->
+<div class="modal-overlay" id="eeat-modal-overlay" onclick="closeEEATModalDirect(event)">
+  <div class="modal-sheet" style="max-height:92vh;display:flex;flex-direction:column;">
+    <div class="modal-header" style="flex-shrink:0;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);">E-E-A-T Playbook</div>
+      <button class="modal-close" onclick="closeEEATModal()">✕</button>
+    </div>
+    <!-- Slide container -->
+    <div id="eeat-slide-wrap" style="flex:1;overflow-y:auto;padding:20px 20px 0;"></div>
+    <!-- Progress dots + nav -->
+    <div style="flex-shrink:0;padding:16px 20px 20px;border-top:1px solid var(--border);margin-top:8px;">
+      <div id="eeat-dots" style="display:flex;justify-content:center;gap:8px;margin-bottom:14px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button id="eeat-prev-btn" class="btn btn-outline" style="flex:1;" onclick="eeatNav(-1)">← Prev</button>
+        <button id="eeat-next-btn" class="btn btn-gold" style="flex:1;" onclick="eeatNav(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -2448,18 +2476,18 @@ const MAX_ENG_PER_WEEK = 5;
 
 // Weekly Challenge Modifiers — one per week, keyed by weekIdx (0–11)
 const WEEKLY_CHALLENGES = [
-  { title: "Add a Testimonial",        desc: "Add at least one real client testimonial to any page on your site." },
-  { title: "Update Your Homepage Hero",desc: "Refresh your headline, subheadline, or hero image on your homepage." },
-  { title: "Write a Blog Post",        desc: "Publish a new blog post — any length, any topic relevant to your audience." },
-  { title: "Add a New Page",           desc: "Create and publish a brand new page on your site." },
-  { title: "Fix Your Mobile Layout",   desc: "Review your site on a phone and fix at least one mobile display issue." },
-  { title: "Update Your About Page",   desc: "Refresh your About page copy, photo, or both." },
-  { title: "Add a Clear CTA",          desc: "Ensure every page has one clear, visible call-to-action above the fold." },
-  { title: "Optimize Page Speed",      desc: "Run your site through PageSpeed Insights and fix at least one issue." },
-  { title: "Add Alt Text to Images",   desc: "Add descriptive alt text to every image on at least one page." },
-  { title: "Update Your Services Page",desc: "Refresh your services or offerings page with current pricing or copy." },
-  { title: "Add Social Proof",         desc: "Add a review, case study, or client logo to any page." },
-  { title: "Final Push — Any Update",  desc: "Complete any meaningful update to your site and finish strong." },
+  { title: "Add a Testimonial (Trust Signal)",        desc: "Add at least one real client testimonial to your site — include the client's name and project for maximum trust impact. Named, verifiable reviews are a direct Trust signal Google looks for under E-E-A-T." },
+  { title: "Clarify Your Homepage (Expertise Signal)",desc: "Refresh your headline, subheadline, or hero image so a first-time visitor immediately understands who you serve and what makes you the expert. Clear positioning is an Expertise signal." },
+  { title: "Write a Blog Post (Experience Signal)",   desc: "Publish a new blog post sharing something from your real experience — a shoot recap, a lesson learned, a behind-the-scenes story. First-hand content is Google's definition of Experience under E-E-A-T." },
+  { title: "Add a New Page (Authority Signal)",       desc: "Create and publish a brand new page on your site — a service page, location page, or FAQ. More depth and coverage builds topical Authority in Google's eyes." },
+  { title: "Fix Your Mobile Layout (Trust Signal)",   desc: "Review your site on a phone and fix at least one mobile display issue. A broken mobile experience erodes visitor Trust and hurts your Google rankings." },
+  { title: "E-E-A-T Your About Page",                 desc: "Upgrade your About page to hit all four E-E-A-T pillars: years of experience, your specific niche, any training or awards, and a professional photo. This is the single highest-impact E-E-A-T page on your site." },
+  { title: "Add a Clear CTA (Trust Signal)",          desc: "Ensure every page has one clear, visible call-to-action above the fold. A site that makes next steps obvious signals professionalism and Trustworthiness to both visitors and Google." },
+  { title: "Optimize Page Speed (Trust Signal)",      desc: "Run your site through PageSpeed Insights (pagespeed.web.dev) and fix at least one issue. Fast, technically sound sites are a core Trust signal — slow sites lose both visitors and rankings." },
+  { title: "Add Alt Text to Images (Experience Signal)", desc: "Add descriptive alt text to every image on at least one page. Good alt text proves you were present and intentional — and tells Google's bots exactly what your Experience-driven visuals show." },
+  { title: "Update Your Services Page (Expertise Signal)", desc: "Refresh your services or offerings page with current pricing, descriptions, or copy. A detailed, current services page demonstrates active Expertise and keeps your site feeling credible." },
+  { title: "Add Verified Social Proof (Authority Signal)", desc: "Add a review, press mention, award, or client logo to any page — with the client's name or source attached. Named, verifiable social proof is how Google measures your Authority in the real world." },
+  { title: "Final Push — Any E-E-A-T Win",            desc: "Complete any meaningful update that strengthens your site's Experience, Expertise, Authority, or Trust. Finish the round strong — every improvement you've made this 90 days is a Google trust signal compounding in your favor." },
 ];
 
 // WAC Pro launch flags — flip both to true at Pro launch
@@ -3903,9 +3931,12 @@ function renderResources() {
   if (!filtered.length) { el.innerHTML = '<p class="text-sm text-muted">No resources yet.</p>'; return; }
   el.innerHTML = filtered.map(r => {
     const tagsHtml = (r.tags || []).map(t => `<span class="resource-tag">${esc(t)}</span>`).join("");
-    return `<div class="resource-card" onclick="openResModal('${r.id}')">
+    const isEEAT = (r.tags || []).includes("eeat-guide");
+    const clickHandler = isEEAT ? `openEEATModal()` : `openResModal('${r.id}')`;
+    const accentStyle = isEEAT ? `border:1.5px solid var(--gold);background:linear-gradient(135deg,rgba(184,134,11,0.06),var(--surface));` : "";
+    return `<div class="resource-card" style="${accentStyle}" onclick="${clickHandler}">
       <div class="resource-emoji">${esc(r.emoji || "📄")}</div>
-      <div class="resource-title">${esc(r.title)}</div>
+      <div class="resource-title">${esc(r.title)}${isEEAT ? ' <span style="font-size:10px;background:var(--gold);color:#fff;padding:1px 6px;border-radius:4px;vertical-align:middle;font-weight:700;">GUIDE</span>' : ""}</div>
       <div class="resource-desc">${esc(r.description || "")}</div>
       <div class="resource-tags">${tagsHtml}</div>
     </div>`;
@@ -3917,11 +3948,17 @@ function openResModal(id) {
   if (!r) return;
   const el = document.getElementById("res-modal-content");
   const linkBtn = r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener" class="btn btn-gold btn-sm mt-16">${esc(r.linkLabel || "Open Link")}</a>` : "";
+  // Replace [[EEAT_LINK]] token with a live button that opens the E-E-A-T carousel
+  const rawBody = esc(r.body || r.description || "");
+  const renderedBody = rawBody.replace(
+    "[[EEAT_LINK]]",
+    `</div><button class="btn btn-gold btn-sm" style="margin:12px 0;" onclick="closeResModal();openEEATModal();">📖 Learn More About E-E-A-T →</button><div style="font-size:15px;line-height:1.7;white-space:pre-wrap;">`
+  );
   el.innerHTML = `
     <div style="font-size:36px;margin-bottom:12px;">${esc(r.emoji || "📄")}</div>
     <h3 style="font-size:20px;font-weight:700;margin-bottom:8px;">${esc(r.title)}</h3>
     ${r.source ? `<div class="text-sm text-muted mb-8">Source: ${esc(r.source)}</div>` : ""}
-    <div style="font-size:15px;line-height:1.7;white-space:pre-wrap;">${esc(r.body || r.description || "")}</div>
+    <div style="font-size:15px;line-height:1.7;white-space:pre-wrap;">${renderedBody}</div>
     ${linkBtn}
   `;
   document.getElementById("res-modal-overlay").classList.add("open");
@@ -5645,6 +5682,290 @@ window.deleteBugReport = async function(id) {
     showToast("Bug report deleted.");
   } catch(e) { showToast("Error: " + e.message); }
 };
+
+// ==============================
+// E-E-A-T CAROUSEL
+// ==============================
+const EEAT_SLIDES = [
+  {
+    emoji: "🧠",
+    title: "What Is E-E-A-T?",
+    body: `E-E-A-T stands for Experience, Expertise, Authoritativeness, and Trustworthiness. It's the framework Google uses to evaluate whether your website deserves to rank in search results.
+
+Google doesn't rank websites — it ranks pages. And it asks four questions about every page it crawls:
+
+  • Experience: Did the person who made this actually do the thing they're describing?
+  • Expertise: Do they clearly know their craft?
+  • Authority: Does the rest of the web recognize them as credible?
+  • Trust: Is this site safe, honest, and transparent?
+
+For photographers and videographers, this is great news. Your work is inherently experience-driven. You were there. You made the shot. Your E-E-A-T advantage is already real — you just need to make it visible on your site.
+
+This is also why WAC exists. Consistent, verifiable weekly updates are exactly how you build E-E-A-T signals over time. Every update you submit is a trust signal compounding in your favor.
+
+Sources: Google Search Quality Rater Guidelines · developers.google.com/search/docs/fundamentals/creating-helpful-content`
+  },
+  {
+    emoji: "📸",
+    title: "Experience — Show Your Work",
+    body: `Google added the first "E" to E-A-T in 2022 specifically to reward creators who have actually done the thing they're writing or showing. For you, this is your biggest advantage.
+
+HOW TO BUILD EXPERIENCE SIGNALS ON YOUR SITE:
+
+Behind-the-Scenes Content
+Don't just show the final polished edit. Add a "Process" section or blog posts showing you on set, your lighting setup, or how you worked with a specific client. Even one photo of you working is more powerful than three portfolio images.
+
+Project Stories (not just galleries)
+Instead of a plain gallery, create "Project Stories." Explain the client's goal, a challenge you faced ("the sun was fading fast"), and how you solved it. This is proof you were present and thinking — not just clicking a button.
+
+Gear Mentions
+Naturally reference the specific cameras, lenses, or drones you use and why. "I chose the Sony a7S III for this low-light reception because..." is an Experience signal. It proves first-hand knowledge.
+
+THIS WEEK'S ACTION:
+Add one behind-the-scenes photo or process note to any page on your site. Caption it with what's happening and why you made that decision.`
+  },
+  {
+    emoji: "🎓",
+    title: "Expertise — Prove Your Craft",
+    body: `Expertise is about demonstrating mastery of your subject area in a way that's visible to both visitors and Google's crawlers.
+
+HOW TO BUILD EXPERTISE SIGNALS ON YOUR SITE:
+
+Your About Page (the highest-impact page)
+Your About page should answer: How long have you been doing this? What's your specific niche? Any formal training, certifications, or awards? A weak About page is one of the most common E-E-A-T gaps on photographer and videographer sites.
+
+About page formula:
+"I'm [Name], a [niche] photographer based in [city] with [X] years of experience working with [client type]. I specialize in [specific thing that makes you different]."
+
+Educational Content for Clients
+Write guides for your clients: "How to dress for your engagement session," "What to expect on your wedding day," "The best time of day for outdoor portraits." This isn't fluff — it's Expertise made visible.
+
+Named Author Bios
+Every page and blog post should have a named author with a short bio. Anonymous content is an Expertise red flag to Google.
+
+THIS WEEK'S ACTION:
+Review your About page. Add your years of experience, your specific niche, and at least one credential, award, or recognizable client name.`
+  },
+  {
+    emoji: "🏆",
+    title: "Authority — Build Your Reputation",
+    body: `Authority is measured by how the rest of the web perceives you. It's the only E-E-A-T pillar you can't fully control — but you can influence it.
+
+HOW TO BUILD AUTHORITY SIGNALS:
+
+"As Seen In" Logos
+If your photos have been featured in a publication, a popular blog (Junebug Weddings, Style Me Pretty, PetaPixel), or a brand's marketing materials — display those logos on your site. Even local press counts.
+
+Awards and Recognitions
+List any industry awards, "Best of" features, or honorable mentions from recognized associations like WPPI, Fearless Photographers, or local business awards. If you don't have any yet, this is your incentive to enter one.
+
+Backlinks from Vendor Sites
+Ask the venues, florists, and planners you've worked with to link back to your site in their vendor lists or blog posts. These backlinks from relevant, real businesses are exactly what Google uses to measure Authority.
+
+Google Business Profile
+If you don't have one, create it. Reviews on your Google Business Profile are an Authority signal that appears directly in search results.
+
+THIS WEEK'S ACTION:
+Reach out to one vendor or venue you've worked with and ask them to add you to their preferred vendor list with a link to your site.`
+  },
+  {
+    emoji: "🔒",
+    title: "Trust — The Foundation",
+    body: `Trust is the most important E-E-A-T pillar. If visitors don't feel safe on your site, the other three pillars don't matter. Google knows this and weights Trust heavily.
+
+HOW TO BUILD TRUST SIGNALS:
+
+HTTPS (Non-negotiable)
+Your site must use HTTPS (the padlock in the browser). If yours still shows as "Not Secure," fix this immediately through your hosting provider. This is a baseline Trust requirement.
+
+Contact Page
+You need a real, easy-to-find contact page with your email address at minimum. A physical city/region and a contact form adds more trust. Anonymous sites rank lower.
+
+Footer with Business Identity
+Your footer should include your business name (and LLC if applicable), a copyright line with the current year, and links to your Privacy Policy and Terms. This signals you're a legitimate business.
+
+Verified Testimonials
+Testimonials are more trustworthy when they include the client's full name and optionally a link to their social profile or the project you did together. "— Sarah M." is weak. "— Sarah Mitchell, Bride, Chicago 2024" is strong.
+
+Privacy Policy
+Every site that collects contact form data or uses analytics needs one. See Slide 7 for a ready-to-use template.
+
+THIS WEEK'S ACTION:
+Check your site for: HTTPS, a contact page, a footer with your business name, and at least one named testimonial. Fix any that are missing.`
+  },
+  {
+    emoji: "✅",
+    title: "Your E-E-A-T Checklist",
+    body: `Use this as your running checklist throughout the 90 days. Each item is a trust signal — check them off as you complete your weekly updates.
+
+EXPERIENCE
+☐ Behind-the-scenes photo or video on at least one page
+☐ At least one "Project Story" (goal, challenge, solution)
+☐ Gear or tool mentioned with a reason why you chose it
+☐ Blog post based on first-hand experience
+
+EXPERTISE
+☐ About page includes: years of experience, niche, credentials
+☐ Named author bio on blog posts and key pages
+☐ At least one educational guide written for your clients
+☐ Services page describes your process, not just your prices
+
+AUTHORITY
+☐ "As Seen In" logos or press mentions displayed
+☐ Google Business Profile created and up to date
+☐ At least one backlink from a vendor, venue, or industry site
+☐ Awards, recognitions, or directory listings present
+
+TRUST
+☐ Site uses HTTPS (padlock visible in browser)
+☐ Contact page with real email address
+☐ Footer has business name and copyright line
+☐ At least one named, verifiable testimonial
+☐ Privacy Policy page published
+☐ No broken links on main pages
+
+WAC TIP: Your Weekly Challenge Modifiers are designed to knock these off one at a time. Every challenge you complete this round is directly tied to one of these pillars.`
+  },
+  {
+    emoji: "📄",
+    title: "Privacy Policy Template",
+    body: `Copy the template below, replace the bracketed fields, and publish it as a page on your site. A Privacy Policy is a Trust signal — it tells Google and your visitors that you're a legitimate, transparent business.
+
+Note: This is a template, not legal advice. Consult an attorney if you have specific legal questions.
+
+─────────────────────────────────
+PRIVACY POLICY — [YOUR BUSINESS NAME]
+Effective Date: [MONTH] [YEAR]
+
+1. WHO WE ARE
+[Your Business Name] is a photography/videography business based in [Your City, State]. We can be reached at [your@email.com].
+
+2. WHAT INFORMATION WE COLLECT
+We collect information you voluntarily provide through our contact form, including your name, email address, phone number, and project details. If you book our services, we also collect billing information through our payment processor (Stripe or HoneyBook).
+
+3. HOW WE USE YOUR INFORMATION
+We use your information to respond to inquiries, fulfill bookings, send invoices, and communicate about your project. We do not sell your personal information to third parties.
+
+4. THIRD-PARTY SERVICES
+We use the following third-party services that may process your data:
+  • Stripe (payment processing) — stripe.com/privacy
+  • Google Analytics (site traffic) — policies.google.com/privacy
+  • [Add any email or gallery tools you use]
+
+5. COOKIES
+Our site may use basic cookies for analytics. You can disable cookies in your browser settings at any time.
+
+6. DATA RETENTION
+We retain your contact and booking information for up to 3 years for business records purposes.
+
+7. YOUR RIGHTS
+You may request access to, correction of, or deletion of your personal data by emailing [your@email.com].
+
+8. CHILDREN'S PRIVACY
+Our services are not directed at children under 13. We do not knowingly collect data from minors.
+
+9. CHANGES TO THIS POLICY
+We may update this policy periodically. The effective date at the top of this page will reflect any changes.
+
+10. CONTACT
+For privacy-related questions, contact us at [your@email.com].
+─────────────────────────────────`,
+    hasCopy: true
+  }
+];
+
+let _eeatSlide = 0;
+
+function openEEATModal(startSlide) {
+  _eeatSlide = startSlide || 0;
+  renderEEATSlide();
+  document.getElementById("eeat-modal-overlay").classList.add("open");
+}
+
+function closeEEATModal() {
+  document.getElementById("eeat-modal-overlay").classList.remove("open");
+}
+
+function closeEEATModalDirect(e) {
+  if (e.target === document.getElementById("eeat-modal-overlay")) closeEEATModal();
+}
+
+function eeatNav(dir) {
+  _eeatSlide = Math.max(0, Math.min(EEAT_SLIDES.length - 1, _eeatSlide + dir));
+  renderEEATSlide();
+}
+
+function markEEATSeen(idx) {
+  const key = "wac_eeat_progress";
+  const progress = JSON.parse(localStorage.getItem(key) || "{}");
+  progress["s" + idx] = true;
+  localStorage.setItem(key, JSON.stringify(progress));
+}
+
+function getEEATProgress() {
+  return JSON.parse(localStorage.getItem("wac_eeat_progress") || "{}");
+}
+
+function renderEEATSlide() {
+  const slide = EEAT_SLIDES[_eeatSlide];
+  if (!slide) return;
+
+  // Mark as seen
+  markEEATSeen(_eeatSlide);
+
+  // Render slide content
+  const wrap = document.getElementById("eeat-slide-wrap");
+  const copyBtn = slide.hasCopy
+    ? `<button class="btn btn-outline btn-sm" style="margin-top:16px;" onclick="copyEEATTemplate()">📋 Copy Template</button>`
+    : "";
+  const coreUpdateLink = _eeatSlide === 0
+    ? `<div style="margin-top:16px;padding:12px 14px;background:rgba(184,134,11,0.08);border:1px solid var(--gold-light);border-radius:8px;font-size:12px;line-height:1.6;"><strong style="color:var(--gold);">🔔 March 2026 Core Update is live.</strong> Google is actively rewarding sites that demonstrate E-E-A-T right now. <span style="color:var(--gold);font-weight:600;cursor:pointer;" onclick="closeEEATModal();setTimeout(()=>navTo('resources'),150);">See the Core Update resource card in Resources →</span></div>`
+    : "";
+
+  wrap.innerHTML = `
+    <div style="font-size:40px;margin-bottom:10px;">${slide.emoji}</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:14px;color:var(--text);">${esc(slide.title)}</div>
+    <div style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text);">${esc(slide.body)}</div>
+    ${copyBtn}
+    ${coreUpdateLink}
+    <div style="height:8px;"></div>
+  `;
+
+  // Render progress dots
+  const progress = getEEATProgress();
+  const dots = document.getElementById("eeat-dots");
+  dots.innerHTML = EEAT_SLIDES.map((s, i) => {
+    const seen = progress["s" + i];
+    const active = i === _eeatSlide;
+    return `<div onclick="eeatJump(${i})" style="width:${active ? 20 : 8}px;height:8px;border-radius:4px;background:${active ? "var(--gold)" : seen ? "var(--gold-light)" : "var(--border)"};transition:all 0.2s;cursor:pointer;"></div>`;
+  }).join("");
+
+  // Update nav buttons
+  document.getElementById("eeat-prev-btn").disabled = _eeatSlide === 0;
+  const nextBtn = document.getElementById("eeat-next-btn");
+  if (_eeatSlide === EEAT_SLIDES.length - 1) {
+    nextBtn.textContent = "Done ✓";
+    nextBtn.onclick = () => closeEEATModal();
+  } else {
+    nextBtn.textContent = "Next →";
+    nextBtn.onclick = () => eeatNav(1);
+  }
+}
+
+function eeatJump(idx) {
+  _eeatSlide = idx;
+  renderEEATSlide();
+}
+
+function copyEEATTemplate() {
+  const slide = EEAT_SLIDES[6];
+  if (!slide) return;
+  navigator.clipboard.writeText(slide.body).then(() => {
+    showToast("Privacy Policy template copied to clipboard!");
+  }).catch(() => {
+    showToast("Copy failed — please select and copy the text manually.");
+  });
+}
 
 // ==============================
 // INIT COMPLETE
