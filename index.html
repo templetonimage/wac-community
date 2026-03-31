@@ -3844,7 +3844,7 @@ async function loadResources() {
     _allResources = [];
     snap.forEach(d => _allResources.push({ id: d.id, ...d.data() }));
     // Sort: E-E-A-T Playbook first, Core Update second, then timestamp descending
-    const _pinOrder = ["E-E-A-T Playbook", "Google\'s March 2026 Core Update"];
+    const _pinOrder = ["Google\'s March 2026 Core Update", "E-E-A-T Playbook"];
     _allResources.sort((a, b) => {
       const ai = _pinOrder.indexOf(a.title);
       const bi = _pinOrder.indexOf(b.title);
