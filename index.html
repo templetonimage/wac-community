@@ -2913,9 +2913,13 @@ function bootApp() {
     updateDoc(doc(db, "wac_registry", currentUser.uid), { lastLogin: Date.now() }).catch(() => {});
   }
 
-  // 1b. Unlock submit buttons on/after April 11, 2026 (held during Google Core Update rollout)
+  // 1b. Unlock submit buttons:
+  //     - Trial T1/T2: open now for challenge-only submissions
+  //     - Full submissions: April 11 (post Core Update)
   const _submitOpen = new Date("2026-04-11T00:00:00").getTime();
-  if (Date.now() >= _submitOpen || (currentUser && currentUser.isAdmin)) {
+  const _trialIdx = getTrialWeekIndex();
+  const _trialChallengeOpen = _trialIdx === 0 || _trialIdx === 1;
+  if (Date.now() >= _submitOpen || _trialChallengeOpen || (currentUser && currentUser.isAdmin)) {
     ["submit-update-btn", "eng-submit-btn"].forEach(id => {
       const btn = document.getElementById(id);
       if (!btn) return;
@@ -3026,6 +3030,34 @@ function loadSubmitPage() {
   updatePtsPreview();
   loadEngHistory();
   loadMySubmissions();
+
+  // Trial mode: T1 and T2 allow challenge-only submissions (no URL required)
+  const trialIdx = getTrialWeekIndex();
+  const isTrialChallengeMode = trialIdx === 0 || trialIdx === 1;
+
+  // Show/hide trial notice banner
+  let trialNotice = document.getElementById("trial-submit-notice");
+  if (!trialNotice) {
+    trialNotice = document.createElement("div");
+    trialNotice.id = "trial-submit-notice";
+    trialNotice.style.cssText = "margin-bottom:14px;padding:12px 14px;border-radius:var(--radius);font-size:12px;line-height:1.7;border:1.5px solid var(--gold);background:linear-gradient(135deg,rgba(184,134,11,0.08),var(--surface));";
+    const card = document.querySelector("#page-submit .card");
+    if (card) card.insertBefore(trialNotice, card.firstChild);
+  }
+  if (isTrialChallengeMode) {
+    trialNotice.style.display = "block";
+    trialNotice.innerHTML = `<strong style="color:var(--gold);">🗓 April Trial — Challenge Submissions Open</strong><br>During T1 and T2, you can earn +5 pts by completing the weekly E-E-A-T challenge. URL is optional — describe what you did and check the challenge box. This is trust-based. Full submissions (URL required) open April 11.`;
+  } else {
+    trialNotice.style.display = "none";
+  }
+
+  // Update URL label to show optional during trial
+  const urlLabel = document.querySelector("#page-submit .form-label");
+  if (urlLabel) {
+    urlLabel.textContent = isTrialChallengeMode
+      ? "Website URL (optional during trial)"
+      : "Website URL (what page did you update?)";
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -4135,8 +4167,19 @@ function clearEngScreenshot() {
 async function submitUpdate() {
   let url = document.getElementById("submit-url").value.trim();
   const note = document.getElementById("submit-note").value.trim();
-  if (!url || !note) { showToast("URL and description are required."); return; }
-  if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+  const trialIdx = getTrialWeekIndex();
+  const isTrialChallengeMode = trialIdx === 0 || trialIdx === 1;
+
+  // During T1/T2 trial, URL is optional but note is still required
+  if (isTrialChallengeMode) {
+    if (!note) { showToast("Please describe what you did."); return; }
+    const challengeEl = document.getElementById("submit-challenge");
+    if (!challengeEl || !challengeEl.checked) { showToast("Check the Weekly Challenge box to earn your +5 pts."); return; }
+  } else {
+    if (!url || !note) { showToast("URL and description are required."); return; }
+  }
+
+  if (url && !/^https?:\/\//i.test(url)) url = "https://" + url;
   if (isRoundOver()) { showToast("Round has ended."); return; }
 
   const weekIdx = getWeekIndex();
