@@ -3086,9 +3086,7 @@ function loadWeeklyChallenge() {
   });
   ["dash-challenge-desc"].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.textContent = isTrial
-      ? `${challenge.desc}${" (No points during trial — this is prep for Round 1.)"}`
-      : challenge.desc;
+    if (el) el.textContent = challenge.desc;
   });
 
   // Populate next-week subtext
