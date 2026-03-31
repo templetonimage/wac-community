@@ -2569,6 +2569,18 @@ function normalizeUrl(url) {
   if (!url) return "";
   return /^https?:\/\//i.test(url) ? url : "https://" + url;
 }
+function linkify(text) {
+  if (!text) return "";
+  // Escape HTML first, then wrap URLs in anchor tags
+  const escaped = esc(text);
+  return escaped.replace(
+    /(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+\.[^\s<>"']+)/gi,
+    url => {
+      const href = /^https?:\/\//i.test(url) ? url : "https://" + url;
+      return `<a href="${href}" target="_blank" rel="noopener" style="color:var(--gold);word-break:break-all;">${url}</a>`;
+    }
+  );
+}
 function esc(str) {
   if (!str) return "";
   const d = document.createElement("div");
@@ -3224,7 +3236,7 @@ function renderFeed(posts) {
         <div class="post-reply-avatar">${rAvatar}</div>
         <div class="post-reply-bubble">
           <div class="post-reply-author">${esc(r.name)}</div>
-          <div class="post-reply-text">${esc(r.text)}</div>
+          <div class="post-reply-text">${linkify(r.text)}</div>
           <div class="post-reply-time">${timeAgo(r.timestamp)}</div>
         </div>
       </div>`;
@@ -3255,7 +3267,7 @@ function renderFeed(posts) {
         </div>
       </div>
       <div id="post-body-${p.id}">
-        <div class="feed-body">${esc(p.text)}</div>
+        <div class="feed-body">${linkify(p.text)}</div>
         ${urlHtml}
       </div>
       <div class="feed-actions">
@@ -3308,7 +3320,7 @@ function renderPVRCard(p) {
       <div class="pvr-reply-avatar">${rAvatarContent}</div>
       <div class="pvr-reply-bubble">
         <div class="pvr-reply-author">${esc(r.name)}</div>
-        <div class="pvr-reply-text">${esc(r.text)}</div>
+        <div class="pvr-reply-text">${linkify(r.text)}</div>
         <div class="pvr-reply-time">${timeAgo(r.timestamp)}</div>
       </div>
     </div>`;
@@ -3340,7 +3352,7 @@ function renderPVRCard(p) {
       </div>
     </div>
     <div id="pvr-body-${p.id}">
-      ${p.pvr_prompt ? `<div class="pvr-prompt">${esc(p.pvr_prompt)}</div>` : ""}
+      ${p.pvr_prompt ? `<div class="pvr-prompt">${linkify(p.pvr_prompt)}</div>` : ""}
     </div>
     <a href="${esc(p.pvr_url)}" target="_blank" rel="noopener" class="pvr-visit-btn">🌐 Visit Page</a>
     <div class="pvr-replies-section">
@@ -3719,7 +3731,7 @@ function renderAnnouncements(anns) {
     return `<div class="card announcement-card" style="margin-bottom:12px;">
       <div class="announcement-tag">ANNOUNCEMENT</div>
       <div style="font-weight:700;font-size:16px;margin-bottom:6px;">${esc(a.title)}</div>
-      <div class="feed-body" style="white-space:pre-wrap;">${esc(a.body)}</div>
+      <div class="feed-body" style="white-space:pre-wrap;">${linkify(a.body)}</div>
       <div class="feed-time">${timeAgo(a.timestamp)}</div>
       ${isAdmin ? `<button onclick="deleteAnn('${a.id}')" style="background:none;border:none;color:var(--danger);font-size:12px;margin-top:6px;cursor:pointer;">Delete</button>` : ""}
     </div>`;
