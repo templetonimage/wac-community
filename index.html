@@ -2011,7 +2011,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="page-title">Reports</div>
         <div class="page-subtitle">All-Star progress, engagement activity, and admin tools.</div>
       </div>
-      <button class="btn btn-outline btn-sm export-btn" onclick="exportCSV()">📥 Export CSV</button>
+      <div id="admin-export-csv-btn" style="display:none;">
+        <button class="btn btn-outline btn-sm export-btn" onclick="exportCSV()">📥 Export CSV</button>
+      </div>
       <div id="report-table-wrap" class="report-table-wrap"></div>
       <div class="card mt-16">
         <div class="card-title">Engagement Activity</div>
@@ -2563,6 +2565,10 @@ let _currentFilter = "All";
 // ==============================
 // UTILITIES
 // ==============================
+function normalizeUrl(url) {
+  if (!url) return "";
+  return /^https?:\/\//i.test(url) ? url : "https://" + url;
+}
 function esc(str) {
   if (!str) return "";
   const d = document.createElement("div");
@@ -2838,7 +2844,7 @@ function bootApp() {
   if (_proNavBtn) _proNavBtn.style.display = userHasPro() ? "flex" : "none";
 
   // 5. Show/hide admin elements
-  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card"];
+  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn"];
   adminBoxes.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
@@ -4424,7 +4430,7 @@ async function renderMemberGrid() {
     const igHandle = m.ig ? m.ig.trim().replace(/^@+/, "") : "";
     const igUrl = igHandle ? `https://www.instagram.com/${igHandle}` : "";
     const websiteBtn = m.website
-      ? `<a href="${esc(m.website)}" target="_blank" rel="noopener" class="member-card-link" onclick="event.stopPropagation()" style="display:block;text-align:center;font-size:11px;color:var(--gold);margin-top:4px;word-break:break-all;">🌐 Visit Site</a>`
+      ? `<a href="${esc(normalizeUrl(m.website))}" target="_blank" rel="noopener" class="member-card-link" onclick="event.stopPropagation()" style="display:block;text-align:center;font-size:11px;color:var(--gold);margin-top:4px;word-break:break-all;">🌐 Visit Site</a>`
       : "";
     const igBtn = igUrl
       ? `<a href="${igUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:block;text-align:center;font-size:11px;color:var(--text-muted);margin-top:2px;">📸 ${esc(m.ig)}</a>`
@@ -4472,7 +4478,7 @@ async function openMemberProfile(member) {
   const weeksCompleted = WEEKS.filter(w => trackerData[w.id]).length;
 
   const dots = WEEKS.map(w => `<div class="member-dot ${trackerData[w.id] ? 'done' : ''}"></div>`).join("");
-  const websiteBtn = member.website ? `<a href="${esc(member.website)}" target="_blank" rel="noopener" class="btn btn-gold btn-block btn-sm mt-16">Visit Website</a>` : "";
+  const websiteBtn = member.website ? `<a href="${esc(normalizeUrl(member.website))}" target="_blank" rel="noopener" class="btn btn-gold btn-block btn-sm mt-16">Visit Website</a>` : "";
   const modalAvatarContent = member.photoURL
     ? `<img src="${esc(member.photoURL)}" alt="${esc(member.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
     : getInitials(member.name);
@@ -4832,7 +4838,7 @@ async function saveProfile() {
   const biz = document.getElementById("prof-biz").value.trim();
   const type = document.getElementById("prof-type").value.trim();
   const ig = document.getElementById("prof-ig").value.trim();
-  const website = document.getElementById("prof-website").value.trim();
+  const website = normalizeUrl(document.getElementById("prof-website").value.trim());
   // photoURL is managed separately by saveProfilePhoto / removeProfilePhoto
   // but we keep it in the update payload so it's never accidentally wiped
   const photoURL = currentUser.photoURL || "";
