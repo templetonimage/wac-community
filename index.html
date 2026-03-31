@@ -3075,7 +3075,7 @@ function loadWeeklyChallenge() {
   const nextText = nextChallenge ? `Next week: ${nextChallenge.title}` : "";
 
   // Trial badge prefix for title
-  const trialPrefix = isTrial ? "🗓 April Challenge: " : "";
+  const trialPrefix = isTrial ? `🗓 T${trialIdx + 1}: ` : "";
 
   // Populate all challenge UI elements
   ["dash-challenge-title", "submit-challenge-label"].forEach(id => {
