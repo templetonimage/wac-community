@@ -3843,8 +3843,16 @@ async function loadResources() {
     const snap = await getDocs(collection(db, "resources"));
     _allResources = [];
     snap.forEach(d => _allResources.push({ id: d.id, ...d.data() }));
-    // Sort client-side by timestamp descending
-    _allResources.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    // Sort: E-E-A-T Playbook first, Core Update second, then timestamp descending
+    const _pinOrder = ["E-E-A-T Playbook", "Google\'s March 2026 Core Update"];
+    _allResources.sort((a, b) => {
+      const ai = _pinOrder.indexOf(a.title);
+      const bi = _pinOrder.indexOf(b.title);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return (b.timestamp || 0) - (a.timestamp || 0);
+    });
     // If empty and admin, show seed prompt
     if (!_allResources.length && currentUser && currentUser.isAdmin) {
       document.getElementById("resource-grid").innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:24px 0;">
@@ -3943,8 +3951,11 @@ function renderResources() {
   el.innerHTML = filtered.map(r => {
     const tagsHtml = (r.tags || []).map(t => `<span class="resource-tag">${esc(t)}</span>`).join("");
     const isEEAT = (r.tags || []).includes("eeat-guide");
+    const isCoreUpdate = r.title === "Google's March 2026 Core Update";
     const clickHandler = isEEAT ? `openEEATModal()` : `openResModal('${r.id}')`;
-    const accentStyle = isEEAT ? `border:1.5px solid var(--gold);background:linear-gradient(135deg,rgba(184,134,11,0.06),var(--surface));` : "";
+    const accentStyle = (isEEAT || isCoreUpdate)
+      ? `border:1.5px solid var(--gold);background:linear-gradient(135deg,rgba(184,134,11,0.06),var(--surface));`
+      : "";
     return `<div class="resource-card" style="${accentStyle}" onclick="${clickHandler}">
       <div class="resource-emoji">${esc(r.emoji || "📄")}</div>
       <div class="resource-title">${esc(r.title)}${isEEAT ? ' <span style="font-size:10px;background:var(--gold);color:#fff;padding:1px 6px;border-radius:4px;vertical-align:middle;font-weight:700;">GUIDE</span>' : ""}</div>
