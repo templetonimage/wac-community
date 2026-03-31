@@ -2036,6 +2036,18 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div id="engagement-report"></div>
       </div>
 
+      <!-- ADMIN: Reset Points Tool -->
+      <div id="admin-reset-points" style="display:none;margin-top:28px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🔄 Reset Member Points</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Zeroes out <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">points</code> and <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">totalPosts</code> for every member in the registry. Submission and engagement history in Firestore is preserved. Use at the end of the April trial before Round 1 begins.</div>
+        <div class="pro-global-danger">
+          <div class="pro-global-danger-title">⚠️ Destructive Action</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">This cannot be undone. All member point totals will be set to zero. Requires double confirmation.</div>
+          <button class="btn btn-sm" onclick="resetAllPoints()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">Reset All Points to Zero</button>
+        </div>
+        <div id="reset-points-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
+      </div>
+
       <!-- ADMIN: WAC Pro Management (hidden until _PRO_GLOBAL_ACTIVE = true) -->
       <div id="admin-pro-panel" style="display:none;margin-top:28px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">★ WAC Pro Management</div>
@@ -2588,6 +2600,33 @@ const TRIAL_WEEKS = [
   {id:"t4", label:"T4", dates:"Apr 22–30"},
 ];
 
+// April Free Trial challenge modifiers — educational/prep focus, no points awarded
+const TRIAL_CHALLENGES = [
+  { title: "E-E-A-T Site Audit",
+    desc: "Open the E-E-A-T Playbook in Resources and run through the full checklist against your site. Note every item you're missing — this is your Round 1 improvement list." },
+  { title: "E-E-A-T Your About Page",
+    desc: "Upgrade your About page to hit all four pillars: years of experience, your specific niche, any training or awards, and a professional photo. This is the highest-impact E-E-A-T page on your site." },
+  { title: "Add a Trust Signal",
+    desc: "Pick one: add a Privacy Policy page, verify your site has HTTPS, add your business name to your footer, or add a named client testimonial. Each one directly strengthens your Trust pillar before Round 1 begins." },
+  { title: "Add an Experience Signal",
+    desc: "Add one piece of first-hand content to your site — a behind-the-scenes photo, a project story, or a mention of the specific gear or tools you use. Show Google you were actually there." },
+];
+
+// Returns 0–3 for April trial weeks, or -1 if not in trial period
+function getTrialWeekIndex() {
+  const now = Date.now();
+  const TRIAL_SCHEDULE = [
+    [Date.UTC(2026,3,1,4,0,0),  Date.UTC(2026,3,8,3,59,59,999)],
+    [Date.UTC(2026,3,8,4,0,0),  Date.UTC(2026,3,15,3,59,59,999)],
+    [Date.UTC(2026,3,15,4,0,0), Date.UTC(2026,3,22,3,59,59,999)],
+    [Date.UTC(2026,3,22,4,0,0), Date.UTC(2026,4,1,3,59,59,999)],
+  ];
+  for (let i = 0; i < TRIAL_SCHEDULE.length; i++) {
+    if (now >= TRIAL_SCHEDULE[i][0] && now <= TRIAL_SCHEDULE[i][1]) return i;
+  }
+  return -1;
+}
+
 // ==============================
 // APP STATE
 // ==============================
@@ -2901,7 +2940,7 @@ function bootApp() {
   if (_proNavBtn) _proNavBtn.style.display = userHasPro() ? "flex" : "none";
 
   // 5. Show/hide admin elements
-  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports"];
+  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points"];
   adminBoxes.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
@@ -2993,21 +3032,33 @@ function loadSubmitPage() {
 //  WEEKLY CHALLENGE
 // ─────────────────────────────────────────────
 function loadWeeklyChallenge() {
+  const trialIdx = getTrialWeekIndex();
+  const isTrial = trialIdx !== -1;
   const weekIdx = getWeekIndex();
-  const challenge = WEEKLY_CHALLENGES[weekIdx] || WEEKLY_CHALLENGES[0];
-  const nextChallenge = WEEKLY_CHALLENGES[weekIdx + 1] || null;
+
+  const challenge = isTrial
+    ? TRIAL_CHALLENGES[trialIdx]
+    : (WEEKLY_CHALLENGES[weekIdx] || WEEKLY_CHALLENGES[0]);
+  const nextChallenge = isTrial
+    ? (TRIAL_CHALLENGES[trialIdx + 1] || null)
+    : (WEEKLY_CHALLENGES[weekIdx + 1] || null);
   const nextText = nextChallenge ? `Next week: ${nextChallenge.title}` : "";
+
+  // Trial badge prefix for title
+  const trialPrefix = isTrial ? "🗓 April Challenge: " : "";
 
   // Populate all challenge UI elements
   ["dash-challenge-title", "submit-challenge-label"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = id === "submit-challenge-label"
-      ? `${challenge.title} — ${challenge.desc}`
-      : challenge.title;
+      ? `${trialPrefix}${challenge.title} — ${challenge.desc}`
+      : `${trialPrefix}${challenge.title}`;
   });
   ["dash-challenge-desc"].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.textContent = challenge.desc;
+    if (el) el.textContent = isTrial
+      ? `${challenge.desc}${" (No points during trial — this is prep for Round 1.)"}`
+      : challenge.desc;
   });
 
   // Populate next-week subtext
@@ -5570,6 +5621,35 @@ window.toggleProAccess = toggleProAccess;
 window.setTrialAccess = setTrialAccess;
 window.enableProForAll = enableProForAll;
 window.clearFeedPostsByWeek = clearFeedPostsByWeek;
+
+// ==============================
+// ADMIN — RESET ALL POINTS
+// ==============================
+window.resetAllPoints = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const first = confirm("Reset ALL member points and post counts to zero?\n\nThis zeroes points and totalPosts in the registry. Submission and engagement history is preserved.");
+  if (!first) return;
+  const second = confirm("Are you sure? This cannot be undone.");
+  if (!second) return;
+
+  const statusEl = document.getElementById("reset-points-status");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Resetting points...";
+
+  try {
+    const snap = await getDocs(collection(db, "wac_registry"));
+    let count = 0;
+    for (const d of snap.docs) {
+      await updateDoc(doc(db, "wac_registry", d.id), { points: 0, totalPosts: 0 });
+      count++;
+    }
+    statusEl.textContent = `Done — ${count} member(s) reset to 0 pts.`;
+    showToast(`${count} member(s) reset to 0 pts.`);
+  } catch (e) {
+    statusEl.textContent = `Error: ${e.message}`;
+    showToast("Reset failed: " + e.message);
+  }
+};
 window.seedDefaultResources = seedDefaultResources;
 window.openEEATModal = openEEATModal;
 window.closeEEATModal = closeEEATModal;
