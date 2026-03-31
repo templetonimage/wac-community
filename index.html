@@ -4056,10 +4056,11 @@ function openResModal(id) {
   const r = _allResources.find(x => x.id === id);
   if (!r) return;
   const el = document.getElementById("res-modal-content");
-  const linkBtn = r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener" class="btn btn-gold btn-sm mt-16">${esc(r.linkLabel || "Open Link")}</a>` : "";
-  // Replace [[EEAT_LINK]] token with a live button that opens the E-E-A-T carousel
-  const rawBody = esc(r.body || r.description || "");
-  const renderedBody = rawBody.replace(
+  // Only show link button if both url AND linkLabel are present
+  const linkBtn = (r.url && r.linkLabel) ? `<a href="${esc(r.url)}" target="_blank" rel="noopener" class="btn btn-gold btn-sm mt-16">${esc(r.linkLabel)}</a>` : "";
+  // Use linkify on body so URLs auto-link; then replace [[EEAT_LINK]] token
+  const linkedBody = linkify(r.body || r.description || "");
+  const renderedBody = linkedBody.replace(
     "[[EEAT_LINK]]",
     `</div><button class="btn btn-gold btn-sm" style="margin:12px 0;" onclick="closeResModal();openEEATModal();">📖 Learn More About E-E-A-T →</button><div style="font-size:15px;line-height:1.7;white-space:pre-wrap;">`
   );
