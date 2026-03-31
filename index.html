@@ -1888,15 +1888,15 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <span class="pts-num" id="pts-num">10</span>
           <span>pts for on-time update</span>
         </div>
-        <div class="form-group">
-          <label class="form-label">Website URL (what page did you update?)</label>
+        <div class="form-group" id="submit-url-group">
+          <label class="form-label" id="submit-url-label">Website URL (what page did you update?)</label>
           <input type="url" id="submit-url" class="form-input" placeholder="https://yoursite.com/page" />
         </div>
         <div class="form-group">
           <label class="form-label">What did you update?</label>
           <textarea id="submit-note" class="form-input" placeholder="Describe what you changed or added..."></textarea>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="submit-format-group">
           <label class="form-label">Update type</label>
           <div class="format-btns" id="format-btns">
             <button class="format-btn" onclick="selectFormat(this,'Page Update')">Page Update</button>
@@ -1914,7 +1914,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             </div>
           </label>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="submit-screenshot-group">
           <label class="form-label">Screenshot <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(optional)</span></label>
           <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;line-height:1.5;">Required for: improving SEO titles, alt text, picture filenames, meta descriptions, fixing broken links.</div>
           <div class="screenshot-area" id="screenshot-area" onclick="document.getElementById('screenshot-input').click()">
@@ -3031,7 +3031,7 @@ function loadSubmitPage() {
   loadEngHistory();
   loadMySubmissions();
 
-  // Trial mode: T1 and T2 allow challenge-only submissions (no URL required)
+  // Trial mode: T1 and T2 — challenge-only, no URL/format/screenshot
   const trialIdx = getTrialWeekIndex();
   const isTrialChallengeMode = trialIdx === 0 || trialIdx === 1;
 
@@ -3046,18 +3046,16 @@ function loadSubmitPage() {
   }
   if (isTrialChallengeMode) {
     trialNotice.style.display = "block";
-    trialNotice.innerHTML = `<strong style="color:var(--gold);">🗓 April Trial — Challenge Submissions Open</strong><br>During T1 and T2, you can earn +5 pts by completing the weekly E-E-A-T challenge. URL is optional — describe what you did and check the challenge box. This is trust-based. Full submissions (URL required) open April 11.`;
+    trialNotice.innerHTML = `<strong style="color:var(--gold);">🗓 April Trial — Challenge Submissions</strong><br>Check the Weekly Challenge box and describe what you worked on. That's it — no URL or screenshot needed. Full submissions open April 11.`;
   } else {
     trialNotice.style.display = "none";
   }
 
-  // Update URL label to show optional during trial
-  const urlLabel = document.querySelector("#page-submit .form-label");
-  if (urlLabel) {
-    urlLabel.textContent = isTrialChallengeMode
-      ? "Website URL (optional during trial)"
-      : "Website URL (what page did you update?)";
-  }
+  // Hide/show URL, format type, and screenshot fields
+  ["submit-url-group", "submit-format-group", "submit-screenshot-group"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isTrialChallengeMode ? "none" : "";
+  });
 }
 
 // ─────────────────────────────────────────────
