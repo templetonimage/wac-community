@@ -2423,16 +2423,16 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
 <!-- EEAT CAROUSEL MODAL -->
 <div class="modal-overlay" id="eeat-modal-overlay" onclick="closeEEATModalDirect(event)">
-  <div class="modal-sheet" style="max-height:92vh;display:flex;flex-direction:column;">
-    <div class="modal-header" style="flex-shrink:0;">
+  <div class="modal-sheet" style="max-height:90dvh;height:90dvh;display:flex;flex-direction:column;overflow:hidden;padding:0;">
+    <div class="modal-header" style="flex-shrink:0;padding:16px 20px;">
       <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);">E-E-A-T Playbook</div>
       <button class="modal-close" onclick="closeEEATModal()">✕</button>
     </div>
     <!-- Slide container -->
-    <div id="eeat-slide-wrap" style="flex:1;overflow-y:auto;padding:20px 20px 0;"></div>
+    <div id="eeat-slide-wrap" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 20px 0;"></div>
     <!-- Progress dots + nav -->
-    <div style="flex-shrink:0;padding:16px 20px 20px;border-top:1px solid var(--border);margin-top:8px;">
-      <div id="eeat-dots" style="display:flex;justify-content:center;gap:8px;margin-bottom:14px;"></div>
+    <div style="flex-shrink:0;padding:12px 20px 28px;border-top:1px solid var(--border);">
+      <div id="eeat-dots" style="display:flex;justify-content:center;gap:8px;margin-bottom:12px;"></div>
       <div style="display:flex;gap:10px;">
         <button id="eeat-prev-btn" class="btn btn-outline" style="flex:1;" onclick="eeatNav(-1)">← Prev</button>
         <button id="eeat-next-btn" class="btn btn-gold" style="flex:1;" onclick="eeatNav(1)">Next →</button>
