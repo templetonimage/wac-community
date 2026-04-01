@@ -2914,22 +2914,29 @@ function bootApp() {
     updateDoc(doc(db, "wac_registry", currentUser.uid), { lastLogin: Date.now() }).catch(() => {});
   }
 
-  // 1b. Unlock submit buttons:
-  //     - Trial T1/T2: open now for challenge-only submissions
-  //     - Full submissions: April 11 (post Core Update)
   const _submitOpen = new Date("2026-04-11T00:00:00").getTime();
   const _trialIdx = getTrialWeekIndex();
-  const _trialChallengeOpen = _trialIdx === 0 || _trialIdx === 1;
-  if (Date.now() >= _submitOpen || _trialChallengeOpen || (currentUser && currentUser.isAdmin)) {
-    ["submit-update-btn", "eng-submit-btn"].forEach(id => {
-      const btn = document.getElementById(id);
-      if (!btn) return;
-      btn.disabled = false;
-      btn.style.opacity = "";
-      btn.style.cursor = "";
-      btn.title = "";
-      btn.innerHTML = btn.innerHTML.replace(/<span[^>]*>\(Opens April 1\)<\/span>/g, "").replace(/<span[^>]*>\(Opens April 11\)<\/span>/g, "").trim();
-    });
+  const _trialChallengeOpen = _trialIdx === 0 || _trialIdx === 1;  // T1/T2 only for update submissions
+  const _trialEngOpen = _trialIdx !== -1;                           // All trial weeks for engagements
+
+  // Unlock Submit Update: T1/T2 trial challenge mode OR after April 11 OR admin
+  const _updateBtn = document.getElementById("submit-update-btn");
+  if (_updateBtn && (Date.now() >= _submitOpen || _trialChallengeOpen || (currentUser && currentUser.isAdmin))) {
+    _updateBtn.disabled = false;
+    _updateBtn.style.opacity = "";
+    _updateBtn.style.cursor = "";
+    _updateBtn.title = "";
+    _updateBtn.innerHTML = _updateBtn.innerHTML.replace(/<span[^>]*>\(Opens April 1\)<\/span>/g, "").replace(/<span[^>]*>\(Opens April 11\)<\/span>/g, "").trim();
+  }
+
+  // Unlock Submit Engagement: all trial weeks OR after April 11 OR admin
+  const _engBtn = document.getElementById("eng-submit-btn");
+  if (_engBtn && (Date.now() >= _submitOpen || _trialEngOpen || (currentUser && currentUser.isAdmin))) {
+    _engBtn.disabled = false;
+    _engBtn.style.opacity = "";
+    _engBtn.style.cursor = "";
+    _engBtn.title = "";
+    _engBtn.innerHTML = _engBtn.innerHTML.replace(/<span[^>]*>\(Opens April 1\)<\/span>/g, "").replace(/<span[^>]*>\(Opens April 11\)<\/span>/g, "").trim();
   }
 
   // 2. Set topnav username and avatar
@@ -3050,6 +3057,35 @@ function loadSubmitPage() {
     trialNotice.innerHTML = `<strong style="color:var(--gold);">🗓 April Trial — Challenge Submissions</strong><br>Check the Weekly Challenge box and describe what you worked on. That's it — no URL or screenshot needed. Full submissions open April 11.`;
   } else {
     trialNotice.style.display = "none";
+  }
+
+  // Engagement section: show trial notice and make screenshot optional during trial
+  const engCard = document.querySelector(".eng-section .card");
+  let engNotice = document.getElementById("trial-eng-notice");
+  if (!engNotice && engCard) {
+    engNotice = document.createElement("div");
+    engNotice.id = "trial-eng-notice";
+    engNotice.style.cssText = "margin-bottom:14px;padding:12px 14px;border-radius:var(--radius);font-size:12px;line-height:1.7;border:1.5px solid var(--gold);background:linear-gradient(135deg,rgba(184,134,11,0.08),var(--surface));";
+    const subtitle = engCard.querySelector("p");
+    if (subtitle) subtitle.after(engNotice);
+  }
+  const engScreenshotLabel = document.querySelector(".eng-section .form-group .form-label span[style*='danger']");
+  const isTrial = trialIdx !== -1;
+  if (isTrial) {
+    if (engNotice) {
+      engNotice.style.display = "block";
+      engNotice.innerHTML = `<strong style="color:var(--gold);">🗓 April Trial — Engagements Open</strong><br>Visit a member's site, comment on their blog, or share their work. Screenshot is optional during the trial.`;
+    }
+    if (engScreenshotLabel) {
+      engScreenshotLabel.textContent = "optional during trial";
+      engScreenshotLabel.style.color = "var(--text-muted)";
+    }
+  } else {
+    if (engNotice) engNotice.style.display = "none";
+    if (engScreenshotLabel) {
+      engScreenshotLabel.textContent = "required";
+      engScreenshotLabel.style.color = "var(--danger)";
+    }
   }
 
   // Hide/show URL, format type, and screenshot fields
@@ -4278,7 +4314,8 @@ async function submitEngagement() {
   const url = document.getElementById("eng-url").value.trim();
   if (!url) { showToast("Enter the member's website URL."); return; }
   if (!_selectedEngType) { showToast("Select engagement type."); return; }
-  if (!_engScreenshotData) { showToast("A screenshot is required."); return; }
+  const isTrial = getTrialWeekIndex() !== -1;
+  if (!isTrial && !_engScreenshotData) { showToast("A screenshot is required."); return; }
   if (isRoundOver()) { showToast("Round has ended."); return; }
 
   const count = await getWeeklyEngCount();
