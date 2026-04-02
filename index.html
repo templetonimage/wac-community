@@ -866,6 +866,51 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   text-align: center;
 }
 
+/* Expert Archive Modal */
+.expert-archive-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  z-index: 9600;
+  overflow-y: auto;
+  padding: 16px;
+}
+.expert-archive-overlay.open { display: block; }
+.expert-archive-modal {
+  background: var(--surface);
+  border-radius: 16px;
+  max-width: 560px;
+  margin: 24px auto;
+  border: 1.5px solid #7c3aed;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+.expert-archive-header {
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), var(--surface));
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.expert-archive-item {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+}
+.expert-archive-item:last-child { border-bottom: none; }
+.expert-archive-response {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: rgba(124,58,237,0.05);
+  border-left: 3px solid #7c3aed;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
 /* EEAT Audit Modal */
 .eeat-audit-overlay {
   display: none;
@@ -2323,7 +2368,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Incoming requests from members. Respond publicly to the Community Feed.</div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <div id="expert-panel-count" style="font-size:12px;color:#7c3aed;font-weight:600;"></div>
-            <button class="btn btn-outline btn-sm" onclick="loadExpertPanel()" style="border-color:#7c3aed;color:#7c3aed;">↻ Refresh</button>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-outline btn-sm" onclick="openExpertArchive()" style="border-color:#7c3aed;color:#7c3aed;">📁 Archive</button>
+              <button class="btn btn-outline btn-sm" onclick="loadExpertPanel()" style="border-color:#7c3aed;color:#7c3aed;">↻ Refresh</button>
+            </div>
           </div>
           <div id="expert-panel-body"><div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Loading requests...</div></div>
         </div>
@@ -2789,6 +2837,22 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <button class="modal-close" onclick="closeArchivedAnnsModal()">✕</button>
     </div>
     <div id="archived-anns-content" style="padding-bottom:8px;"></div>
+  </div>
+</div>
+
+<!-- EXPERT ARCHIVE MODAL -->
+<div class="expert-archive-overlay" id="expert-archive-overlay" onclick="closeExpertArchiveDirect(event)">
+  <div class="expert-archive-modal">
+    <div class="expert-archive-header">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#7c3aed;">📁 Expert Review Archive</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">All responded requests.</div>
+      </div>
+      <button onclick="closeExpertArchive()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">✕</button>
+    </div>
+    <div id="expert-archive-body" style="max-height:70vh;overflow-y:auto;">
+      <div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Loading archive...</div>
+    </div>
   </div>
 </div>
 
@@ -3393,7 +3457,7 @@ function bootApp() {
 
   // Expert panel — visible to Expert user on Reports page (loaded on navTo)
   const _expertPanel = document.getElementById("expert-panel");
-  if (_expertPanel) _expertPanel.style.display = currentUser.isExpert ? "block" : "none";
+  if (_expertPanel) _expertPanel.style.display = (currentUser.isExpert || currentUser.isAdmin) ? "block" : "none";
 
   // 6. Load all data
   loadFeed();
@@ -3453,7 +3517,7 @@ function navTo(page) {
   if (page === "reports") {
     loadTrackerReport();
     if (currentUser && currentUser.isAdmin) { loadBugReports(); populateAdminSubFilters(); loadAdminExpertWebhook(); }
-    if (currentUser && currentUser.isExpert) loadExpertPanel();
+    if (currentUser && (currentUser.isExpert || currentUser.isAdmin)) loadExpertPanel();
   }
   if (page === "pro") renderProPage();
 }
@@ -7268,7 +7332,7 @@ function initRERTab() {
 // EXPERT PANEL
 // ==============================
 async function loadExpertPanel() {
-  if (!currentUser || !currentUser.isExpert) return;
+  if (!currentUser || (!currentUser.isExpert && !currentUser.isAdmin)) return;
   const panel = document.getElementById("expert-panel");
   const body = document.getElementById("expert-panel-body");
   const countEl = document.getElementById("expert-panel-count");
@@ -7285,7 +7349,6 @@ async function loadExpertPanel() {
       const snap = await getDocs(q);
       snap.forEach(d => all.push({ id: d.id, ...d.data() }));
     } catch (idxErr) {
-      // Fallback: fetch without orderBy (Firestore index may not exist yet)
       const snap = await getDocs(collection(db, "expert_reviews"));
       snap.forEach(d => all.push({ id: d.id, ...d.data() }));
       all.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -7293,14 +7356,17 @@ async function loadExpertPanel() {
     const pending = all.filter(r => r.status === "pending");
     const responded = all.filter(r => r.status === "responded");
 
-    if (countEl) countEl.textContent = `${pending.length} pending · ${responded.length} responded`;
+    if (countEl) {
+      countEl.textContent = `${pending.length} pending`;
+      if (responded.length) countEl.textContent += ` · ${responded.length} in archive`;
+    }
 
-    if (!all.length) {
-      body.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No Expert Review Requests yet.</div>`;
+    if (!pending.length) {
+      body.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No pending requests. All caught up!</div>`;
       return;
     }
 
-    body.innerHTML = all.map(r => renderExpertPanelItem(r)).join("");
+    body.innerHTML = pending.map(r => renderExpertPanelItem(r)).join("");
   } catch (e) {
     body.innerHTML = `<div style="color:#e74c3c;padding:12px;font-size:13px;">Error loading requests: ${e.message}</div>`;
   }
@@ -7366,9 +7432,10 @@ async function submitExpertResponse(reviewId, requesterUid, requesterName, pageU
       timestamp: Date.now()
     });
 
-    // 2. Mark review as responded in Firestore
+    // 2. Mark review as responded in Firestore, storing response copy
     await updateDoc(doc(db, "expert_reviews", reviewId), {
       status: "responded",
+      responseText,
       respondedAt: Date.now()
     });
 
@@ -7497,8 +7564,82 @@ async function testExpertWebhook() {
 }
 
 // ==============================
+// EXPERT ARCHIVE
+// ==============================
+async function openExpertArchive() {
+  document.getElementById("expert-archive-overlay").classList.add("open");
+  await loadExpertArchive();
+}
+
+function closeExpertArchive() {
+  document.getElementById("expert-archive-overlay").classList.remove("open");
+}
+
+function closeExpertArchiveDirect(e) {
+  if (e.target === document.getElementById("expert-archive-overlay")) closeExpertArchive();
+}
+
+async function loadExpertArchive() {
+  const body = document.getElementById("expert-archive-body");
+  if (!body) return;
+  body.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Loading...</div>`;
+
+  try {
+    let responded = [];
+    try {
+      const q = query(
+        collection(db, "expert_reviews"),
+        where("status", "==", "responded"),
+        orderBy("respondedAt", "desc")
+      );
+      const snap = await getDocs(q);
+      snap.forEach(d => responded.push({ id: d.id, ...d.data() }));
+    } catch {
+      // Fallback if composite index not yet built
+      const snap = await getDocs(collection(db, "expert_reviews"));
+      snap.forEach(d => { if (d.data().status === "responded") responded.push({ id: d.id, ...d.data() }); });
+      responded.sort((a, b) => (b.respondedAt || 0) - (a.respondedAt || 0));
+    }
+
+    if (!responded.length) {
+      body.innerHTML = `<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">No responded requests yet.</div>`;
+      return;
+    }
+
+    body.innerHTML = responded.map(r => {
+      const submitted = new Date(r.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      const respondedDate = r.respondedAt
+        ? new Date(r.respondedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+        : "—";
+      return `<div class="expert-archive-item">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+          <div>
+            <div style="font-weight:700;font-size:13px;color:var(--text);">${esc(r.requesterName)}</div>
+            <div style="font-size:11px;color:var(--text-muted);">Submitted ${submitted} · Responded ${respondedDate}</div>
+          </div>
+          <span class="rer-status-pill rer-status-responded" style="flex-shrink:0;">✓ Responded</span>
+        </div>
+        <div style="margin-bottom:6px;">
+          <a href="${esc(r.pageUrl)}" target="_blank" rel="noopener" style="font-size:12px;color:#7c3aed;word-break:break-all;">🌐 ${esc(r.pageUrl)}</a>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;line-height:1.5;font-style:italic;">"${esc(r.feedbackRequest)}"</div>
+        ${r.responseText
+          ? `<div class="expert-archive-response">${esc(r.responseText)}</div>`
+          : `<div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Response stored in Community Feed.</div>`
+        }
+      </div>`;
+    }).join("");
+  } catch (e) {
+    body.innerHTML = `<div style="color:#e74c3c;padding:16px;font-size:13px;">Error loading archive: ${e.message}</div>`;
+  }
+}
+
+// ==============================
 // WINDOW EXPORTS — NEW FEATURES
 // ==============================
+window.openExpertArchive = openExpertArchive;
+window.closeExpertArchive = closeExpertArchive;
+window.closeExpertArchiveDirect = closeExpertArchiveDirect;
 window.openEEATAudit = openEEATAudit;
 window.closeEEATAudit = closeEEATAudit;
 window.closeEEATAuditDirect = closeEEATAuditDirect;
