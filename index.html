@@ -2006,7 +2006,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         </div>
         <div style="display:flex;gap:8px;">
           <button onclick="openEEATModal()" class="btn btn-gold btn-sm" style="flex:1;">View Guide →</button>
-          <button onclick="openEEATAudit()" class="btn btn-outline btn-sm" style="flex:1;">✅ Site Audit</button>
+          <button onclick="openEEATAudit()" class="btn btn-sm" style="flex:1;background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold);color:#e8d5a0;">✅ Site Audit</button>
         </div>
       </div>
       <div class="dash-allstar-banner dash-animate" style="animation-delay:0.55s;">
@@ -2111,8 +2111,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <textarea id="rer-prompt" class="form-input" placeholder="e.g. Does my About page clearly communicate my expertise? Is my CTA compelling?" style="min-height:80px;"></textarea>
           </div>
           <div class="rer-warning">⏳ Expert reviews are personal and take time. Please allow a few days for a response before following up.</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;padding:6px 10px;background:var(--surface2);border-radius:6px;border-left:2px solid var(--border);">📌 Limited to 1 Expert Review Request per month.</div>
           <div id="rer-limit-msg" style="display:none;padding:10px 12px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.3);border-radius:8px;font-size:12px;color:#7c3aed;margin-bottom:10px;line-height:1.5;"></div>
-          <button class="btn btn-sm" id="rer-submit-btn" onclick="submitRER()" style="background:#7c3aed;color:#fff;border-color:#7c3aed;">Request Expert Review</button>
+          <button class="btn btn-gold btn-sm" id="rer-submit-btn" onclick="submitRER()">Request Expert Review</button>
         </div>
       </div>
       <div id="feed-list"></div>
@@ -2124,7 +2125,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="page-title">Resources</div>
         <div class="page-subtitle">Website strategy guides and tools — tap any card to read.</div>
         <div style="margin-top:10px;">
-          <button onclick="openEEATAudit()" class="btn btn-outline btn-sm" style="border-color:var(--gold);color:var(--gold);">✅ Open E-E-A-T Site Audit</button>
+          <button onclick="openEEATAudit()" class="btn btn-sm" style="background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold);color:#e8d5a0;">✅ Open E-E-A-T Site Audit</button>
         </div>
       </div>
       <!-- Admin resource compose -->
@@ -6812,43 +6813,10 @@ Verified Testimonials
 Testimonials are more trustworthy when they include the client's full name and optionally a link to their social profile or the project you did together. "— Sarah M." is weak. "— Sarah Mitchell, Bride, Chicago 2024" is strong.
 
 Privacy Policy
-Every site that collects contact form data or uses analytics needs one. See Slide 7 for a ready-to-use template.
+Every site that collects contact form data or uses analytics needs one. See the next slide for a ready-to-use template.
 
 THIS WEEK'S ACTION:
 Check your site for: HTTPS, a contact page, a footer with your business name, and at least one named testimonial. Fix any that are missing.`
-  },
-  {
-    emoji: "✅",
-    title: "Your E-E-A-T Checklist",
-    body: `Use this as your running checklist throughout the 90 days. Each item is a trust signal — check them off as you complete your weekly updates.
-
-EXPERIENCE
-☐ Behind-the-scenes photo or video on at least one page
-☐ At least one "Project Story" (goal, challenge, solution)
-☐ Gear or tool mentioned with a reason why you chose it
-☐ Blog post based on first-hand experience
-
-EXPERTISE
-☐ About page includes: years of experience, niche, credentials
-☐ Named author bio on blog posts and key pages
-☐ At least one educational guide written for your clients
-☐ Services page describes your process, not just your prices
-
-AUTHORITY
-☐ "As Seen In" logos or press mentions displayed
-☐ Google Business Profile created and up to date
-☐ At least one backlink from a vendor, venue, or industry site
-☐ Awards, recognitions, or directory listings present
-
-TRUST
-☐ Site uses HTTPS (padlock visible in browser)
-☐ Contact page with real email address
-☐ Footer has business name and copyright line
-☐ At least one named, verifiable testimonial
-☐ Privacy Policy page published
-☐ No broken links on main pages
-
-WAC TIP: Your Weekly Challenge Modifiers are designed to knock these off one at a time. Every challenge you complete this round is directly tied to one of these pillars.`
   },
   {
     emoji: "📄",
@@ -6895,6 +6863,39 @@ We may update this policy periodically. The effective date at the top of this pa
 For privacy-related questions, contact us at [your@email.com].
 ─────────────────────────────────`,
     hasCopy: true
+  },
+  {
+    emoji: "✅",
+    title: "Your E-E-A-T Checklist",
+    body: `Use this as your running checklist throughout the 90 days. Each item is a trust signal — check them off as you complete your weekly updates.
+
+EXPERIENCE
+☐ Behind-the-scenes photo or video on at least one page
+☐ At least one "Project Story" (goal, challenge, solution)
+☐ Gear or tool mentioned with a reason why you chose it
+☐ Blog post based on first-hand experience
+
+EXPERTISE
+☐ About page includes: years of experience, niche, credentials
+☐ Named author bio on blog posts and key pages
+☐ At least one educational guide written for your clients
+☐ Services page describes your process, not just your prices
+
+AUTHORITY
+☐ "As Seen In" logos or press mentions displayed
+☐ Google Business Profile created and up to date
+☐ At least one backlink from a vendor, venue, or industry site
+☐ Awards, recognitions, or directory listings present
+
+TRUST
+☐ Site uses HTTPS (padlock visible in browser)
+☐ Contact page with real email address
+☐ Footer has business name and copyright line
+☐ At least one named, verifiable testimonial
+☐ Privacy Policy page published
+☐ No broken links on main pages
+
+WAC TIP: Your Weekly Challenge Modifiers are designed to knock these off one at a time. Every challenge you complete this round is directly tied to one of these pillars.`
   }
 ];
 
@@ -6968,8 +6969,8 @@ function renderEEATSlide() {
   document.getElementById("eeat-prev-btn").disabled = _eeatSlide === 0;
   const nextBtn = document.getElementById("eeat-next-btn");
   if (_eeatSlide === EEAT_SLIDES.length - 1) {
-    nextBtn.textContent = "Done ✓";
-    nextBtn.onclick = () => closeEEATModal();
+    nextBtn.textContent = "✅ Open Site Audit";
+    nextBtn.onclick = () => { closeEEATModal(); setTimeout(() => openEEATAudit(), 150); };
   } else {
     nextBtn.textContent = "Next →";
     nextBtn.onclick = () => eeatNav(1);
@@ -6982,7 +6983,7 @@ function eeatJump(idx) {
 }
 
 function copyEEATTemplate() {
-  const slide = EEAT_SLIDES[6];
+  const slide = EEAT_SLIDES.find(s => s.hasCopy);
   if (!slide) return;
   navigator.clipboard.writeText(slide.body).then(() => {
     showToast("Privacy Policy template copied to clipboard!");
