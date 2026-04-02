@@ -1806,6 +1806,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <button class="btn btn-gold btn-sm" onclick="submitAnnouncement()">Post Announcement</button>
       </div>
       <div id="announcements-list"></div>
+      <div id="prev-anns-trigger" style="display:none;text-align:center;margin-bottom:8px;">
+        <button onclick="openArchivedAnnsModal()" style="background:none;border:none;color:var(--text-muted);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;padding:4px 8px;border-radius:6px;text-decoration:underline;text-underline-offset:3px;">📁 Previous Announcements</button>
+      </div>
       <!-- Member compose -->
       <div class="card">
         <div class="feed-compose-tabs">
@@ -2461,6 +2464,17 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <button class="modal-close" onclick="closeTrackerModal()">✕</button>
     </div>
     <div id="admin-tracker-content"></div>
+  </div>
+</div>
+
+<!-- ARCHIVED ANNOUNCEMENTS MODAL -->
+<div class="modal-overlay" id="archived-anns-overlay" onclick="closeArchivedAnnsModalDirect(event)">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.05em;">Previous Announcements</div>
+      <button class="modal-close" onclick="closeArchivedAnnsModal()">✕</button>
+    </div>
+    <div id="archived-anns-content" style="padding-bottom:8px;"></div>
   </div>
 </div>
 
@@ -3962,13 +3976,20 @@ async function submitAnnouncement() {
   }
 }
 
+let _archivedAnns = [];
+
 async function loadAnnouncements() {
   try {
     const snap = await getDocs(collection(db, "announcements"));
-    const anns = [];
-    snap.forEach(d => anns.push({ id: d.id, ...d.data() }));
-    anns.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    renderAnnouncements(anns.slice(0, 10));
+    const all = [];
+    snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+    all.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    const active   = all.filter(a => !a.archived);
+    _archivedAnns  = all.filter(a => a.archived);
+    renderAnnouncements(active.slice(0, 10));
+    // Show/hide "Previous Announcements" trigger
+    const triggerEl = document.getElementById("prev-anns-trigger");
+    if (triggerEl) triggerEl.style.display = _archivedAnns.length ? "block" : "none";
   } catch (e) { console.error("loadAnnouncements error:", e); }
 }
 
@@ -3978,12 +3999,21 @@ function renderAnnouncements(anns) {
   el.innerHTML = anns.map((a, i) => {
     const isAdmin = currentUser.isAdmin;
     const bodyId = `ann-body-${a.id || i}`;
-    const btnId = `ann-toggle-${a.id || i}`;
-    const bodyText = a.body || "";
+    const btnId  = `ann-toggle-${a.id || i}`;
+    const bodyText    = a.body || "";
     const firstNewline = bodyText.indexOf("\n");
-    const firstLine = firstNewline === -1 ? bodyText : bodyText.slice(0, firstNewline);
-    const hasMore = firstNewline !== -1 && bodyText.slice(firstNewline + 1).trim().length > 0;
-    const restText = hasMore ? bodyText.slice(firstNewline + 1) : "";
+    const firstLine   = firstNewline === -1 ? bodyText : bodyText.slice(0, firstNewline);
+    const hasMore     = firstNewline !== -1 && bodyText.slice(firstNewline + 1).trim().length > 0;
+    const restText    = hasMore ? bodyText.slice(firstNewline + 1) : "";
+    const adminActions = isAdmin ? `
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button onclick="archiveAnn('${a.id}')" style="background:none;border:none;color:var(--text-muted);font-size:12px;cursor:pointer;padding:0;">📁 Archive</button>
+        <button onclick="deleteAnn('${a.id}')" style="background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;padding:0;">🗑 Delete</button>
+      </div>` : "";
+    const adminInlineActions = isAdmin
+      ? ` · <button onclick="archiveAnn('${a.id}')" style="background:none;border:none;color:var(--text-muted);font-size:12px;cursor:pointer;padding:0;">Archive</button>`
+        + ` · <button onclick="deleteAnn('${a.id}')" style="background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;padding:0;">Delete</button>`
+      : "";
     return `<div class="card announcement-card" style="margin-bottom:12px;">
       <div class="announcement-tag">ANNOUNCEMENT</div>
       <div style="font-weight:700;font-size:16px;margin-bottom:6px;">${esc(a.title)}</div>
@@ -3991,30 +4021,81 @@ function renderAnnouncements(anns) {
       <div id="${bodyId}" style="display:none;">
         <div class="feed-body" style="white-space:pre-wrap;margin-bottom:8px;">${linkify(restText)}</div>
         <div class="feed-time">${timeAgo(a.timestamp)}</div>
-        ${isAdmin ? `<button onclick="deleteAnn('${a.id}')" style="background:none;border:none;color:var(--danger);font-size:12px;margin-top:6px;cursor:pointer;">Delete</button>` : ""}
+        ${adminActions}
       </div>
-      ${hasMore ? `<button id="${btnId}" onclick="toggleAnnBody('${bodyId}','${btnId}')" style="background:none;border:none;color:var(--gold);font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;padding:0;margin-top:2px;">See More ▸</button>`
-        : `<div class="feed-time" style="margin-top:4px;">${timeAgo(a.timestamp)}${isAdmin ? ` · <button onclick="deleteAnn('${a.id}')" style="background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;padding:0;">Delete</button>` : ""}</div>`}
+      ${hasMore
+        ? `<button id="${btnId}" onclick="toggleAnnBody('${bodyId}','${btnId}')" style="background:none;border:none;color:var(--gold);font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;padding:0;margin-top:2px;">See More ▸</button>`
+        : `<div class="feed-time" style="margin-top:4px;">${timeAgo(a.timestamp)}${adminInlineActions}</div>`}
     </div>`;
   }).join("");
 }
 
 function toggleAnnBody(bodyId, btnId) {
   const body = document.getElementById(bodyId);
-  const btn = document.getElementById(btnId);
+  const btn  = document.getElementById(btnId);
   if (!body || !btn) return;
   const open = body.style.display === "block";
   body.style.display = open ? "none" : "block";
   btn.textContent = open ? "See More ▸" : "See Less ▴";
 }
 
+async function archiveAnn(id) {
+  if (!confirm("Archive this announcement? It will be moved to Previous Announcements.")) return;
+  try {
+    await updateDoc(doc(db, "announcements", id), { archived: true });
+    showToast("Announcement archived.");
+    loadAnnouncements();
+  } catch { showToast("Failed to archive."); }
+}
+
 async function deleteAnn(id) {
-  if (!confirm("Delete this announcement?")) return;
+  if (!confirm("Delete this announcement? This cannot be undone.")) return;
   try {
     await deleteDoc(doc(db, "announcements", id));
     showToast("Announcement deleted.");
     loadAnnouncements();
   } catch { showToast("Failed to delete."); }
+}
+
+function openArchivedAnnsModal() {
+  const el = document.getElementById("archived-anns-content");
+  if (!_archivedAnns.length) {
+    el.innerHTML = '<p class="text-sm text-muted" style="padding:8px 0;">No previous announcements yet.</p>';
+  } else {
+    el.innerHTML = _archivedAnns.map((a, i) => {
+      const bodyText = a.body || "";
+      const adminActions = currentUser.isAdmin
+        ? `<div style="display:flex;gap:12px;margin-top:10px;">
+            <button onclick="unarchiveAnn('${a.id}')" style="background:none;border:none;color:var(--gold);font-size:12px;cursor:pointer;padding:0;">↩ Restore</button>
+            <button onclick="deleteAnn('${a.id}')" style="background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;padding:0;">🗑 Delete</button>
+           </div>` : "";
+      return `<div style="border-bottom:1px solid var(--border);padding:14px 0;${i === 0 ? "padding-top:4px;" : ""}">
+        <div class="announcement-tag" style="margin-bottom:6px;">ARCHIVED</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px;">${esc(a.title)}</div>
+        <div style="font-size:13px;line-height:1.6;color:var(--text-muted);white-space:pre-wrap;">${linkify(bodyText)}</div>
+        <div class="feed-time" style="margin-top:6px;">${timeAgo(a.timestamp)}</div>
+        ${adminActions}
+      </div>`;
+    }).join("");
+  }
+  document.getElementById("archived-anns-overlay").classList.add("open");
+}
+
+function closeArchivedAnnsModal() {
+  document.getElementById("archived-anns-overlay").classList.remove("open");
+}
+
+function closeArchivedAnnsModalDirect(e) {
+  if (e.target === document.getElementById("archived-anns-overlay")) closeArchivedAnnsModal();
+}
+
+async function unarchiveAnn(id) {
+  try {
+    await updateDoc(doc(db, "announcements", id), { archived: false });
+    showToast("Announcement restored.");
+    closeArchivedAnnsModal();
+    loadAnnouncements();
+  } catch { showToast("Failed to restore."); }
 }
 
 // ==============================
@@ -5814,7 +5895,12 @@ window.togglePVRCompose = togglePVRCompose;
 window.submitPVRReply = submitPVRReply;
 window.submitAnnouncement = submitAnnouncement;
 window.deleteAnn = deleteAnn;
+window.archiveAnn = archiveAnn;
+window.unarchiveAnn = unarchiveAnn;
 window.toggleAnnBody = toggleAnnBody;
+window.openArchivedAnnsModal = openArchivedAnnsModal;
+window.closeArchivedAnnsModal = closeArchivedAnnsModal;
+window.closeArchivedAnnsModalDirect = closeArchivedAnnsModalDirect;
 window.submitResource = submitResource;
 window.setFilter = setFilter;
 window.openResModal = openResModal;
