@@ -1726,7 +1726,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div class="dash-quick-actions dash-animate" style="animation-delay:0.5s;">
         <button class="dash-quick-btn" onclick="navTo('submit');loadSubmitPage();">
           <span class="dash-quick-btn-icon">📤</span>
-          <span class="dash-quick-btn-label">Submit Post<span class="dash-quick-btn-sub">Log this week's update</span></span>
+          <span class="dash-quick-btn-label">Submit Update<span class="dash-quick-btn-sub">Log this week's update</span></span>
         </button>
         <button class="dash-quick-btn" onclick="navTo('tracker');">
           <span class="dash-quick-btn-icon">✅</span>
@@ -2093,6 +2093,49 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           </div>
           <button class="btn btn-sm" onclick="clearFeedPostsByWeek()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">🗑 Clear Feed Posts for Selected Week</button>
           <div id="clear-feed-status" style="display:none;margin-top:12px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
+        </div>
+      </div>
+
+      <!-- ADMIN: Submissions & Points Editor -->
+      <div id="admin-submissions-tool" style="display:none;margin-top:28px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">📋 Submissions & Points Editor</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">View and edit all member submissions (including trial). Adjust points directly or delete a submission. Point changes update the member's registry total.</div>
+        <div class="card" style="border:1.5px solid var(--border);">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
+            <div style="flex:1;min-width:180px;">
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Filter by Member</label>
+              <select id="admin-sub-member-filter" class="form-input" onchange="loadAdminSubmissions()" style="width:100%;">
+                <option value="">All Members</option>
+              </select>
+            </div>
+            <div style="flex:1;min-width:130px;">
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Collection</label>
+              <select id="admin-sub-collection" class="form-input" onchange="loadAdminSubmissions()" style="width:100%;">
+                <option value="submissions">Updates (Round 1)</option>
+                <option value="submissions-trial">Updates (Trial Only)</option>
+                <option value="engagements">Engagements</option>
+              </select>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="loadAdminSubmissions()" style="white-space:nowrap;height:38px;">↻ Refresh</button>
+          </div>
+          <div id="admin-sub-list"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Select a filter or click Refresh to load submissions.</div></div>
+        </div>
+        <!-- Admin Edit Points by User -->
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;margin-top:28px;">🎯 Edit Member Points Directly</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Set a member's point total to any value. This updates the registry only — submission records are not changed.</div>
+        <div class="card" style="border:1.5px solid var(--border);">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <div style="flex:2;min-width:180px;">
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Member</label>
+              <select id="admin-pts-member" class="form-input" style="width:100%;"></select>
+            </div>
+            <div style="flex:1;min-width:90px;">
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">New Point Total</label>
+              <input type="number" id="admin-pts-value" class="form-input" min="0" placeholder="e.g. 45" style="width:100%;" />
+            </div>
+            <button class="btn btn-sm" onclick="adminSetMemberPoints()" style="background:var(--gold);color:#1a1a1a;border-color:var(--gold);white-space:nowrap;height:38px;">Set Points</button>
+          </div>
+          <div id="admin-pts-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
         </div>
       </div>
     </div>
@@ -2720,12 +2763,11 @@ function getInitials(name) {
 }
 
 function getMilestoneBadges(totalPosts) {
-  let b = "";
-  if (totalPosts >= 50) b += "🏆";
-  if (totalPosts >= 25) b += "💎";
-  if (totalPosts >= 10) b += "🔥";
-  if (totalPosts >= 1) b += "🌱";
-  return b;
+  if (totalPosts >= 50) return "🏆";
+  if (totalPosts >= 25) return "💎";
+  if (totalPosts >= 10) return "🔥";
+  if (totalPosts >= 1)  return "🌱";
+  return "";
 }
 
 // ==============================
@@ -2952,7 +2994,7 @@ function bootApp() {
   if (_proNavBtn) _proNavBtn.style.display = userHasPro() ? "flex" : "none";
 
   // 5. Show/hide admin elements
-  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points"];
+  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-submissions-tool"];
   adminBoxes.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
@@ -2969,11 +3011,17 @@ function bootApp() {
     // Clear Feed tool always visible to admin
     const _clearFeedTool = document.getElementById("admin-clear-feed-tool");
     if (_clearFeedTool) _clearFeedTool.style.display = "block";
+    // Submissions & Points Editor always visible to admin
+    const _subsTool = document.getElementById("admin-submissions-tool");
+    if (_subsTool) _subsTool.style.display = "block";
+    populateAdminSubFilters();
   } else {
     const _proPanel = document.getElementById("admin-pro-panel");
     if (_proPanel) _proPanel.style.display = "none";
     const _clearFeedTool = document.getElementById("admin-clear-feed-tool");
     if (_clearFeedTool) _clearFeedTool.style.display = "none";
+    const _subsTool = document.getElementById("admin-submissions-tool");
+    if (_subsTool) _subsTool.style.display = "none";
   }
 
   // 6. Load all data
@@ -3030,7 +3078,7 @@ function navTo(page) {
   if (page === "profile") { initProfilePhotoPreview(); }
   if (page === "resources") loadResources();
   if (page === "members") loadDirectory();
-  if (page === "reports") { loadTrackerReport(); if (currentUser && currentUser.isAdmin) loadBugReports(); }
+  if (page === "reports") { loadTrackerReport(); if (currentUser && currentUser.isAdmin) { loadBugReports(); populateAdminSubFilters(); } }
   if (page === "pro") renderProPage();
 }
 
@@ -3475,7 +3523,7 @@ function renderPVRCard(p) {
   const isOwner = p.authorUid === currentUser.uid || currentUser.isAdmin;
   const replies = p.replies || [];
   const replyCount = replies.length;
-  const canReply = p.authorUid !== currentUser.uid;
+  const canReply = p.authorUid !== currentUser.uid || currentUser.isAdmin;
   const PREVIEW = 3;
   const hasMore = replies.length > PREVIEW;
 
@@ -3485,10 +3533,13 @@ function renderPVRCard(p) {
     const rAvatarContent = rPhoto
       ? `<img src="${esc(rPhoto)}" alt="${esc(r.name)}" />`
       : getInitials(r.name);
-    return `<div class="pvr-reply">
+    const adminBadge = r.isAdminComment
+      ? `<span style="font-size:10px;font-weight:700;background:var(--gold);color:#1a1a1a;border-radius:20px;padding:1px 7px;margin-left:6px;vertical-align:middle;letter-spacing:0.04em;">Admin</span>`
+      : "";
+    return `<div class="pvr-reply" ${r.isAdminComment ? 'style="border-left:2px solid var(--gold);padding-left:8px;"' : ""}>
       <div class="pvr-reply-avatar">${rAvatarContent}</div>
       <div class="pvr-reply-bubble">
-        <div class="pvr-reply-author">${esc(r.name)}</div>
+        <div class="pvr-reply-author">${esc(r.name)}${adminBadge}</div>
         <div class="pvr-reply-text">${linkify(r.text)}</div>
         <div class="pvr-reply-time">${timeAgo(r.timestamp)}</div>
       </div>
@@ -3537,10 +3588,10 @@ function renderPVRCard(p) {
         <button class="see-more-btn" id="pvr-see-more-btn-${p.id}" onclick="togglePVRSeeMore('${p.id}')" data-open="false">See ${replies.length - PREVIEW} more</button>` : ""}
         ${canReply ? `
         <div class="pvr-reply-compose" id="pvr-compose-${p.id}">
-          <textarea class="pvr-reply-input" id="pvr-input-${p.id}" placeholder="Leave your feedback..."></textarea>
-          <button class="pvr-reply-send" onclick="submitPVRReply('${p.id}', '${esc(p.authorUid)}')">Send +2pts</button>
+          <textarea class="pvr-reply-input" id="pvr-input-${p.id}" placeholder="${currentUser.isAdmin ? "Leave an admin comment (no points awarded)..." : "Leave your feedback..."}"></textarea>
+          <button class="pvr-reply-send" onclick="${currentUser.isAdmin ? `submitAdminPVRComment('${p.id}')` : `submitPVRReply('${p.id}', '${esc(p.authorUid)}')`}">${currentUser.isAdmin ? "Comment" : "Send +2pts"}</button>
         </div>
-        <button class="pvr-feedback-btn" id="pvr-feedback-btn-${p.id}" onclick="togglePVRCompose('${p.id}')">✏️ Leave Feedback</button>
+        <button class="pvr-feedback-btn" id="pvr-feedback-btn-${p.id}" onclick="togglePVRCompose('${p.id}')">${currentUser.isAdmin ? "💬 Add Admin Comment" : "✏️ Leave Feedback"}</button>
         ` : `<div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:4px;">You can't reply to your own request.</div>`}
       </div>
     </div>
@@ -3855,6 +3906,35 @@ async function submitPVRReply(postId, postAuthorUid) {
     showToast("Failed to send feedback.");
   }
 }
+
+
+
+// ==============================
+// ADMIN — PVR COMMENT (no points)
+// ==============================
+async function submitAdminPVRComment(postId) {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const input = document.getElementById("pvr-input-" + postId);
+  const text = input ? input.value.trim() : "";
+  if (!text) { showToast("Write a comment first."); return; }
+  const reply = {
+    name: currentUser.name,
+    uid: currentUser.uid || currentUser.email,
+    text,
+    isAdminComment: true,
+    timestamp: Date.now()
+  };
+  try {
+    await updateDoc(doc(db, "posts", postId), { replies: arrayUnion(reply) });
+    if (input) input.value = "";
+    showToast("Admin comment posted.");
+    loadFeed();
+  } catch (e) {
+    console.error("submitAdminPVRComment error:", e);
+    showToast("Failed to post comment.");
+  }
+}
+window.submitAdminPVRComment = submitAdminPVRComment;
 
 
 
@@ -4224,21 +4304,36 @@ async function submitUpdate() {
   if (url && !/^https?:\/\//i.test(url)) url = "https://" + url;
   if (isRoundOver()) { showToast("Round has ended."); return; }
 
+  const isTrial = trialIdx !== -1;
   const weekIdx = getWeekIndex();
-  const deadline = getWeekDeadline(weekIdx);
   const now = Date.now();
-  const isLate = now > deadline;
-  const lateWindow = deadline + (24 * 60 * 60 * 1000);
-  if (isLate && now > lateWindow) { showToast("Submission window has closed for this week."); return; }
 
-  // Check weekly limit
+  // Trial submissions: use trial week label + tag; skip round deadline logic
+  let isLate = false;
+  if (!isTrial) {
+    const deadline = getWeekDeadline(weekIdx);
+    isLate = now > deadline;
+    const lateWindow = deadline + (24 * 60 * 60 * 1000);
+    if (isLate && now > lateWindow) { showToast("Submission window has closed for this week."); return; }
+  }
+
+  // Check weekly limit (trial: 1 per trial week; round: normal required count)
   try {
-    const required = WEEKS[weekIdx].required;
-    const q = query(collection(db, "submissions"),
-      where("authorUid", "==", currentUser.uid),
-      where("weekIdx", "==", weekIdx));
-    const snap = await getDocs(q);
-    if (snap.size >= required) { showToast(`You've already submitted ${required} update(s) this week.`); return; }
+    let alreadySubmitted = false;
+    if (isTrial) {
+      const tq = query(collection(db, "submissions"),
+        where("authorUid", "==", currentUser.uid),
+        where("trialWeekIdx", "==", trialIdx));
+      const tsnap = await getDocs(tq);
+      if (tsnap.size >= 1) { showToast("You've already submitted for this trial week."); return; }
+    } else {
+      const required = WEEKS[weekIdx].required;
+      const q = query(collection(db, "submissions"),
+        where("authorUid", "==", currentUser.uid),
+        where("weekIdx", "==", weekIdx));
+      const snap = await getDocs(q);
+      if (snap.size >= required) { showToast(`You've already submitted ${required} update(s) this week.`); return; }
+    }
 
     let pts = isLate ? PTS_LATE_24H : PTS_ON_TIME;
     if (_selectedFormat === "Blog Post" || _selectedFormat === "New Page") pts += PTS_FORMAT_BONUS;
@@ -4246,11 +4341,17 @@ async function submitUpdate() {
     const challengeCompleted = challengeEl && challengeEl.checked;
     if (challengeCompleted) pts += PTS_CHALLENGE;
 
+    const trialWeek = isTrial ? TRIAL_WEEKS[trialIdx] : null;
+    const weekLabel = isTrial
+      ? `${trialWeek.label} (${trialWeek.dates})`
+      : WEEKS[weekIdx].label + " (" + WEEKS[weekIdx].dates + ")";
+
     await addDoc(collection(db, "submissions"), {
       author: currentUser.name,
       authorUid: currentUser.uid,
       weekIdx,
-      weekLabel: WEEKS[weekIdx].label + " (" + WEEKS[weekIdx].dates + ")",
+      weekLabel,
+      ...(isTrial ? { isTrial: true, trialWeekIdx: trialIdx } : {}),
       url,
       note,
       format: _selectedFormat || "Static",
@@ -4389,19 +4490,71 @@ async function loadMySubmissions() {
     items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     const el = document.getElementById("my-submissions");
     if (!items.length) { el.innerHTML = '<p class="text-sm text-muted">No submissions yet.</p>'; return; }
-    el.innerHTML = items.map(s => `<div class="submission-item">
+    const now = Date.now();
+    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+    el.innerHTML = items.map(s => {
+      const canEdit = (now - (s.timestamp || 0)) < SEVEN_DAYS;
+      const urlB64  = btoa(unescape(encodeURIComponent(s.url  || "")));
+      const noteB64 = btoa(unescape(encodeURIComponent(s.note || "")));
+      const trialBadge = s.isTrial
+        ? '<span style="font-size:10px;font-weight:600;background:#fff8e1;color:#b8860b;border:1px solid #f0d060;border-radius:20px;padding:1px 7px;margin-left:6px;vertical-align:middle;">Trial</span>'
+        : "";
+      const weekDisplay = esc(s.weekLabel || "—");
+      return `<div class="submission-item">
       <div class="submission-info">
-        <div class="submission-week">${esc(s.weekLabel)}${s.isLate ? ' <span style="color:var(--danger);font-size:11px;">(late)</span>' : ""}</div>
-        <div class="submission-url"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>
+        <div class="submission-week">${weekDisplay}${trialBadge}${s.isLate ? ' <span style="color:var(--danger);font-size:11px;">(late)</span>' : ""}</div>
+        ${s.url ? `<div class="submission-url"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url)}</a></div>` : ""}
+        ${s.note ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${esc(s.note)}</div>` : ""}
       </div>
       <div class="submission-pts">+${s.pts}</div>
-      <button class="submission-del" onclick="deleteSubmission('${s.id}', ${s.pts})">🗑</button>
-    </div>`).join("");
+      ${canEdit ? `<button class="btn btn-outline btn-sm sub-edit-btn" style="font-size:11px;padding:4px 9px;margin-right:4px;"
+        data-id="${s.id}" data-url="${urlB64}" data-note="${noteB64}">Edit</button>` : ""}
+      <button class="submission-del sub-del-btn" data-id="${s.id}" data-pts="${s.pts}">🗑</button>
+    </div>`;
+    }).join("");
+
+    // Event delegation — data attributes, no inline onclick, safe for any content
+    el.onclick = function(e) {
+      const editBtn = e.target.closest(".sub-edit-btn");
+      const delBtn  = e.target.closest(".sub-del-btn");
+      if (editBtn) {
+        const docId       = editBtn.dataset.id;
+        const currentUrl  = decodeURIComponent(escape(atob(editBtn.dataset.url)));
+        const currentNote = decodeURIComponent(escape(atob(editBtn.dataset.note)));
+        editSubmission(docId, currentUrl, currentNote);
+      }
+      if (delBtn) {
+        const docId = delBtn.dataset.id;
+        const pts   = parseInt(delBtn.dataset.pts, 10);
+        deleteSubmission(docId, pts);
+      }
+    };
   } catch (e) { console.error("loadMySubmissions error:", e); }
 }
 
+window.editSubmission = async function(docId, currentUrl, currentNote) {
+  const newUrl = prompt("Edit your website URL:", currentUrl);
+  if (newUrl === null) return;
+  const newNote = prompt("Edit your description:", currentNote);
+  if (newNote === null) return;
+  const trimUrl  = newUrl.trim();
+  const trimNote = newNote.trim();
+  if (!trimUrl && !trimNote) { showToast("At least a URL or description is required."); return; }
+  try {
+    const updates = { editedAt: Date.now() };
+    if (trimUrl)  updates.url  = normalizeUrl(trimUrl);
+    if (trimNote) updates.note = trimNote;
+    await updateDoc(doc(db, "submissions", docId), updates);
+    showToast("Submission updated!");
+    loadMySubmissions();
+  } catch (e) {
+    console.error("editSubmission error:", e);
+    showToast("Failed to update submission.");
+  }
+};
+
 async function deleteSubmission(id, pts) {
-  if (!confirm("Delete this submission? Points will be deducted.")) return;
+  if (!confirm(`Delete this submission? ${pts} point${pts !== 1 ? "s" : ""} will be deducted from your total.`)) return;
   try {
     await deleteDoc(doc(db, "submissions", id));
     const regRef = doc(db, "wac_registry", currentUser.uid);
@@ -4409,11 +4562,12 @@ async function deleteSubmission(id, pts) {
       points: increment(-pts),
       totalPosts: increment(-1)
     });
-    currentUser.points = Math.max(0, (currentUser.points || 0) - pts);
+    currentUser.points    = Math.max(0, (currentUser.points    || 0) - pts);
     currentUser.totalPosts = Math.max(0, (currentUser.totalPosts || 0) - 1);
     lsSet("wac_session", currentUser);
-    showToast("Submission deleted. Points deducted.");
+    showToast(`Submission deleted. -${pts} pts`);
     loadMySubmissions();
+    updatePtsPreview();
   } catch { showToast("Failed to delete submission."); }
 }
 
@@ -5675,6 +5829,7 @@ window.submitUpdate = submitUpdate;
 window.selectEngType = selectEngType;
 window.submitEngagement = submitEngagement;
 window.deleteSubmission = deleteSubmission;
+window.editSubmission = window.editSubmission;
 window.toggleCheck = toggleCheck;
 window.toggleTrialCheck = toggleTrialCheck;
 window.handleMemberCardClick = handleMemberCardClick;
@@ -5707,6 +5862,193 @@ window.toggleProAccess = toggleProAccess;
 window.setTrialAccess = setTrialAccess;
 window.enableProForAll = enableProForAll;
 window.clearFeedPostsByWeek = clearFeedPostsByWeek;
+
+// ==============================
+// ADMIN — SUBMISSIONS & POINTS EDITOR
+// ==============================
+
+async function populateAdminSubFilters() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  try {
+    const snap = await getDocs(collection(db, "wac_registry"));
+    const members = [];
+    snap.forEach(d => members.push({ uid: d.id, ...d.data() }));
+    members.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+    const filterEl = document.getElementById("admin-sub-member-filter");
+    const ptsEl = document.getElementById("admin-pts-member");
+    if (filterEl) {
+      filterEl.innerHTML = '<option value="">All Members</option>' +
+        members.map(m => `<option value="${m.uid}">${esc(m.name)} (${m.points || 0} pts)</option>`).join("");
+    }
+    if (ptsEl) {
+      ptsEl.innerHTML = '<option value="">— select member —</option>' +
+        members.map(m => `<option value="${m.uid}" data-pts="${m.points || 0}">${esc(m.name)} — ${m.points || 0} pts</option>`).join("");
+      ptsEl.onchange = function() {
+        const sel = ptsEl.selectedOptions[0];
+        const cur = sel ? sel.getAttribute("data-pts") : "";
+        const ptsInput = document.getElementById("admin-pts-value");
+        if (ptsInput && cur !== null) ptsInput.value = cur;
+      };
+    }
+  } catch (e) { console.error("populateAdminSubFilters error:", e); }
+}
+
+window.loadAdminSubmissions = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const listEl = document.getElementById("admin-sub-list");
+  const memberUid = document.getElementById("admin-sub-member-filter").value;
+  const collValue = document.getElementById("admin-sub-collection").value;
+  // "submissions-trial" is a virtual filter — actual Firestore collection is still "submissions"
+  const collName   = collValue === "submissions-trial" ? "submissions" : collValue;
+  const trialOnly  = collValue === "submissions-trial";
+  listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Loading...</div>';
+  try {
+    let constraints = [];
+    if (memberUid)  constraints.push(where("authorUid", "==", memberUid));
+    if (trialOnly)  constraints.push(where("isTrial", "==", true));
+    const q = constraints.length
+      ? query(collection(db, collName), ...constraints)
+      : query(collection(db, collName));
+    const snap = await getDocs(q);
+    const items = [];
+    snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    // For round submissions filter: exclude trial docs unless trialOnly selected
+    const filtered = (collValue === "submissions")
+      ? items.filter(s => !s.isTrial)
+      : items;
+    filtered.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    if (!filtered.length) {
+      listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No records found.</div>';
+      return;
+    }
+    const isEng = collName === "engagements";
+    listEl.innerHTML = filtered.map(s => {
+      const urlField  = isEng ? (s.targetUrl || "") : (s.url || "");
+      const noteField = isEng ? (s.note || s.type || "") : (s.note || "");
+      const weekLabel = s.weekLabel || (s.weekIdx !== undefined ? `Week ${s.weekIdx + 1}` : "—");
+      const trialBadge = s.isTrial
+        ? '<span style="font-size:10px;font-weight:600;background:#fff8e1;color:#b8860b;border:1px solid #f0d060;border-radius:20px;padding:1px 7px;margin-left:6px;">Trial</span>'
+        : "";
+      const urlB64  = btoa(unescape(encodeURIComponent(urlField)));
+      const noteB64 = btoa(unescape(encodeURIComponent(noteField)));
+      const uidB64  = btoa(unescape(encodeURIComponent(s.authorUid || "")));
+      return `<div class="admin-sub-row" style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:var(--surface);"
+        data-id="${s.id}" data-coll="${collName}" data-uid="${uidB64}" data-pts="${s.pts}" data-url="${urlB64}" data-note="${noteB64}">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">
+              ${esc(s.author)} · ${esc(weekLabel)}${trialBadge}${s.isLate ? ' <span style="color:var(--danger);">(late)</span>' : ""}
+            </div>
+            ${urlField ? `<div style="font-size:13px;margin-bottom:4px;word-break:break-all;"><a href="${esc(urlField)}" target="_blank" rel="noopener">${esc(urlField)}</a></div>` : ""}
+            ${noteField ? `<div style="font-size:12px;color:var(--text-muted);">${esc(noteField)}</div>` : ""}
+            ${s.challengeCompleted ? `<div style="font-size:11px;color:var(--gold);margin-top:3px;">⚡ Weekly Challenge completed</div>` : ""}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+            <span style="font-weight:700;color:var(--gold);font-size:14px;">+${s.pts}</span>
+            <button class="btn btn-outline btn-sm admin-sub-edit-btn" style="font-size:11px;padding:4px 10px;">Edit</button>
+            <button class="btn btn-sm admin-sub-del-btn" style="font-size:11px;padding:4px 10px;background:var(--danger);color:#fff;border-color:var(--danger);">Del</button>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">${timeAgo(s.timestamp)} · ID: ${s.id.substring(0,10)}…${s.hasScreenshot ? " · 📸 screenshot" : ""}</div>
+      </div>`;
+    }).join("");
+
+    // Event delegation on the list — data attributes, no inline onclick
+    listEl.onclick = function(e) {
+      const row     = e.target.closest(".admin-sub-row");
+      if (!row) return;
+      const editBtn = e.target.closest(".admin-sub-edit-btn");
+      const delBtn  = e.target.closest(".admin-sub-del-btn");
+      if (!editBtn && !delBtn) return;
+      const docId   = row.dataset.id;
+      const coll    = row.dataset.coll;
+      const uid     = decodeURIComponent(escape(atob(row.dataset.uid)));
+      const pts     = parseInt(row.dataset.pts, 10);
+      const url     = decodeURIComponent(escape(atob(row.dataset.url)));
+      const note    = decodeURIComponent(escape(atob(row.dataset.note)));
+      if (editBtn) adminOpenEditSubmission(docId, coll, uid, pts, url, note);
+      if (delBtn)  adminDeleteSubmission(docId, coll, uid, pts);
+    };
+  } catch (e) {
+    console.error("loadAdminSubmissions error:", e);
+    listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--danger);font-size:13px;">Failed to load.</div>';
+  }
+};
+
+window.adminOpenEditSubmission = function(docId, collName, authorUid, currentPts, currentUrl, currentNote) {
+  const newUrl = prompt("Edit URL (leave blank to keep):", currentUrl);
+  if (newUrl === null) return; // cancelled
+  const newNote = prompt("Edit note/description (leave blank to keep):", currentNote);
+  if (newNote === null) return;
+  const newPtsRaw = prompt(`Edit points (current: ${currentPts}):`, currentPts);
+  if (newPtsRaw === null) return;
+  const newPts = parseInt(newPtsRaw, 10);
+  if (isNaN(newPts) || newPts < 0) { showToast("Invalid points value."); return; }
+
+  const updates = {};
+  if (newUrl.trim()) updates[collName === "engagements" ? "targetUrl" : "url"] = normalizeUrl(newUrl.trim());
+  if (newNote.trim()) updates.note = newNote.trim();
+  const ptsDiff = newPts - currentPts;
+
+  (async () => {
+    try {
+      updates.pts = newPts;
+      await updateDoc(doc(db, collName, docId), updates);
+      if (ptsDiff !== 0) {
+        await updateDoc(doc(db, "wac_registry", authorUid), { points: increment(ptsDiff) });
+      }
+      showToast("Submission updated.");
+      await loadAdminSubmissions();
+      await populateAdminSubFilters();
+    } catch (e) {
+      console.error("adminOpenEditSubmission error:", e);
+      showToast("Update failed.");
+    }
+  })();
+};
+
+window.adminDeleteSubmission = async function(docId, collName, authorUid, pts) {
+  if (!confirm(`Delete this submission? The member's points will be reduced by ${pts}.`)) return;
+  try {
+    await deleteDoc(doc(db, collName, docId));
+    await updateDoc(doc(db, "wac_registry", authorUid), {
+      points: increment(-pts),
+      totalPosts: increment(-1)
+    });
+    showToast("Submission deleted. Points deducted.");
+    await loadAdminSubmissions();
+    await populateAdminSubFilters();
+  } catch (e) {
+    console.error("adminDeleteSubmission error:", e);
+    showToast("Delete failed.");
+  }
+};
+
+window.adminSetMemberPoints = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const memberUid = document.getElementById("admin-pts-member").value;
+  const newPts = parseInt(document.getElementById("admin-pts-value").value, 10);
+  if (!memberUid) { showToast("Select a member."); return; }
+  if (isNaN(newPts) || newPts < 0) { showToast("Enter a valid point value."); return; }
+  const sel = document.getElementById("admin-pts-member").selectedOptions[0];
+  const name = sel ? sel.textContent.split(" — ")[0] : "this member";
+  if (!confirm(`Set ${name}'s points to ${newPts}?`)) return;
+  const statusEl = document.getElementById("admin-pts-status");
+  try {
+    await updateDoc(doc(db, "wac_registry", memberUid), { points: newPts });
+    statusEl.style.display = "block";
+    statusEl.textContent = `Points updated: ${name} → ${newPts} pts`;
+    showToast(`Points set to ${newPts}.`);
+    await populateAdminSubFilters();
+  } catch (e) {
+    console.error("adminSetMemberPoints error:", e);
+    showToast("Failed to update points.");
+  }
+};
+
+window.populateAdminSubFilters = populateAdminSubFilters;
+window.loadAdminSubmissions = window.loadAdminSubmissions;
 
 // ==============================
 // ADMIN — RESET ALL POINTS
