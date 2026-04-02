@@ -737,8 +737,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .rer-compose-fields { display: none; }
 .rer-compose-fields.visible { display: block; }
 .rer-card {
-  background: linear-gradient(135deg, rgba(124,58,237,0.08), var(--surface));
-  border: 1.5px solid #7c3aed;
+  background: linear-gradient(135deg, rgba(184,134,11,0.08), var(--surface));
+  border: 1.5px solid var(--gold);
   border-radius: var(--radius);
   padding: 14px 16px;
   margin-bottom: 14px;
@@ -747,7 +747,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #7c3aed;
+  color: var(--gold);
   text-transform: uppercase;
   margin-bottom: 6px;
   display: flex;
@@ -773,13 +773,13 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border-radius: 999px;
   letter-spacing: 0.04em;
 }
-.rer-status-pending { background: rgba(124,58,237,0.12); color: #7c3aed; }
+.rer-status-pending { background: rgba(184,134,11,0.12); color: var(--gold); }
 .rer-status-responded { background: rgba(39,174,96,0.12); color: #27ae60; }
 
 /* Expert feed response card */
 .expert-response-card {
-  background: linear-gradient(135deg, rgba(124,58,237,0.07), var(--surface));
-  border: 1.5px solid #7c3aed;
+  background: linear-gradient(135deg, rgba(184,134,11,0.07), var(--surface));
+  border: 1.5px solid var(--gold);
   border-radius: var(--radius);
   padding: 14px 16px;
   margin-bottom: 14px;
@@ -788,7 +788,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #7c3aed;
+  color: var(--gold);
   text-transform: uppercase;
   margin-bottom: 8px;
   display: flex;
@@ -798,8 +798,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
 /* Expert Panel (Reports page) */
 .expert-panel-card {
-  background: linear-gradient(135deg, rgba(124,58,237,0.06), var(--surface));
-  border: 1.5px solid #7c3aed;
+  background: linear-gradient(135deg, rgba(184,134,11,0.07), var(--surface));
+  border: 1.5px solid var(--gold);
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 20px;
@@ -808,11 +808,11 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   font-family: 'Bebas Neue', sans-serif;
   font-size: 22px;
   letter-spacing: 0.05em;
-  color: #7c3aed;
+  color: var(--gold-dark);
   margin-bottom: 4px;
 }
 .expert-review-item {
-  border: 1px solid rgba(124,58,237,0.25);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 12px 14px;
   margin-bottom: 10px;
@@ -826,7 +826,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .expert-review-url {
   font-size: 13px;
   font-weight: 600;
-  color: #7c3aed;
+  color: var(--gold-dark);
   word-break: break-all;
   margin-bottom: 6px;
 }
@@ -861,7 +861,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   max-width: 420px;
   width: 100%;
   padding: 28px 24px 24px;
-  border: 2px solid #7c3aed;
+  border: 2px solid var(--gold);
   box-shadow: 0 20px 60px rgba(0,0,0,0.4);
   text-align: center;
 }
@@ -882,12 +882,12 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border-radius: 16px;
   max-width: 560px;
   margin: 24px auto;
-  border: 1.5px solid #7c3aed;
+  border: 1.5px solid var(--gold);
   box-shadow: 0 20px 60px rgba(0,0,0,0.4);
   overflow: hidden;
 }
 .expert-archive-header {
-  background: linear-gradient(135deg, rgba(124,58,237,0.08), var(--surface));
+  background: linear-gradient(135deg, rgba(184,134,11,0.08), var(--surface));
   border-bottom: 1px solid var(--border);
   padding: 16px 20px;
   display: flex;
@@ -902,8 +902,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .expert-archive-response {
   margin-top: 8px;
   padding: 10px 12px;
-  background: rgba(124,58,237,0.05);
-  border-left: 3px solid #7c3aed;
+  background: rgba(184,134,11,0.05);
+  border-left: 3px solid var(--gold);
   border-radius: 0 6px 6px 0;
   font-size: 13px;
   line-height: 1.6;
@@ -2157,7 +2157,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           </div>
           <div class="rer-warning">⏳ Expert reviews are personal and take time. Please allow a few days for a response before following up.</div>
           <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;padding:6px 10px;background:var(--surface2);border-radius:6px;border-left:2px solid var(--border);">📌 Limited to 1 Expert Review Request per month.</div>
-          <div id="rer-limit-msg" style="display:none;padding:10px 12px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.3);border-radius:8px;font-size:12px;color:#7c3aed;margin-bottom:10px;line-height:1.5;"></div>
+          <div id="rer-limit-msg" style="display:none;padding:10px 12px;background:rgba(184,134,11,0.08);border:1px solid rgba(184,134,11,0.3);border-radius:8px;font-size:12px;color:var(--gold);margin-bottom:10px;line-height:1.5;"></div>
           <button class="btn btn-gold btn-sm" id="rer-submit-btn" onclick="submitRER()">Request Expert Review</button>
         </div>
       </div>
@@ -2367,10 +2367,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div class="expert-panel-title">🎯 Expert Review Requests</div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Incoming requests from members. Respond publicly to the Community Feed.</div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-            <div id="expert-panel-count" style="font-size:12px;color:#7c3aed;font-weight:600;"></div>
+            <div id="expert-panel-count" style="font-size:12px;color:var(--gold-dark);font-weight:600;"></div>
             <div style="display:flex;gap:8px;">
-              <button class="btn btn-outline btn-sm" onclick="openExpertArchive()" style="border-color:#7c3aed;color:#7c3aed;">📁 Archive</button>
-              <button class="btn btn-outline btn-sm" onclick="loadExpertPanel()" style="border-color:#7c3aed;color:#7c3aed;">↻ Refresh</button>
+              <button class="btn btn-outline btn-sm" onclick="openExpertArchive()" style="border-color:var(--gold);color:var(--gold-dark);">📁 Archive</button>
+              <button class="btn btn-outline btn-sm" onclick="loadExpertPanel()" style="border-color:var(--gold);color:var(--gold-dark);">↻ Refresh</button>
             </div>
           </div>
           <div id="expert-panel-body"><div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Loading requests...</div></div>
@@ -2845,7 +2845,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   <div class="expert-archive-modal">
     <div class="expert-archive-header">
       <div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#7c3aed;">📁 Expert Review Archive</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);">📁 Expert Review Archive</div>
         <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">All responded requests.</div>
       </div>
       <button onclick="closeExpertArchive()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">✕</button>
@@ -3814,7 +3814,7 @@ function _renderDashboard({total, postPts, engPts, trackerPostCount, weekSubmitt
       <div class="dash-lb-rank${i < 3 ? ' top3' : ''}">${rankDisplay}</div>
       ${_dashAvatarHTML(m.name, m.photoURL || "")}
       <div class="dash-lb-info">
-        <div class="dash-lb-name">${esc(m.name)}${isYou ? '<span class="dash-you-badge">YOU</span>' : ''}${m.isExpert ? ' <span style="font-size:10px;color:#7c3aed;font-weight:700;">🎯</span>' : ''}${m.isAllStar ? ' ⭐' : ''}</div>
+        <div class="dash-lb-name">${esc(m.name)}${isYou ? '<span class="dash-you-badge">YOU</span>' : ''}${m.isExpert ? ' <span style="font-size:10px;color:var(--gold);font-weight:700;">🎯</span>' : ''}${m.isAllStar ? ' ⭐' : ''}</div>
         <div class="dash-lb-sub">${posts} update${posts !== 1 ? 's' : ''}</div>
       </div>
       <div class="dash-lb-pts">${m.points || 0}</div>
@@ -5304,7 +5304,7 @@ async function renderAdminRegistry() {
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
             <span style="font-weight:600;">${esc(m.name)}</span>
             ${m.isFounder ? `<span style="font-size:10px;background:var(--gold);color:#000;padding:1px 6px;border-radius:4px;font-weight:700;">🏅 Founder</span>` : ""}
-            ${m.isExpert ? `<span style="font-size:10px;background:#f0e6ff;color:#7c3aed;padding:1px 6px;border-radius:4px;font-weight:700;">🎯 Expert</span>` : ""}
+            ${m.isExpert ? `<span style="font-size:10px;background:rgba(184,134,11,0.12);color:var(--gold);padding:1px 6px;border-radius:4px;font-weight:700;">🎯 Expert</span>` : ""}
             ${m.isVIP ? `<span style="font-size:10px;background:#e8f4fd;color:#2980b9;padding:1px 6px;border-radius:4px;font-weight:700;">⚡ VIP</span>` : ""}
             ${m.isAllStar ? `<span style="font-size:10px;background:#fffbf0;color:var(--gold-dark);padding:1px 6px;border-radius:4px;font-weight:700;">⭐ All-Star</span>` : ""}
             ${proBadgeHtml}${trialHtml}
@@ -5322,7 +5322,7 @@ async function renderAdminRegistry() {
             <button class="${(m.rounds||[]).includes('R2')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R2')">R2 ${(m.rounds||[]).includes("R2")?"✓":""}</button>
             <button class="${(m.rounds||[]).includes('R3')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R3')">R3 ${(m.rounds||[]).includes("R3")?"✓":""}</button>
             <button class="${m.isFounder?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isFounder')">🏅 Founder</button>
-            <button class="${m.isExpert?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isExpert')" style="${m.isExpert ? 'background:#f0e6ff;border-color:#7c3aed;color:#7c3aed;font-weight:600;' : ''}">🎯 Expert</button>
+            <button class="${m.isExpert?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isExpert')" style="${m.isExpert ? 'background:rgba(184,134,11,0.12);border-color:var(--gold);color:var(--gold);font-weight:600;' : ''}">🎯 Expert</button>
             <button class="${m.isVIP?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isVIP')">⚡ VIP</button>
             <button class="${m.isAllStar?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isAllStar')">⭐ All-Star</button>
             <button onclick="editRegistryEmail('${docId}','${esc(m.email)}')">✏️ Email</button>
@@ -7307,7 +7307,7 @@ async function loadRERStatus() {
     const cardHtml = `
       <div class="rer-card">
         <div class="rer-eyebrow">🎯 Your Expert Review Request — ${isPending ? "This Month" : "Answered"}</div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:4px;word-break:break-all;"><a href="${esc(rerDoc.pageUrl)}" target="_blank" rel="noopener" style="color:#7c3aed;">${esc(rerDoc.pageUrl)}</a></div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px;word-break:break-all;"><a href="${esc(rerDoc.pageUrl)}" target="_blank" rel="noopener" style="color:var(--gold);">${esc(rerDoc.pageUrl)}</a></div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;line-height:1.5;">${esc(rerDoc.feedbackRequest)}</div>
         ${statusPill}
         ${isPending ? `<div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Awaiting Expert response. Allow a few days.</div>` : `<div style="font-size:11px;color:#27ae60;margin-top:6px;">Check the Community Feed for the Expert's response.</div>`}
@@ -7383,18 +7383,18 @@ function renderExpertPanelItem(r) {
       <strong>${esc(r.requesterName)}</strong> · ${date} · ${statusPill}
     </div>
     <div class="expert-review-url">
-      <a href="${esc(r.pageUrl)}" target="_blank" rel="noopener" style="color:#7c3aed;">🌐 ${esc(r.pageUrl)}</a>
+      <a href="${esc(r.pageUrl)}" target="_blank" rel="noopener" style="color:var(--gold);">🌐 ${esc(r.pageUrl)}</a>
     </div>
     <div class="expert-review-feedback">${esc(r.feedbackRequest)}</div>
     ${isPending ? `
-    <button class="btn btn-sm" onclick="openExpertRespond('${r.id}')" style="background:#7c3aed;color:#fff;border-color:#7c3aed;">✍️ Write Response</button>
+    <button class="btn btn-gold btn-sm" onclick="openExpertRespond('${r.id}')">✍️ Write Response</button>
     <div class="expert-respond-compose" id="expert-respond-compose-${r.id}">
       <div class="form-group" style="margin-top:10px;">
         <label class="form-label">Your expert response <span style="font-weight:400;font-size:11px;color:var(--text-muted);">(posts publicly to the Community Feed)</span></label>
         <textarea class="form-input" id="expert-respond-text-${r.id}" placeholder="Write your expert feedback here..." style="min-height:100px;"></textarea>
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="btn btn-sm" onclick="submitExpertResponse('${r.id}','${esc(r.requesterUid)}','${esc(r.requesterName)}','${esc(r.pageUrl)}')" style="background:#7c3aed;color:#fff;border-color:#7c3aed;">Post Response to Feed</button>
+        <button class="btn btn-gold btn-sm" onclick="submitExpertResponse('${r.id}','${esc(r.requesterUid)}','${esc(r.requesterName)}','${esc(r.pageUrl)}')">Post Response to Feed</button>
         <button class="btn btn-outline btn-sm" onclick="closeExpertRespond('${r.id}')">Cancel</button>
       </div>
     </div>` : `<div style="font-size:12px;color:#27ae60;margin-top:4px;">Response posted to Community Feed.</div>`}
@@ -7459,13 +7459,13 @@ function renderExpertResponseCard(p) {
   return `<div class="expert-response-card">
     <div class="expert-response-eyebrow">🎯 EXPERT REVIEW RESPONSE</div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <div style="width:34px;height:34px;border-radius:50%;background:rgba(124,58,237,0.2);color:#7c3aed;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;flex-shrink:0;overflow:hidden;border:1.5px solid #7c3aed;">${avatarContent}</div>
+      <div style="width:34px;height:34px;border-radius:50%;background:rgba(184,134,11,0.2);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;flex-shrink:0;overflow:hidden;border:1.5px solid var(--gold);">${avatarContent}</div>
       <div>
-        <div style="font-weight:700;font-size:13px;color:var(--text);">${esc(p.author)} <span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:#f0e6ff;color:#7c3aed;">🎯 Expert</span></div>
+        <div style="font-weight:700;font-size:13px;color:var(--text);">${esc(p.author)} <span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:rgba(184,134,11,0.12);color:var(--gold);">🎯 Expert</span></div>
         <div style="font-size:11px;color:var(--text-muted);">${date} · for <strong>${esc(p.requesterName)}</strong></div>
       </div>
     </div>
-    <div style="font-size:12px;margin-bottom:8px;"><a href="${esc(p.pageUrl)}" target="_blank" rel="noopener" style="color:#7c3aed;word-break:break-all;">🌐 ${esc(p.pageUrl)}</a></div>
+    <div style="font-size:12px;margin-bottom:8px;"><a href="${esc(p.pageUrl)}" target="_blank" rel="noopener" style="color:var(--gold);word-break:break-all;">🌐 ${esc(p.pageUrl)}</a></div>
     <div style="font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--text);margin-bottom:10px;">${esc(p.body)}</div>
     ${isOwner ? `<button class="btn btn-sm btn-outline" onclick="deletePost('${p.id}')" style="color:var(--danger);border-color:var(--danger);font-size:11px;">Delete</button>` : ""}
   </div>`;
@@ -7620,7 +7620,7 @@ async function loadExpertArchive() {
           <span class="rer-status-pill rer-status-responded" style="flex-shrink:0;">✓ Responded</span>
         </div>
         <div style="margin-bottom:6px;">
-          <a href="${esc(r.pageUrl)}" target="_blank" rel="noopener" style="font-size:12px;color:#7c3aed;word-break:break-all;">🌐 ${esc(r.pageUrl)}</a>
+          <a href="${esc(r.pageUrl)}" target="_blank" rel="noopener" style="font-size:12px;color:var(--gold);word-break:break-all;">🌐 ${esc(r.pageUrl)}</a>
         </div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;line-height:1.5;font-style:italic;">"${esc(r.feedbackRequest)}"</div>
         ${r.responseText
