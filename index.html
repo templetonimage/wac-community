@@ -208,7 +208,7 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   cursor: pointer;
   border: none;
   background: transparent;
-  color: rgba(184,134,11,0.6);
+  color: rgba(255,255,255,0.7);
   font-size: 9px;
   font-family: 'DM Sans', sans-serif;
   font-weight: 500;
@@ -217,9 +217,10 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   padding: 8px 2px;
   position: relative;
 }
-.nav-item svg { width: 20px; height: 20px; }
-.nav-item.active { color: var(--gold); }
-.nav-item:hover { color: var(--gold); }
+.nav-item svg { width: 20px; height: 20px; transition: color 0.15s; }
+.nav-item.active svg { color: var(--gold); }
+.nav-item.active { color: rgba(255,255,255,0.9); }
+.nav-item:hover { color: #fff; }
 
 /* ==============================
    SCROLL WRAPPER
