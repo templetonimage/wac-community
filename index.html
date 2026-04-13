@@ -3385,7 +3385,7 @@ function bootApp() {
 
   const _submitOpen = new Date("2026-04-11T00:00:00").getTime();
   const _trialIdx = getTrialWeekIndex();
-  const _trialChallengeOpen = _trialIdx === 0 || _trialIdx === 1;  // T1/T2 only for update submissions
+  const _trialChallengeOpen = _trialIdx === 0;  // T1 only for challenge-only mode; T2+ gets full submissions
   const _trialEngOpen = _trialIdx !== -1;                           // All trial weeks for engagements
 
   // Unlock Submit Update: T1/T2 trial challenge mode OR after April 11 OR admin
@@ -3528,9 +3528,9 @@ function loadSubmitPage() {
   loadEngHistory();
   loadMySubmissions();
 
-  // Trial mode: T1 and T2 — challenge-only, no URL/format/screenshot
+  // Trial mode: T1 only — challenge-only, no URL/format/screenshot
   const trialIdx = getTrialWeekIndex();
-  const isTrialChallengeMode = trialIdx === 0 || trialIdx === 1;
+  const isTrialChallengeMode = trialIdx === 0;
 
   // Show/hide trial notice banner
   let trialNotice = document.getElementById("trial-submit-notice");
@@ -4808,9 +4808,9 @@ async function submitUpdate() {
   let url = document.getElementById("submit-url").value.trim();
   const note = document.getElementById("submit-note").value.trim();
   const trialIdx = getTrialWeekIndex();
-  const isTrialChallengeMode = trialIdx === 0 || trialIdx === 1;
+  const isTrialChallengeMode = trialIdx === 0;
 
-  // During T1/T2 trial, URL is optional but note is still required
+  // During T1 trial, URL is optional but note is still required
   if (isTrialChallengeMode) {
     if (!note) { showToast("Please describe what you did."); return; }
     const challengeEl = document.getElementById("submit-challenge");
