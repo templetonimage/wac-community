@@ -3292,7 +3292,6 @@ async function resolveUser(user) {
   const snap = await getDoc(doc(db, "wac_registry", uid));
   if (!snap.exists()) return null;
   const d = sanitizeMember({ id: snap.id, ...snap.data() });
-  if (!d.rounds?.includes(CURRENT_ROUND) && !d.isFounder) return null;
   return {
     name: d.name,
     email,
@@ -3723,9 +3722,10 @@ window.loadDashboard = async function() {
     });
 
     // Leaderboard top 10 (exclude admin)
+    const isTrial = getTrialWeekIndex() !== -1;
     const lbMembers = lbSnap.docs
       .map(d => sanitizeMember({id:d.id, ...d.data()}))
-      .filter(m => m.isFounder || (m.rounds || []).includes(CURRENT_ROUND))
+      .filter(m => isTrial || m.isFounder || (m.rounds || []).includes(CURRENT_ROUND))
       .sort((a, b) => (b.points || 0) - (a.points || 0))
       .filter(m => !m.isAdmin && m.email !== ADMIN_EMAIL)
       .slice(0, 10);
@@ -3775,7 +3775,9 @@ function _renderDashboard({total, postPts, engPts, trackerPostCount, weekSubmitt
   const totalRequired = 24;
   const pct = Math.min(Math.round((trackerPostCount / totalRequired) * 100), 100);
   const subEl = document.getElementById('dash-allstar-sub');
-  if (subEl) subEl.textContent = `${trackerPostCount} of ${totalRequired} updates completed`;
+  if (subEl) subEl.textContent = getTrialWeekIndex() !== -1
+    ? `Tracking begins Round 1 · May 1`
+    : `${trackerPostCount} of ${totalRequired} updates completed`;
   const pctEl = document.getElementById('dash-prog-pct');
   if (pctEl) pctEl.textContent = pct + '%';
   setTimeout(() => {
