@@ -3679,15 +3679,19 @@ window.loadDashboard = async function() {
     const uid = currentUser.uid;
     const registryId = currentUser.registryId || uid;
 
-    const [regSnap, subSnap, engSnap, trackerSnap, lbSnap] = await Promise.all([
-      getDoc(dc(db, 'wac_registry', registryId)),
-      getDocs(q(col(db, 'submissions'), where('authorUid', '==', uid))),
-      getDocs(q(col(db, 'engagements'), where('authorUid', '==', uid))),
-      getDoc(dc(db, 'trackers', uid)),
-      (async () => {
-        try { return await getDocs(q(col(db, 'wac_registry'), ob('points', 'desc'), lim(12))); }
-        catch(e) { return await getDocs(col(db, 'wac_registry')); }
-      })()
+    const _timeout = ms => new Promise((_, rej) => setTimeout(() => rej(new Error('Dashboard fetch timeout')), ms));
+    const [regSnap, subSnap, engSnap, trackerSnap, lbSnap] = await Promise.race([
+      Promise.all([
+        getDoc(dc(db, 'wac_registry', registryId)),
+        getDocs(q(col(db, 'submissions'), where('authorUid', '==', uid))),
+        getDocs(q(col(db, 'engagements'), where('authorUid', '==', uid))),
+        getDoc(dc(db, 'trackers', uid)),
+        (async () => {
+          try { return await getDocs(q(col(db, 'wac_registry'), ob('points', 'desc'), lim(12))); }
+          catch(e) { return await getDocs(col(db, 'wac_registry')); }
+        })()
+      ]),
+      _timeout(10000)
     ]);
 
     const regData = regSnap.exists() ? regSnap.data() : {};
