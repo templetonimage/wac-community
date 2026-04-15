@@ -3769,7 +3769,7 @@ function _renderDashboard({total, postPts, engPts, trackerPostCount, weekSubmitt
   _dashCountUp(document.getElementById('dash-val-total'), total,            120);
   _dashCountUp(document.getElementById('dash-val-posts'), postPts,          200);
   _dashCountUp(document.getElementById('dash-val-eng'),   engPts,           280);
-  _dashCountUp(document.getElementById('dash-val-count'), trackerPostCount, 360);
+  _dashCountUp(document.getElementById('dash-val-count'), subs.length,      360);
 
   // All-Star progress bar (24 total required updates across 12 weeks)
   const totalRequired = 24;
