@@ -3670,7 +3670,7 @@ window.loadDashboard = async function() {
   if (metaEl) metaEl.textContent = new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
 
   if (!db || useLocalFallback) {
-    _renderDashboard({total:0, postPts:0, engPts:0, trackerPostCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
+    _renderDashboard({total:0, postPts:0, engPts:0, trackerPostCount:0, subsCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
     return;
   }
 
@@ -3734,11 +3734,11 @@ window.loadDashboard = async function() {
       .filter(m => !m.isAdmin && m.email !== ADMIN_EMAIL)
       .slice(0, 10);
 
-    _renderDashboard({total:totalPts, postPts, engPts, trackerPostCount, weekSubmitted, trackerThisWeek, trackerDots, leaderboard:lbMembers, myUid:uid});
+    _renderDashboard({total:totalPts, postPts, engPts, trackerPostCount, subsCount:subs.length, weekSubmitted, trackerThisWeek, trackerDots, leaderboard:lbMembers, myUid:uid});
 
   } catch(e) {
     console.error('Dashboard load error:', e);
-    _renderDashboard({total:0, postPts:0, engPts:0, trackerPostCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
+    _renderDashboard({total:0, postPts:0, engPts:0, trackerPostCount:0, subsCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
   }
 };
 
@@ -3756,7 +3756,7 @@ function _dashCountUp(el, target, delay=0, duration=900) {
   }, delay);
 }
 
-function _renderDashboard({total, postPts, engPts, trackerPostCount, weekSubmitted, trackerThisWeek, trackerDots, leaderboard, myUid}) {
+function _renderDashboard({total, postPts, engPts, trackerPostCount, subsCount, weekSubmitted, trackerThisWeek, trackerDots, leaderboard, myUid}) {
   // Status pills
   const strip = document.getElementById('dash-status-strip');
   if (strip) {
@@ -3773,7 +3773,7 @@ function _renderDashboard({total, postPts, engPts, trackerPostCount, weekSubmitt
   _dashCountUp(document.getElementById('dash-val-total'), total,            120);
   _dashCountUp(document.getElementById('dash-val-posts'), postPts,          200);
   _dashCountUp(document.getElementById('dash-val-eng'),   engPts,           280);
-  _dashCountUp(document.getElementById('dash-val-count'), subs.length,      360);
+  _dashCountUp(document.getElementById('dash-val-count'), subsCount,         360);
 
   // All-Star progress bar (24 total required updates across 12 weeks)
   const totalRequired = 24;
