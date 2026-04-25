@@ -1932,6 +1932,81 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .eng-screenshot-area{border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.15s;background:var(--surface2);margin-bottom:8px;}
 .eng-screenshot-area:hover{border-color:var(--gold-light);}
 .eng-screenshot-preview{max-width:100%;max-height:180px;border-radius:8px;margin-top:8px;}
+/* ===== ZOOM REPLAY BANNER & MODAL ===== */
+.replay-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #b8860b 0%, #d4a017 50%, #c9960e 100%);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 2px 10px rgba(184,134,11,0.25);
+  transition: opacity 0.15s;
+}
+.replay-banner:active { opacity: 0.85; }
+.replay-banner-icon { font-size: 28px; flex-shrink: 0; }
+.replay-banner-text { flex: 1; }
+.replay-banner-title { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; }
+.replay-banner-sub { font-size: 12px; color: rgba(255,255,255,0.82); margin-top: 2px; }
+.replay-banner-arrow { font-size: 22px; color: rgba(255,255,255,0.75); flex-shrink: 0; }
+
+.zoom-replay-overlay {
+  position: fixed; inset: 0; z-index: 1100;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.zoom-replay-overlay.open { opacity: 1; pointer-events: all; }
+.zoom-replay-sheet {
+  background: #1e1e1e;
+  border-radius: 20px 20px 0 0;
+  width: 100%; max-width: 540px;
+  max-height: 82vh;
+  display: flex; flex-direction: column;
+  transform: translateY(40px);
+  transition: transform 0.28s cubic-bezier(.32,1,.45,1);
+  overflow: hidden;
+}
+.zoom-replay-overlay.open .zoom-replay-sheet { transform: translateY(0); }
+.zoom-replay-header {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 22px 20px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+.zoom-replay-header-icon { font-size: 28px; flex-shrink: 0; }
+.zoom-replay-header-text { flex: 1; }
+.zoom-replay-header-title { font-size: 18px; font-weight: 700; color: #fff; line-height: 1.2; }
+.zoom-replay-header-sub { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 3px; }
+.zoom-replay-close {
+  background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
+  width: 30px; height: 30px; font-size: 16px; color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+.zoom-replay-list { overflow-y: auto; padding: 12px 16px 24px; }
+.zoom-replay-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.zoom-replay-item:last-child { border-bottom: none; }
+.zoom-replay-thumb { font-size: 30px; flex-shrink: 0; width: 44px; text-align: center; }
+.zoom-replay-info { flex: 1; }
+.zoom-replay-item-title { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.3; }
+.zoom-replay-item-date { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.zoom-replay-watch-btn {
+  background: #b8860b; color: #fff; border: none; border-radius: 8px;
+  padding: 7px 13px; font-size: 12px; font-weight: 700;
+  cursor: pointer; flex-shrink: 0; white-space: nowrap;
+  text-decoration: none; display: inline-block;
+  transition: background 0.15s;
+}
+.zoom-replay-watch-btn:hover { background: #d4a017; }
 </style>
 </head>
 <body>
@@ -2194,6 +2269,14 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <button class="btn btn-gold btn-sm" onclick="submitResource()">Add Resource</button>
         <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="seedDefaultResources()">🌱 Seed Missing Resources</button>
         <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="fixResourceUrls()">🔧 Fix Stale Resource URLs</button>
+      </div>
+      <div class="replay-banner" onclick="openReplayModal()">
+        <div class="replay-banner-icon">🎬</div>
+        <div class="replay-banner-text">
+          <div class="replay-banner-title">Previous Zoom Replays</div>
+          <div class="replay-banner-sub">Watch recordings from past WAC sessions</div>
+        </div>
+        <div class="replay-banner-arrow">›</div>
       </div>
       <div id="filter-bar" class="filter-bar"></div>
       <div id="resource-grid" class="resource-grid"></div>
@@ -2810,6 +2893,21 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   </div>
 </div>
 
+<!-- ZOOM REPLAY MODAL -->
+<div class="zoom-replay-overlay" id="zoom-replay-overlay" onclick="closeReplayModalDirect(event)">
+  <div class="zoom-replay-sheet">
+    <div class="zoom-replay-header">
+      <div class="zoom-replay-header-icon">🎬</div>
+      <div class="zoom-replay-header-text">
+        <div class="zoom-replay-header-title">Previous Zoom Replays</div>
+        <div class="zoom-replay-header-sub">Click any session to watch the recording</div>
+      </div>
+      <button class="zoom-replay-close" onclick="closeReplayModal()">✕</button>
+    </div>
+    <div class="zoom-replay-list" id="zoom-replay-list"></div>
+  </div>
+</div>
+
 <!-- MEMBER PROFILE MODAL -->
 <div class="modal-overlay" id="member-modal-overlay" onclick="closeMemberModalDirect(event)">
   <div class="modal-sheet">
@@ -2954,6 +3052,12 @@ const PTS_SCREENSHOT = 2;
 const PTS_FORMAT_BONUS = 2; // Blog Post or New Page
 const PTS_ENGAGEMENT = 2;
 const PTS_CHALLENGE  = 5;
+
+const ZOOM_REPLAYS = [
+  { title:"WAC Introductory Zoom",         date:"April 1, 2026",  url:"https://youtu.be/CZUVyytXaPY", emoji:"🎬" },
+  { title:"WAC Check-In Zoom",             date:"April 10, 2026", url:"https://youtu.be/DTOL2pGRP40", emoji:"🎬" },
+  { title:"WAC Comprehensive On-Ramp Zoom",date:"April 23, 2026", url:"https://youtu.be/bpF_1jHKWzM", emoji:"🎬" },
+];
 const MAX_ENG_PER_WEEK = 5;
 
 // Weekly Challenge Modifiers — one per week, keyed by weekIdx (0–11)
@@ -4721,6 +4825,27 @@ function closeResModal() {
 function closeResModalDirect(e) {
   if (e.target === document.getElementById("res-modal-overlay")) closeResModal();
 }
+
+window.openReplayModal = function() {
+  const list = document.getElementById("zoom-replay-list");
+  list.innerHTML = ZOOM_REPLAYS.map(r => `
+    <div class="zoom-replay-item">
+      <div class="zoom-replay-thumb">${r.emoji}</div>
+      <div class="zoom-replay-info">
+        <div class="zoom-replay-item-title">${esc(r.title)}</div>
+        <div class="zoom-replay-item-date">${esc(r.date)}</div>
+      </div>
+      <a href="${esc(r.url)}" target="_blank" rel="noopener" class="zoom-replay-watch-btn">Watch ↗</a>
+    </div>
+  `).join("");
+  document.getElementById("zoom-replay-overlay").classList.add("open");
+};
+window.closeReplayModal = function() {
+  document.getElementById("zoom-replay-overlay").classList.remove("open");
+};
+window.closeReplayModalDirect = function(e) {
+  if (e.target === document.getElementById("zoom-replay-overlay")) window.closeReplayModal();
+};
 
 // ==============================
 // SUBMIT UPDATE
