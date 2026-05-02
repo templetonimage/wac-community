@@ -2406,7 +2406,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="page-subtitle">Your 12-week accountability record — May through July.</div>
       </div>
       <!-- April Free Trial section (local only) -->
-      <div class="card mb-16">
+      <div class="card mb-16" style="display:none;">
         <div class="card-title" style="font-size:16px;margin-bottom:4px;">🗓 April Free Trial</div>
         <p class="text-sm text-muted" style="margin-bottom:14px;">Personal check-in only — does not count toward All-Star or points.</p>
         <div id="trial-tracker-body"></div>
@@ -2515,18 +2515,18 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Select Week to Clear</label>
             <select id="clear-feed-week-select" class="form-input" style="max-width:320px;">
               <option value="">— choose a week —</option>
-              <option value="0">W1 · Jun 1–7</option>
-              <option value="1">W2 · Jun 8–14</option>
-              <option value="2">W3 · Jun 15–21</option>
-              <option value="3">W4 · Jun 22–30</option>
-              <option value="4">W5 · Jul 1–7</option>
-              <option value="5">W6 · Jul 8–14</option>
-              <option value="6">W7 · Jul 15–21</option>
-              <option value="7">W8 · Jul 22–31</option>
-              <option value="8">W9 · Aug 1–7</option>
-              <option value="9">W10 · Aug 8–14</option>
-              <option value="10">W11 · Aug 15–21</option>
-              <option value="11">W12 · Aug 22–31</option>
+              <option value="0">W1 · May 1–7</option>
+              <option value="1">W2 · May 8–14</option>
+              <option value="2">W3 · May 15–21</option>
+              <option value="3">W4 · May 22–31</option>
+              <option value="4">W5 · Jun 1–7</option>
+              <option value="5">W6 · Jun 8–14</option>
+              <option value="6">W7 · Jun 15–21</option>
+              <option value="7">W8 · Jun 22–30</option>
+              <option value="8">W9 · Jul 1–7</option>
+              <option value="9">W10 · Jul 8–14</option>
+              <option value="10">W11 · Jul 15–21</option>
+              <option value="11">W12 · Jul 22–31</option>
             </select>
           </div>
           <div style="background:#fff5f5;border:1px solid #f5c6c6;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#c0392b;line-height:1.5;">
@@ -5450,6 +5450,7 @@ async function renderAdminRegistry() {
             <button class="${m.isVIP?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isVIP')">⚡ VIP</button>
             <button class="${m.isAllStar?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isAllStar')">⭐ All-Star</button>
             <button onclick="editRegistryEmail('${docId}','${esc(m.email)}')">✏️ Email</button>
+            <button onclick="editRegistryName('${docId}','${esc(m.name)}')">✏️ Name</button>
             <button onclick="toggleProAccess('${docId}',${!!m.isPro})" style="${m.isPro ? "background:#fffbf0;border-color:var(--gold);color:var(--gold-dark);font-weight:600;" : ""}">${m.isPro ? "★ Remove Pro" : "★ Grant Pro"}</button>
             <button onclick="setTrialAccess('${docId}','${esc(m.name)}')">⏱ Trial Access</button>
             <button onclick="removeRegistryMember('${docId}','${esc(m.name)}')" style="color:var(--danger);">✕ Remove</button>
@@ -5732,6 +5733,16 @@ async function editRegistryEmail(docId, currentEmail) {
     showToast("Email updated.");
     loadDirectory();
   } catch { showToast("Failed to update email."); }
+}
+
+async function editRegistryName(docId, currentName) {
+  const newName = prompt("New name:", currentName);
+  if (!newName || newName === currentName) return;
+  try {
+    await updateDoc(doc(db, "wac_registry", docId), { name: newName });
+    showToast("Name updated.");
+    loadDirectory();
+  } catch { showToast("Failed to update name."); }
 }
 
 // ==============================
@@ -6492,6 +6503,7 @@ window.toggleRegistryRound = toggleRegistryRound;
 window.toggleRegistryFlag = toggleRegistryFlag;
 window.removeRegistryMember = removeRegistryMember;
 window.editRegistryEmail = editRegistryEmail;
+window.editRegistryName = editRegistryName;
 window.createMemberAccount = createMemberAccount;
 window.initPasswordField = initPasswordField;
 window.copyWelcomeEmail = copyWelcomeEmail;
