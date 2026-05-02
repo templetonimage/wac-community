@@ -1393,6 +1393,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   margin-top: 24px;
   padding-top: 24px;
   border-top: 2px solid var(--border);
+  display: none;
 }
 .eng-type-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
 .eng-type-btn {
@@ -2089,7 +2090,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div class="dash-stat-value" id="dash-val-posts">0</div>
           <div class="dash-stat-label">Update Points</div>
         </div>
-        <div class="dash-stat-card dash-animate" style="animation-delay:0.39s;">
+        <div class="dash-stat-card dash-animate" style="animation-delay:0.39s;display:none;">
           <span class="dash-stat-icon">🤝</span>
           <div class="dash-stat-value" id="dash-val-eng">0</div>
           <div class="dash-stat-label">Engage Points</div>
@@ -2393,8 +2394,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="points-row"><span>On-time update</span><span class="pts-val">+10 pts</span></div>
         <div class="points-row"><span>Blog Post or New Page</span><span class="pts-val">+2 pts</span></div>
         <div class="points-row"><span>Weekly Challenge bonus</span><span class="pts-val">+5 pts</span></div>
-        <div class="points-row"><span>Engagement (per member site)</span><span class="pts-val">+2 pts</span></div>
-        <div class="points-row"><span>Max engagements/week</span><span class="pts-val">5</span></div>
+        <div class="points-row" style="display:none;"><span>Engagement (per member site)</span><span class="pts-val">+2 pts</span></div>
+        <div class="points-row" style="display:none;"><span>Max engagements/week</span><span class="pts-val">5</span></div>
       </div>
     </div>
 
@@ -2472,7 +2473,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       </div>
 
       <div id="report-table-wrap" class="report-table-wrap"></div>
-      <div class="card mt-16">
+      <div class="card mt-16" style="display:none;">
         <div class="card-title">Engagement Activity</div>
         <div id="engagement-report"></div>
       </div>
