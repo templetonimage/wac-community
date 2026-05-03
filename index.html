@@ -4773,7 +4773,7 @@ async function loadResources() {
     _allResources = [];
     snap.forEach(d => _allResources.push({ id: d.id, ...d.data() }));
     // Sort: E-E-A-T Playbook first, Core Update second, then timestamp descending
-    const _pinOrder = ["Google\'s March 2026 Core Update", "E-E-A-T Playbook"];
+    const _pinOrder = ["Google\'s March 2026 Core Update", "E-E-A-T Playbook", "The People First Content Guide"];
     _allResources.sort((a, b) => {
       const ai = _pinOrder.indexOf(a.title);
       const bi = _pinOrder.indexOf(b.title);
@@ -4834,6 +4834,50 @@ async function seedDefaultResources() {
     { emoji:"🗓️", title:"30-Day Website Content Strategy Prompt", description:"A ready-to-use AI prompt that builds your 30-day site strategy using StoryBrand principles and SEO best practices.", tags:["Strategy","SEO","Copywriting","Planning"], source:"WAC Resource Library", url:"", linkLabel:"",
       body:`Copy and paste this prompt into Claude or ChatGPT. Fill in the bracketed fields before submitting.\n\n─────────────────────────────────────\n\nYou are an experienced website designer, wireframer, and SEO copywriter with deep knowledge of the StoryBrand framework by Donald Miller. Your job is to build a 30-day website content strategy for a solopreneur that drives organic traffic, builds trust, and converts visitors — without sounding like a robot or a corporate brand.\n\n---\n\nABOUT ME:\nBusiness type: [e.g. Wedding Photographer / Business Coach / Fitness Trainer]\nTarget client: [e.g. engaged couples in the Mid-Atlantic / female entrepreneurs / busy professionals 35–50]\nPrimary keyword I want to rank for: [e.g. "Baltimore wedding photographer" / "business coach for women" / "online personal trainer"]\nMy website URL: [yoursite.com]\nMy current biggest website weakness: [e.g. no blog, outdated homepage, no testimonials, thin service pages]\n\n---\n\nYOUR TASK:\n\nUsing the StoryBrand framework (the CLIENT is the hero, I am the guide), create a 30-day website content strategy. The strategy should include:\n\n1. HOMEPAGE AUDIT & REWRITE BRIEF\nUsing StoryBrand principles, write a brief for improving my homepage that includes:\n- A revised H1 headline (client-focused, not me-focused)\n- A revised subheadline (names the problem and hints at the solution)\n- A suggested above-the-fold CTA (one action, specific)\n- One recommended trust element to add near the CTA\n\n2. WEEK-BY-WEEK CONTENT PLAN (4 weeks)\nFor each week, provide:\n- A specific page or section to update (with a reason why)\n- A suggested H1 or H2 for that page/section\n- 2–3 bullet points of copy direction (what to say, not just what topic)\n- One SEO note (how this update supports the target keyword or a supporting keyword)\n\nFormat each week like this:\n\nWEEK [#] — [Page or Section Name]\nGoal: [one sentence]\nH1 or H2: "[suggested header]"\nCopy direction:\n• [point 1]\n• [point 2]\n• [point 3]\nSEO note: [keyword or intent this targets]\n\n3. BLOG POST PLAN (4 posts, one per week)\nFor each post, provide:\n- Post title (written as an H1, keyword-optimized, human-sounding)\n- Target keyword or search intent\n- Suggested H2 subheadings (3–4 per post, forming an outline)\n- A 2-sentence intro hook using StoryBrand: open with the client's problem, position me as the guide\n- One internal link suggestion (which existing page this post should link to)\n\n4. ONE QUICK-WIN UPDATE\nIdentify the single highest-leverage change I can make to my site this week — the one update most likely to improve rankings or conversions immediately. Be specific. Name the page, the element, and what to change it to.\n\n---\n\nSTORYBRAND RULES TO FOLLOW THROUGHOUT:\n- The client is always the hero. I am the guide.\n- Lead with their problem or desire, not my credentials.\n- Every headline should answer: "What's in it for me?" from the client's perspective.\n- CTAs should be direct and action-oriented: "Book Your Free Call" not "Learn More."\n- Avoid jargon, corporate speak, or anything that sounds like it was written by AI.\n- Simple > clever. Clear > creative.\n\n---\n\nOUTPUT FORMAT:\nDeliver all four sections clearly labeled. Use headers, bullet points, and example copy. Write all suggested headlines and copy in my voice — friendly, direct, professional, and human.` },
     { emoji:"🧭", title:"E-E-A-T Playbook", description:"Google's framework for deciding if your site deserves to rank. 7-slide guide built for photographers and videographers.", tags:["eeat-guide","eeat","seo"], source:"WAC Resource Library", url:"", linkLabel:"", body:"" },
+    { emoji:"🫂", title:"The People First Content Guide", description:"Google's own framework for creating content that actually serves your readers — not just the algorithm.", tags:["seo","strategy","copywriting"], source:"Google Search Central", url:"https://developers.google.com/search/docs/fundamentals/creating-helpful-content", linkLabel:"Read Google's Guide →",
+      body:`Google's "People First" content guidance is the closest thing to a cheat code for ranking in 2025–2026. It's not about tricks or technical hacks — it's about writing for humans, not bots.
+
+The core question Google wants you to ask about every page you publish:
+
+"Does this content provide original value, serve a real person's need, and leave them feeling satisfied — or was it created primarily to rank?"
+
+━━━━━━━━━━━━━━━━━━━━━━
+THE PEOPLE FIRST CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━
+Ask these questions about every page on your site:
+
+  • Do you have an existing or intended audience that would find this content useful?
+  • Does your content clearly demonstrate first-hand expertise and depth of knowledge?
+  • Does your site have a primary purpose or focus?
+  • After reading your content, will someone leave feeling they learned enough to achieve their goal?
+  • Will someone reading your content leave feeling like they had a satisfying experience?
+
+If you're answering "no" or "maybe" to any of these — that page needs work.
+
+━━━━━━━━━━━━━━━━━━━━━━
+WHAT GOOGLE IS EXPLICITLY REWARDING
+━━━━━━━━━━━━━━━━━━━━━━
+  • Content written by someone with real experience in the topic
+  • Pages that go deeper than what's already ranking
+  • Sites with a clear, consistent topic focus
+  • Content that doesn't require a follow-up search to get a complete answer
+  • Named authors with verifiable credentials or track records
+
+━━━━━━━━━━━━━━━━━━━━━━
+WHAT GOOGLE IS DEMOTING
+━━━━━━━━━━━━━━━━━━━━━━
+  • Content written primarily to rank, not to help
+  • Pages that summarize what others have already said without adding anything new
+  • Sites covering many unrelated topics without clear authority
+  • Content where the reader still needs to go elsewhere to get their actual answer
+  • Thin pages padded to look comprehensive
+
+━━━━━━━━━━━━━━━━━━━━━━
+THE WAC CONNECTION
+━━━━━━━━━━━━━━━━━━━━━━
+Every weekly update you submit is an opportunity to make one more page on your site more people-first. You don't need to rewrite everything at once. Pick one page per week and ask the checklist questions above. Tighten the copy. Add a real example. Remove the filler. That's the work.
+
+WAC Action: Run your homepage through the People First checklist right now. Identify the one answer that makes you most uncomfortable — and make fixing it your update this week.` },
     { emoji:"🔔", title:"Google's March 2026 Core Update", description:"The first broad core update of 2026 is rolling out now. Here's what it targets and what to do.", tags:["seo","core-update"], source:"Search Engine Land / Search Engine Journal", url:"https://developers.google.com/search/docs/fundamentals/creating-helpful-content", linkLabel:"Google's Helpful Content Guide →",
       body:`Google's March 2026 Core Update began rolling out on March 27, 2026. Google says the rollout may take up to 2 weeks to complete — expect full stabilization around April 10–11.\n\nThis is the third significant algorithm change Google has pushed in roughly five weeks:\n\n  • Feb 5–27 — Discover Core Update (targeted Google Discover feeds)\n  • Mar 24–25 — Spam Update (completed in under 24 hours)\n  • Mar 27 — Broad Core Update (rolling out now — affects all sites, all niches)\n\n━━━━━━━━━━━━━━━━━━━━━━\nWHAT GOOGLE IS TARGETING\n━━━━━━━━━━━━━━━━━━━━━━\nSites that saw the biggest drops:\n  • Mass-produced AI content with no human oversight\n  • Pages with anonymous or unqualified authorship\n  • Thin content that doesn't add value beyond what's already ranking\n  • Sites covering too many unrelated topics\n  • Pages with no trust signals (no contact info, no Privacy Policy, no named author)\n\nSites that held or gained rankings:\n  • Genuine topical authority in a specific niche\n  • Named, credentialed authors\n  • First-hand, experience-driven content\n  • Strong Core Web Vitals and mobile performance\n  • Transparent, trustworthy site structure\n\n━━━━━━━━━━━━━━━━━━━━━━\nWHAT TO DO RIGHT NOW\n━━━━━━━━━━━━━━━━━━━━━━\n1. Don't panic and don't make sweeping changes while the rollout is still active. Rankings are still moving.\n\n2. After April 11, open Google Search Console and compare the 2 weeks before March 27 to the 2 weeks after. Look for patterns — did specific pages drop? Pages with no author bio? Pages with thin content?\n\n3. A drop is not a penalty. It means Google's systems now prefer other results for the same query. The fix is improving your content quality, not a technical patch.\n\n4. Content quality improvements are typically recognized at the next major core update — expected June or July 2026. Start making improvements now so they're in place for that cycle.\n\n━━━━━━━━━━━━━━━━━━━━━━\nTHE WAC CONNECTION\n━━━━━━━━━━━━━━━━━━━━━━\nThis update rewards exactly what WAC is built around. Consistent, verifiable weekly updates build the Experience, Expertise, Authority, and Trust signals Google is now prioritizing. Every update you submit this round is a trust signal compounding toward the next core update window.\n\n[[EEAT_LINK]]\n\n━━━━━━━━━━━━━━━━━━━━━━\nSOURCES\n━━━━━━━━━━━━━━━━━━━━━━\n  • Search Engine Land — https://searchengineland.com/google-march-2026-core-update-rolling-out-now-472759\n  • Search Engine Journal — https://searchenginejournal.com/google-begins-rolling-out-march-2026-core-update/570657\n  • Google Search Status Dashboard — https://status.search.google.com/incidents/7eTbAa2jWdToLkraZj5y\n  • Google Helpful Content Guide — https://developers.google.com/search/docs/fundamentals/creating-helpful-content` },
   ];
@@ -4881,8 +4925,9 @@ function renderResources() {
     const tagsHtml = (r.tags || []).map(t => `<span class="resource-tag">${esc(t)}</span>`).join("");
     const isEEAT = (r.tags || []).includes("eeat-guide");
     const isCoreUpdate = r.title === "Google's March 2026 Core Update";
+    const isPeopleFirst = r.title === "The People First Content Guide";
     const clickHandler = isEEAT ? `openEEATModal()` : `openResModal('${r.id}')`;
-    const accentStyle = (isEEAT || isCoreUpdate)
+    const accentStyle = (isEEAT || isCoreUpdate || isPeopleFirst)
       ? `border:1.5px solid var(--gold);background:linear-gradient(135deg,rgba(184,134,11,0.06),var(--surface));`
       : "";
     return `<div class="resource-card" style="${accentStyle}" onclick="${clickHandler}">
