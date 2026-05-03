@@ -797,6 +797,106 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   gap: 5px;
 }
 
+/* Backlink Repository */
+.backlink-listing-card {
+  background: var(--surface);
+  border: 1.5px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.backlink-dir-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+.backlink-dir-card:hover { border-color: var(--gold); }
+.backlink-dir-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.backlink-dir-url {
+  font-size: 12px;
+  color: var(--gold-dark);
+  margin-bottom: 6px;
+  word-break: break-all;
+}
+.backlink-dir-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.backlink-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  margin-right: 6px;
+  margin-bottom: 8px;
+}
+.backlink-tag.gold {
+  border-color: var(--gold);
+  color: var(--gold-dark);
+}
+.backlink-rules {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+.backlink-section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  margin-bottom: 12px;
+  margin-top: 20px;
+}
+.backlink-filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.backlink-filter-btn {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.06em;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.backlink-filter-btn.active {
+  border-color: var(--gold);
+  color: var(--gold-dark);
+  background: rgba(184,134,11,0.07);
+}
+.backlink-empty {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 /* Expert Panel (Reports page) */
 .expert-panel-card {
   background: linear-gradient(135deg, rgba(184,134,11,0.07), var(--surface));
@@ -2750,6 +2850,45 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       </div>
     </div>
 
+    <!-- PAGE: BACKLINKS -->
+    <div class="page" id="page-backlinks">
+      <div class="page-header">
+        <div class="page-title">Backlink Repository</div>
+        <div class="page-subtitle">Voluntary link exchanges between real businesses. No spam, no farms.</div>
+      </div>
+
+      <!-- Ground Rules -->
+      <div class="backlink-rules">
+        <strong style="color:var(--text);">Ground Rules:</strong> Real business sites only &nbsp;·&nbsp; One listing per member &nbsp;·&nbsp; No reciprocal link farms &nbsp;·&nbsp; Exchange only with sites relevant to your audience &nbsp;·&nbsp; Abuse = removal
+      </div>
+
+      <!-- YOUR LISTING -->
+      <div class="backlink-section-label">Your Listing</div>
+      <div class="backlink-listing-card" id="bl-your-listing">
+        <div style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px;">Loading...</div>
+      </div>
+
+      <!-- DIRECTORY -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:8px;">
+        <div class="backlink-section-label" style="margin:0;">Directory</div>
+        <div id="bl-dir-count" style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;"></div>
+      </div>
+      <div class="backlink-filter-row">
+        <button class="backlink-filter-btn active" id="blf-all" onclick="blFilter('all')">All</button>
+        <button class="backlink-filter-btn" id="blf-do-follow" onclick="blFilter('do-follow')">Do-Follow</button>
+        <button class="backlink-filter-btn" id="blf-guest-post" onclick="blFilter('guest-post')">Guest Post</button>
+        <button class="backlink-filter-btn" id="blf-either" onclick="blFilter('either')">Either</button>
+      </div>
+      <div id="bl-directory"><div class="backlink-empty">Loading directory...</div></div>
+
+      <!-- ADMIN: Backlink Listings Management -->
+      <div id="bl-admin-panel" style="display:none;margin-top:32px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🔗 All Backlink Listings</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">All active member listings. Delete any listing for abuse or spam.</div>
+        <div id="bl-admin-body"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Loading...</div></div>
+      </div>
+    </div>
+
     <!-- PAGE: PRO (hidden from free users — visible to admin + Pro members) -->
     <div class="page" id="page-pro">
       <div class="pro-page-header">
@@ -2847,6 +2986,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <button class="nav-item" id="nav-members" onclick="navTo('members')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Members
+    </button>
+    <button class="nav-item" id="nav-backlinks" onclick="navTo('backlinks')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Backlinks
     </button>
     <button class="nav-item" id="nav-pro" onclick="navTo('pro')" style="display:none;position:relative;">
       <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -3610,6 +3753,7 @@ function navTo(page) {
   if (page === "profile") { initProfilePhotoPreview(); loadRERStatus(); }
   if (page === "resources") loadResources();
   if (page === "members") loadDirectory();
+  if (page === "backlinks") loadBacklinkPage();
   if (page === "reports") {
     loadTrackerReport();
     if (currentUser && currentUser.isAdmin) { loadBugReports(); populateAdminSubFilters(); loadAdminExpertWebhook(); }
@@ -7828,6 +7972,281 @@ window.testExpertWebhook = testExpertWebhook;
   </div>
 </div>
 
+
+<script>
+// ==============================
+// BACKLINK REPOSITORY
+// ==============================
+
+let _blCurrentFilter = 'all';
+let _blAllListings = [];
+
+async function loadBacklinkPage() {
+  if (!currentUser) return;
+  await renderMyListing();
+  await loadBacklinkDirectory();
+  if (currentUser.isAdmin) {
+    document.getElementById('bl-admin-panel').style.display = 'block';
+    loadAdminBacklinks();
+  }
+}
+
+async function renderMyListing() {
+  const container = document.getElementById('bl-your-listing');
+  try {
+    const ref = doc(db, 'wac_backlinks', currentUser.uid);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const d = snap.data();
+      const exchangeLabel = { 'do-follow': 'Do-Follow Exchange', 'guest-post': 'Guest Post', 'either': 'Either / Open' };
+      container.innerHTML = `
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${esc(d.displayName)}</div>
+            <a href="${esc(d.siteUrl)}" target="_blank" rel="noopener" style="font-size:12px;color:var(--gold-dark);word-break:break-all;">${esc(d.siteUrl)}</a>
+            <div style="margin:8px 0;">
+              <span class="backlink-tag gold">${esc(d.siteNiche)}</span>
+              <span class="backlink-tag">${exchangeLabel[d.exchangeType] || d.exchangeType}</span>
+            </div>
+            <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">${esc(d.siteDescription)}</div>
+            <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;">Listed ${new Date(d.listedAt?.toDate ? d.listedAt.toDate() : d.listedAt).toLocaleDateString()}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+            <button class="btn btn-outline btn-sm" onclick="openEditListing()">Edit</button>
+            <button class="btn btn-outline btn-sm" style="color:#c0392b;border-color:#c0392b;" onclick="removeListing()">Remove</button>
+          </div>
+        </div>`;
+    } else {
+      container.innerHTML = `
+        <div style="text-align:center;padding:8px 0 16px;">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">You don't have a listing yet. Add your site to let other members find and reach out to you for a backlink exchange.</div>
+          <button class="btn btn-gold btn-sm" onclick="openEditListing()">+ Add My Site</button>
+        </div>`;
+    }
+  } catch(e) {
+    container.innerHTML = `<div style="color:#c0392b;font-size:13px;">Error loading your listing.</div>`;
+  }
+}
+
+function openEditListing() {
+  const overlay = document.createElement('div');
+  overlay.id = 'bl-edit-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:flex-end;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:var(--surface);border-radius:14px 14px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;max-height:90dvh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;">Add / Edit Listing</div>
+        <button onclick="document.getElementById('bl-edit-overlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Site URL</label>
+        <input type="url" id="bl-edit-url" class="form-input" placeholder="https://yoursite.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Niche / Industry</label>
+        <input type="text" id="bl-edit-niche" class="form-input" placeholder="e.g. Wedding Photography, Marketing, Finance" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Site Description <span style="font-weight:400;color:var(--text-muted);font-size:11px;">(max 140 chars)</span></label>
+        <textarea id="bl-edit-desc" class="form-input" maxlength="140" placeholder="What your site is about and who it serves..." style="min-height:72px;resize:vertical;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Exchange Type</label>
+        <select id="bl-edit-type" class="form-input" style="background:var(--surface2);">
+          <option value="do-follow">Do-Follow Exchange</option>
+          <option value="guest-post">Guest Post</option>
+          <option value="either">Either / Open</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contact Email</label>
+        <input type="email" id="bl-edit-email" class="form-input" placeholder="your@email.com" />
+      </div>
+      <div id="bl-edit-msg" style="font-size:12px;min-height:16px;margin-bottom:10px;color:var(--text-muted);"></div>
+      <button class="btn btn-gold btn-block" onclick="saveListing()">Save Listing</button>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  // Pre-fill if listing exists
+  getDoc(doc(db, 'wac_backlinks', currentUser.uid)).then(snap => {
+    if (snap.exists()) {
+      const d = snap.data();
+      document.getElementById('bl-edit-url').value = d.siteUrl || '';
+      document.getElementById('bl-edit-niche').value = d.siteNiche || '';
+      document.getElementById('bl-edit-desc').value = d.siteDescription || '';
+      document.getElementById('bl-edit-type').value = d.exchangeType || 'either';
+      document.getElementById('bl-edit-email').value = d.contactEmail || currentUser.email || '';
+    } else {
+      document.getElementById('bl-edit-email').value = currentUser.email || '';
+    }
+  });
+}
+
+async function saveListing() {
+  const msg = document.getElementById('bl-edit-msg');
+  const url = document.getElementById('bl-edit-url').value.trim();
+  const niche = document.getElementById('bl-edit-niche').value.trim();
+  const desc = document.getElementById('bl-edit-desc').value.trim();
+  const type = document.getElementById('bl-edit-type').value;
+  const email = document.getElementById('bl-edit-email').value.trim();
+
+  if (!url || !niche || !desc || !email) {
+    msg.style.color = '#c0392b';
+    msg.textContent = 'Please fill in all fields.';
+    return;
+  }
+  if (!url.startsWith('http')) {
+    msg.style.color = '#c0392b';
+    msg.textContent = 'Site URL must start with https://';
+    return;
+  }
+
+  msg.style.color = 'var(--text-muted)';
+  msg.textContent = 'Saving...';
+
+  try {
+    await setDoc(doc(db, 'wac_backlinks', currentUser.uid), {
+      uid: currentUser.uid,
+      displayName: currentUser.displayName || currentUser.name || '',
+      siteUrl: url,
+      siteNiche: niche,
+      siteDescription: desc,
+      exchangeType: type,
+      contactEmail: email,
+      listedAt: new Date(),
+      isActive: true
+    });
+    document.getElementById('bl-edit-overlay').remove();
+    renderMyListing();
+    loadBacklinkDirectory();
+  } catch(e) {
+    msg.style.color = '#c0392b';
+    msg.textContent = 'Error saving. Try again.';
+  }
+}
+
+async function removeListing() {
+  if (!confirm('Remove your listing from the directory?')) return;
+  try {
+    await deleteDoc(doc(db, 'wac_backlinks', currentUser.uid));
+    renderMyListing();
+    loadBacklinkDirectory();
+  } catch(e) {
+    alert('Error removing listing. Try again.');
+  }
+}
+
+async function loadBacklinkDirectory() {
+  const container = document.getElementById('bl-directory');
+  const countEl = document.getElementById('bl-dir-count');
+  try {
+    const snap = await getDocs(collection(db, 'wac_backlinks'));
+    _blAllListings = [];
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.uid !== currentUser.uid && data.isActive !== false) {
+        _blAllListings.push({ id: d.id, ...data });
+      }
+    });
+    _blAllListings.sort((a, b) => {
+      const at = a.listedAt?.toDate ? a.listedAt.toDate() : new Date(a.listedAt);
+      const bt = b.listedAt?.toDate ? b.listedAt.toDate() : new Date(b.listedAt);
+      return bt - at;
+    });
+    renderBacklinkDirectory();
+  } catch(e) {
+    container.innerHTML = `<div class="backlink-empty">Error loading directory.</div>`;
+  }
+}
+
+function renderBacklinkDirectory() {
+  const container = document.getElementById('bl-directory');
+  const countEl = document.getElementById('bl-dir-count');
+  const exchangeLabel = { 'do-follow': 'Do-Follow', 'guest-post': 'Guest Post', 'either': 'Either / Open' };
+
+  let filtered = _blCurrentFilter === 'all'
+    ? _blAllListings
+    : _blAllListings.filter(d => d.exchangeType === _blCurrentFilter);
+
+  countEl.textContent = filtered.length === 0 ? '' : `${filtered.length} listing${filtered.length === 1 ? '' : 's'}`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="backlink-empty">No listings yet${_blCurrentFilter !== 'all' ? ' for this filter' : ''}. Be the first to add yours.</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(d => `
+    <div class="backlink-dir-card">
+      <div class="backlink-dir-name">${esc(d.displayName)}</div>
+      <a href="${esc(d.siteUrl)}" target="_blank" rel="noopener" class="backlink-dir-url">${esc(d.siteUrl)}</a>
+      <div>
+        <span class="backlink-tag gold">${esc(d.siteNiche)}</span>
+        <span class="backlink-tag">${exchangeLabel[d.exchangeType] || d.exchangeType}</span>
+      </div>
+      <div class="backlink-dir-desc">${esc(d.siteDescription)}</div>
+      <a href="mailto:${esc(d.contactEmail)}?subject=WAC Backlink Exchange — ${encodeURIComponent(d.siteUrl)}"
+         class="btn btn-outline btn-sm" style="display:inline-block;">Contact for Exchange</a>
+    </div>`).join('');
+}
+
+function blFilter(type) {
+  _blCurrentFilter = type;
+  document.querySelectorAll('.backlink-filter-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('blf-' + type);
+  if (btn) btn.classList.add('active');
+  renderBacklinkDirectory();
+}
+
+async function loadAdminBacklinks() {
+  const container = document.getElementById('bl-admin-body');
+  try {
+    const snap = await getDocs(collection(db, 'wac_backlinks'));
+    if (snap.empty) {
+      container.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No listings yet.</div>`;
+      return;
+    }
+    const rows = [];
+    snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
+    rows.sort((a, b) => {
+      const at = a.listedAt?.toDate ? a.listedAt.toDate() : new Date(a.listedAt);
+      const bt = b.listedAt?.toDate ? b.listedAt.toDate() : new Date(b.listedAt);
+      return bt - at;
+    });
+    const exchangeLabel = { 'do-follow': 'Do-Follow', 'guest-post': 'Guest Post', 'either': 'Either / Open' };
+    container.innerHTML = rows.map(d => `
+      <div class="backlink-dir-card" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+        <div style="flex:1;min-width:0;">
+          <div class="backlink-dir-name">${esc(d.displayName)} <span style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text-muted);">${esc(d.uid)}</span></div>
+          <div class="backlink-dir-url">${esc(d.siteUrl)}</div>
+          <div><span class="backlink-tag gold">${esc(d.siteNiche)}</span><span class="backlink-tag">${exchangeLabel[d.exchangeType] || d.exchangeType}</span></div>
+          <div class="backlink-dir-desc">${esc(d.siteDescription)}</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;">${esc(d.contactEmail)}</div>
+        </div>
+        <button class="btn btn-sm" onclick="adminDeleteBacklink('${d.id}')" style="background:#c0392b;color:#fff;border-color:#c0392b;flex-shrink:0;">Delete</button>
+      </div>`).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="color:#c0392b;font-size:13px;padding:12px;">Error loading listings.</div>`;
+  }
+}
+
+async function adminDeleteBacklink(uid) {
+  if (!confirm('Delete this listing? This cannot be undone.')) return;
+  try {
+    await deleteDoc(doc(db, 'wac_backlinks', uid));
+    loadAdminBacklinks();
+    loadBacklinkDirectory();
+  } catch(e) {
+    alert('Error deleting listing.');
+  }
+}
+
+window.loadBacklinkPage = loadBacklinkPage;
+window.openEditListing = openEditListing;
+window.saveListing = saveListing;
+window.removeListing = removeListing;
+window.blFilter = blFilter;
+window.adminDeleteBacklink = adminDeleteBacklink;
+</script>
 
 </body>
 </html>
