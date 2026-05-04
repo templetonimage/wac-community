@@ -2558,6 +2558,18 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div id="reset-points-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
       </div>
 
+      <!-- ADMIN: Delete Trial Submissions -->
+      <div id="admin-delete-trial" style="display:none;margin-top:28px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🗑 Delete Trial Submissions</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Permanently deletes all submission documents flagged <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">isTrial: true</code> from Firestore for all members. Run this after resetting points to fully clear trial data.</div>
+        <div class="pro-global-danger">
+          <div class="pro-global-danger-title">⚠️ Destructive Action</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">This cannot be undone. All trial submission records will be permanently deleted. Requires double confirmation.</div>
+          <button class="btn btn-sm" onclick="deleteAllTrialSubmissions()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">Delete All Trial Submissions</button>
+        </div>
+        <div id="delete-trial-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
+      </div>
+
       <!-- ADMIN: WAC Pro Management (hidden until _PRO_GLOBAL_ACTIVE = true) -->
       <div id="admin-pro-panel" style="display:none;margin-top:28px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">★ WAC Pro Management</div>
@@ -3620,7 +3632,7 @@ function bootApp() {
   if (_proNavBtn) _proNavBtn.style.display = userHasPro() ? "flex" : "none";
 
   // 5. Show/hide admin elements
-  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-submissions-tool"];
+  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-delete-trial", "admin-submissions-tool"];
   adminBoxes.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
@@ -5277,7 +5289,7 @@ async function loadMySubmissions() {
     const q = query(collection(db, "submissions"), where("authorUid", "==", currentUser.uid));
     const snap = await getDocs(q);
     const items = [];
-    snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    snap.forEach(d => { const data = d.data(); if (!data.isTrial) items.push({ id: d.id, ...data }); });
     items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     const el = document.getElementById("my-submissions");
     if (!items.length) { el.innerHTML = '<p class="text-sm text-muted">No submissions yet.</p>'; return; }
@@ -6889,6 +6901,34 @@ window.resetAllPoints = async function() {
     showToast("Reset failed: " + e.message);
   }
 };
+window.deleteAllTrialSubmissions = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const first = confirm("Delete ALL trial submissions for all members?\n\nThis permanently removes every Firestore document in 'submissions' where isTrial is true.");
+  if (!first) return;
+  const second = confirm("Are you sure? This cannot be undone.");
+  if (!second) return;
+
+  const statusEl = document.getElementById("delete-trial-status");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Deleting trial submissions...";
+
+  try {
+    const q = query(collection(db, "submissions"), where("isTrial", "==", true));
+    const snap = await getDocs(q);
+    let count = 0;
+    for (const d of snap.docs) {
+      await deleteDoc(doc(db, "submissions", d.id));
+      count++;
+    }
+    statusEl.textContent = `Done — ${count} trial submission(s) deleted.`;
+    showToast(`${count} trial submission(s) deleted.`);
+    loadMySubmissions();
+  } catch (e) {
+    statusEl.textContent = `Error: ${e.message}`;
+    showToast("Delete failed: " + e.message);
+  }
+};
+
 window.seedDefaultResources = seedDefaultResources;
 
 // Clears stale url/linkLabel from resource cards that should have none
