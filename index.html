@@ -2563,7 +2563,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="pro-global-danger">
           <div class="pro-global-danger-title">⚠️ Destructive Action</div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">This cannot be undone. All member point totals will be set to zero. Requires double confirmation.</div>
-          <button class="btn btn-sm" onclick="resetAllPoints()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">Reset All Points to Zero</button>
+          <button class="btn btn-sm" onclick="resetAllPoints()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">Recompute All Points from Submissions</button>
         </div>
         <div id="reset-points-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
       </div>
@@ -6888,27 +6888,50 @@ window.loadAdminSubmissions = window.loadAdminSubmissions;
 // ==============================
 window.resetAllPoints = async function() {
   if (!currentUser || !currentUser.isAdmin) return;
-  const first = confirm("Reset ALL member points and post counts to zero?\n\nThis zeroes points and totalPosts in the registry. Submission and engagement history is preserved.");
+  const first = confirm("Recompute ALL member points from Round 1 submissions?\n\nThis zeroes everyone first, then restores points from actual Round 1 submissions (trial submissions excluded). Use this to reset trial-era totals at the start of a new round.");
   if (!first) return;
   const second = confirm("Are you sure? This cannot be undone.");
   if (!second) return;
 
   const statusEl = document.getElementById("reset-points-status");
   statusEl.style.display = "block";
-  statusEl.textContent = "Resetting points...";
+  statusEl.textContent = "Recomputing points from submissions...";
 
   try {
-    const snap = await getDocs(collection(db, "wac_registry"));
-    let count = 0;
-    for (const d of snap.docs) {
+    // Step 1: zero everyone
+    const regSnap = await getDocs(collection(db, "wac_registry"));
+    for (const d of regSnap.docs) {
       await updateDoc(doc(db, "wac_registry", d.id), { points: 0, totalPosts: 0 });
+    }
+
+    // Step 2: fetch all Round 1 submissions (no isTrial flag)
+    const subSnap = await getDocs(query(collection(db, "submissions"), where("isTrial", "==", false)));
+    // Also fetch docs where isTrial field doesn't exist (Round 1 submissions pre-flag)
+    const subSnap2 = await getDocs(collection(db, "submissions"));
+    const allSubs = subSnap2.docs.filter(d => !d.data().isTrial);
+
+    // Step 3: tally per member
+    const totals = {}; // uid -> { points, totalPosts }
+    for (const d of allSubs) {
+      const { authorUid, pts } = d.data();
+      if (!authorUid) continue;
+      if (!totals[authorUid]) totals[authorUid] = { points: 0, totalPosts: 0 };
+      totals[authorUid].points += (pts || 0);
+      totals[authorUid].totalPosts += 1;
+    }
+
+    // Step 4: write tallied totals back
+    let count = 0;
+    for (const [uid, tally] of Object.entries(totals)) {
+      await updateDoc(doc(db, "wac_registry", uid), tally);
       count++;
     }
-    statusEl.textContent = `Done — ${count} member(s) reset to 0 pts.`;
-    showToast(`${count} member(s) reset to 0 pts.`);
+
+    statusEl.textContent = `Done — recomputed points for ${count} member(s) from ${allSubs.length} Round 1 submission(s).`;
+    showToast(`Points recomputed for ${count} member(s).`);
   } catch (e) {
     statusEl.textContent = `Error: ${e.message}`;
-    showToast("Reset failed: " + e.message);
+    showToast("Recompute failed: " + e.message);
   }
 };
 window.deleteAllTrialSubmissions = async function() {
