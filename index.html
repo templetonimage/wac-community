@@ -2619,6 +2619,68 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div id="cowork-session-list"><div style="font-size:13px;color:var(--text-muted);padding:8px 0;">Loading sessions...</div></div>
       </div>
 
+      <!-- ADMIN: Community Points Log -->
+      <div id="admin-community-pts-tool" style="display:none;margin-top:28px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">💬 Community Points Log</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">All community point events — Feed posts, PVR, RER, Backlink, Zoom RSVP, Coworking. Logged going forward; prior events are not backfilled.</div>
+        <div class="card" style="border:1.5px solid var(--border);">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
+            <div style="flex:1;min-width:180px;">
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Filter by Member</label>
+              <select id="comm-pts-member-filter" class="form-input" onchange="loadCommunityPtsLog()" style="width:100%;">
+                <option value="">All Members</option>
+              </select>
+            </div>
+            <div style="flex:1;min-width:130px;">
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Filter by Action</label>
+              <select id="comm-pts-action-filter" class="form-input" onchange="loadCommunityPtsLog()" style="width:100%;">
+                <option value="">All Actions</option>
+                <option value="Feed Post">Feed Post</option>
+                <option value="Peer Review Request">Peer Review Request</option>
+                <option value="Expert Review Request">Expert Review Request</option>
+                <option value="Backlink Listing Added">Backlink Listing Added</option>
+                <option value="Zoom RSVP">Zoom RSVP</option>
+                <option value="Coworking RSVP">Coworking RSVP</option>
+                <option value="Coworking Attendance">Coworking Attendance</option>
+              </select>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="loadCommunityPtsLog()" style="white-space:nowrap;height:38px;">↻ Refresh</button>
+          </div>
+          <div id="comm-pts-list"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Click Refresh to load.</div></div>
+        </div>
+
+        <!-- Backfill Tool -->
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.05em;margin:24px 0 4px;">🔧 Backfill Missing Points</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Award community points retroactively for a member who missed an event before logging was in place. Writes a log entry and increments their registry total.</div>
+        <div class="card" style="border:1.5px solid var(--border);">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
+            <div style="flex:2;min-width:180px;">
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Member</label>
+              <select id="backfill-member" class="form-input" style="width:100%;"></select>
+            </div>
+            <div style="flex:2;min-width:160px;">
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Action</label>
+              <select id="backfill-action" class="form-input" style="width:100%;" onchange="backfillActionChanged()">
+                <option value="Feed Post">Feed Post (+1)</option>
+                <option value="Peer Review Request">Peer Review Request (+5)</option>
+                <option value="Expert Review Request">Expert Review Request (+10)</option>
+                <option value="Backlink Listing Added">Backlink Listing Added (+15)</option>
+                <option value="Zoom RSVP">Zoom RSVP (+2)</option>
+                <option value="Coworking RSVP">Coworking RSVP (+2)</option>
+                <option value="Coworking Attendance">Coworking Attendance (+5)</option>
+                <option value="Manual Adjustment">Manual Adjustment (custom)</option>
+              </select>
+            </div>
+            <div style="flex:1;min-width:80px;">
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Points</label>
+              <input type="number" id="backfill-pts" class="form-input" value="2" min="1" style="width:100%;" />
+            </div>
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="adminBackfillPts()">Award &amp; Log</button>
+          <div id="backfill-status" style="font-size:12px;color:var(--text-muted);margin-top:8px;min-height:14px;"></div>
+        </div>
+      </div>
+
       <!-- ADMIN: WAC Pro Management (hidden until _PRO_GLOBAL_ACTIVE = true) -->
       <div id="admin-pro-panel" style="display:none;margin-top:28px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">★ WAC Pro Management</div>
@@ -3688,7 +3750,7 @@ function bootApp() {
   if (_proNavBtn) _proNavBtn.style.display = userHasPro() ? "flex" : "none";
 
   // 5. Show/hide admin elements
-  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-delete-trial", "admin-submissions-tool", "admin-cowork-tool"];
+  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-delete-trial", "admin-submissions-tool", "admin-cowork-tool", "admin-community-pts-tool"];
   adminBoxes.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
@@ -3714,6 +3776,9 @@ function bootApp() {
     // Coworking tool visible to admin
     const _coworkTool = document.getElementById("admin-cowork-tool");
     if (_coworkTool) { _coworkTool.style.display = "block"; loadAdminCoworkSessions(); }
+    // Community points log
+    const _commPtsTool = document.getElementById("admin-community-pts-tool");
+    if (_commPtsTool) { _commPtsTool.style.display = "block"; populateCommPtsMemberFilter(); }
     populateAdminSubFilters();
   } else {
     const _proPanel = document.getElementById("admin-pro-panel");
@@ -3726,6 +3791,8 @@ function bootApp() {
     if (_expertWebhook) _expertWebhook.style.display = "none";
     const _coworkToolHide = document.getElementById("admin-cowork-tool");
     if (_coworkToolHide) _coworkToolHide.style.display = "none";
+    const _commPtsHide = document.getElementById("admin-community-pts-tool");
+    if (_commPtsHide) _commPtsHide.style.display = "none";
   }
 
   // Expert panel — visible to Expert user on Reports page (loaded on navTo)
@@ -4131,6 +4198,7 @@ async function submitPost() {
     });
     await updateDoc(doc(db, "wac_registry", currentUser.uid), { points: increment(PTS_POST) });
     currentUser.points = (currentUser.points || 0) + PTS_POST;
+    logCommunityPts(currentUser.uid, currentUser.name, "Feed Post", PTS_POST);
     document.getElementById("feed-compose").value = "";
     document.getElementById("feed-url").value = "";
     showToast(`Posted! +${PTS_POST} pt`);
@@ -4562,6 +4630,7 @@ async function submitPVR() {
     const regRefPVR = doc(db, "wac_registry", currentUser.uid);
     await updateDoc(regRefPVR, { points: increment(PTS_PVR) });
     currentUser.points = (currentUser.points || 0) + PTS_PVR;
+    logCommunityPts(currentUser.uid, currentUser.name, "Peer Review Request", PTS_PVR);
     document.getElementById("pvr-url").value = "";
     document.getElementById("pvr-prompt").value = "";
     switchComposeTab("post");
@@ -6699,6 +6768,17 @@ window.submitPostReply = submitPostReply;
 window.switchComposeTab = switchComposeTab;
 
 // ==============================
+// COMMUNITY POINTS AUDIT LOG
+// ==============================
+async function logCommunityPts(uid, name, action, pts) {
+  try {
+    await addDoc(collection(db, 'wac_community_pts'), {
+      uid, name, action, pts, ts: Date.now()
+    });
+  } catch(e) { console.warn('logCommunityPts failed:', e.message); }
+}
+
+// ==============================
 // COWORKING SESSIONS
 // ==============================
 
@@ -6746,6 +6826,7 @@ async function rsvpCowork() {
     await setDoc(rsvpRef, { uid: currentUser.uid, name: currentUser.name || '', rsvpAt: Date.now() });
     await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_COWORK_RSVP) });
     currentUser.points = (currentUser.points || 0) + PTS_COWORK_RSVP;
+    logCommunityPts(currentUser.uid, currentUser.name, 'Coworking RSVP', PTS_COWORK_RSVP);
     showToast(`RSVP confirmed! +${PTS_COWORK_RSVP} pts`);
     await loadCoworkCard();
   } catch(e) {
@@ -6870,6 +6951,7 @@ async function adminAwardAttendance(sessionId) {
       if (!uid) continue;
       await setDoc(doc(db, 'wac_coworking_sessions', sessionId, 'attendees', uid), { uid, awardedAt: Date.now() });
       await updateDoc(doc(db, 'wac_registry', uid), { points: increment(PTS_COWORK_ATTEND) });
+      logCommunityPts(uid, cb.dataset.name || uid, 'Coworking Attendance', PTS_COWORK_ATTEND);
       count++;
     }
     if (statusEl) { statusEl.style.color = 'var(--gold-dark)'; statusEl.textContent = `Done — ${PTS_COWORK_ATTEND} pts awarded to ${count} member(s).`; }
@@ -6901,6 +6983,7 @@ async function zoomRSVP() {
     await setDoc(rsvpRef, { uid: currentUser.uid, name: currentUser.name || '', rsvpAt: Date.now() });
     await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_COWORK_RSVP) });
     currentUser.points = (currentUser.points || 0) + PTS_COWORK_RSVP;
+    logCommunityPts(currentUser.uid, currentUser.name, 'Zoom RSVP', PTS_COWORK_RSVP);
     showToast(`RSVP confirmed! +${PTS_COWORK_RSVP} pts`);
     _setZoomRSVPDone(btn);
     window.open(ZOOM_CALENDAR_URL, '_blank', 'noopener');
@@ -6930,6 +7013,119 @@ async function initZoomRSVPBtn() {
   } catch(e) { /* non-critical, leave button as-is */ }
 }
 window.zoomRSVP = zoomRSVP;
+
+
+// ==============================
+// ADMIN — COMMUNITY POINTS LOG
+// ==============================
+
+const _BACKFILL_PTS_MAP = {
+  'Feed Post': 1,
+  'Peer Review Request': 5,
+  'Expert Review Request': 10,
+  'Backlink Listing Added': 15,
+  'Zoom RSVP': 2,
+  'Coworking RSVP': 2,
+  'Coworking Attendance': 5,
+  'Manual Adjustment': ''
+};
+
+async function populateCommPtsMemberFilter() {
+  const sel = document.getElementById('comm-pts-member-filter');
+  const backfillSel = document.getElementById('backfill-member');
+  if (!sel) return;
+  try {
+    const snap = await getDocs(collection(db, 'wac_registry'));
+    const members = snap.docs
+      .map(d => ({uid: d.id, ...d.data()}))
+      .filter(m => m.email !== ADMIN_EMAIL)
+      .sort((a,b) => (a.name||'').localeCompare(b.name||''));
+    const opts = members.map(m => `<option value="${m.uid}">${esc(m.name)}</option>`).join('');
+    sel.innerHTML = '<option value="">All Members</option>' + opts;
+    if (backfillSel) backfillSel.innerHTML = '<option value="">— select member —</option>' + opts;
+  } catch(e) { console.error('populateCommPtsMemberFilter:', e); }
+}
+
+function backfillActionChanged() {
+  const action = document.getElementById('backfill-action')?.value;
+  const ptsEl = document.getElementById('backfill-pts');
+  if (ptsEl && action in _BACKFILL_PTS_MAP) {
+    ptsEl.value = _BACKFILL_PTS_MAP[action];
+  }
+}
+
+async function adminBackfillPts() {
+  const uid = document.getElementById('backfill-member')?.value;
+  const action = document.getElementById('backfill-action')?.value;
+  const pts = parseInt(document.getElementById('backfill-pts')?.value, 10);
+  const statusEl = document.getElementById('backfill-status');
+  if (!uid) { if (statusEl) { statusEl.style.color='#c0392b'; statusEl.textContent='Select a member.'; } return; }
+  if (!action) { if (statusEl) { statusEl.style.color='#c0392b'; statusEl.textContent='Select an action.'; } return; }
+  if (!pts || pts < 1) { if (statusEl) { statusEl.style.color='#c0392b'; statusEl.textContent='Enter a valid point value.'; } return; }
+  const memberName = document.getElementById('backfill-member')?.selectedOptions[0]?.text || uid;
+  if (!confirm(`Award +${pts} pts to ${memberName} for "${action}"?\n\nThis will increment their total and log the event.`)) return;
+  if (statusEl) { statusEl.style.color='var(--text-muted)'; statusEl.textContent='Awarding...'; }
+  try {
+    await updateDoc(doc(db, 'wac_registry', uid), { points: increment(pts) });
+    await logCommunityPts(uid, memberName, action + ' (backfill)', pts);
+    if (statusEl) { statusEl.style.color='var(--gold-dark)'; statusEl.textContent=`Done — +${pts} pts awarded to ${memberName} for "${action}".`; }
+    showToast(`Backfill complete: +${pts} pts to ${memberName}`);
+    await loadCommunityPtsLog();
+  } catch(e) {
+    if (statusEl) { statusEl.style.color='#c0392b'; statusEl.textContent='Error: ' + e.message; }
+  }
+}
+
+window.adminBackfillPts = adminBackfillPts;
+window.backfillActionChanged = backfillActionChanged;
+
+async function loadCommunityPtsLog() {
+  const listEl = document.getElementById('comm-pts-list');
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Loading...</div>';
+  const memberFilter = document.getElementById('comm-pts-member-filter')?.value || '';
+  const actionFilter = document.getElementById('comm-pts-action-filter')?.value || '';
+  try {
+    let q = collection(db, 'wac_community_pts');
+    const snap = await getDocs(q);
+    let rows = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    if (memberFilter) rows = rows.filter(r => r.uid === memberFilter);
+    if (actionFilter) rows = rows.filter(r => r.action === actionFilter);
+    rows.sort((a,b) => (b.ts||0) - (a.ts||0));
+    if (!rows.length) {
+      listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No records found.</div>';
+      return;
+    }
+    listEl.innerHTML = `
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">${rows.length} record${rows.length !== 1 ? 's' : ''}</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="text-align:left;padding:6px 8px;color:var(--text-muted);font-weight:600;white-space:nowrap;">Member</th>
+              <th style="text-align:left;padding:6px 8px;color:var(--text-muted);font-weight:600;white-space:nowrap;">Action</th>
+              <th style="text-align:right;padding:6px 8px;color:var(--text-muted);font-weight:600;">Pts</th>
+              <th style="text-align:right;padding:6px 8px;color:var(--text-muted);font-weight:600;white-space:nowrap;">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:7px 8px;color:var(--text);">${esc(r.name || r.uid)}</td>
+                <td style="padding:7px 8px;color:var(--text-muted);">${esc(r.action)}</td>
+                <td style="padding:7px 8px;text-align:right;font-weight:700;color:var(--gold);">+${r.pts}</td>
+                <td style="padding:7px 8px;text-align:right;color:var(--text-muted);white-space:nowrap;">${new Date(r.ts||0).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch(e) {
+    listEl.innerHTML = '<div style="color:#c0392b;font-size:13px;padding:8px;">Error: ' + e.message + '</div>';
+  }
+}
+
+window.loadCommunityPtsLog = loadCommunityPtsLog;
+window.populateCommPtsMemberFilter = populateCommPtsMemberFilter;
 
 window.rsvpCowork = rsvpCowork;
 window.adminCreateCoworkSession = adminCreateCoworkSession;
@@ -7932,6 +8128,7 @@ async function submitRER() {
     const regRefRER = doc(db, "wac_registry", currentUser.uid);
     await updateDoc(regRefRER, { points: increment(PTS_RER) });
     currentUser.points = (currentUser.points || 0) + PTS_RER;
+    logCommunityPts(currentUser.uid, currentUser.name, "Expert Review Request", PTS_RER);
     document.getElementById("rer-url").value = "";
     document.getElementById("rer-prompt").value = "";
     switchComposeTab("post");
@@ -8467,6 +8664,7 @@ async function saveListing() {
     if (isNew) {
       await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_BACKLINK) });
       currentUser.points = (currentUser.points || 0) + PTS_BACKLINK;
+      logCommunityPts(currentUser.uid, currentUser.name, 'Backlink Listing Added', PTS_BACKLINK);
       showToast(`Listing added! +${PTS_BACKLINK} pts`);
     } else {
       showToast('Listing updated!');
