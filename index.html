@@ -2158,10 +2158,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div class="dash-stat-value" id="dash-val-posts">0</div>
           <div class="dash-stat-label">Update Points</div>
         </div>
-        <div class="dash-stat-card dash-animate" style="animation-delay:0.39s;display:none;">
-          <span class="dash-stat-icon">🤝</span>
-          <div class="dash-stat-value" id="dash-val-eng">0</div>
-          <div class="dash-stat-label">Engage Points</div>
+        <div class="dash-stat-card dash-animate" style="animation-delay:0.39s;">
+          <span class="dash-stat-icon">💬</span>
+          <div class="dash-stat-value" id="dash-val-community">0</div>
+          <div class="dash-stat-label">Community Pts</div>
         </div>
         <div class="dash-stat-card dash-animate" style="animation-delay:0.46s;">
           <span class="dash-stat-icon">📅</span>
@@ -2485,6 +2485,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="points-row"><span>On-time update</span><span class="pts-val">+10 pts</span></div>
         <div class="points-row"><span>Blog Post or New Page</span><span class="pts-val">+2 pts</span></div>
         <div class="points-row"><span>Weekly Challenge bonus</span><span class="pts-val">+5 pts</span></div>
+        <div class="points-row"><span>Community Feed post</span><span class="pts-val">+1 pt</span></div>
         <div class="points-row"><span>Peer Review Request</span><span class="pts-val">+5 pts</span></div>
         <div class="points-row"><span>Expert Review Request</span><span class="pts-val">+10 pts</span></div>
         <div class="points-row"><span>Backlink Directory listing</span><span class="pts-val">+15 pts</span></div>
@@ -3214,6 +3215,7 @@ const PTS_CHALLENGE  = 5;
 const PTS_PVR        = 5;  // Posting a Peer Review Request
 const PTS_RER        = 10; // Posting an Expert Review Request
 const PTS_BACKLINK   = 15; // Adding listing to Backlink Repository
+const PTS_POST          = 1;  // Regular community feed post
 const PTS_COWORK_RSVP   = 2;  // RSVP to a coworking session
 const PTS_COWORK_ATTEND = 5;  // Attending a coworking session (admin-awarded)
 
@@ -3946,7 +3948,7 @@ window.loadDashboard = async function() {
   initZoomRSVPBtn();
 
   if (!db || useLocalFallback) {
-    _renderDashboard({total:0, postPts:0, engPts:0, trackerPostCount:0, subsCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
+    _renderDashboard({total:0, postPts:0, engPts:0, communityPts:0, trackerPostCount:0, subsCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
     return;
   }
 
@@ -3976,6 +3978,7 @@ window.loadDashboard = async function() {
     const engs = engSnap.docs.map(d => ({...d.data(), id:d.id}));
     const postPts = subs.reduce((a, s) => a + (s.pts || 0), 0);
     const engPts = engs.reduce((a, e) => a + (e.pts || 0), 0);
+    const communityPts = Math.max(0, totalPts - postPts - engPts);
 
     // Tracker-based post count
     const trackerData = trackerSnap.exists() ? trackerSnap.data() : {};
@@ -4010,11 +4013,11 @@ window.loadDashboard = async function() {
       .filter(m => !m.isAdmin && m.email !== ADMIN_EMAIL)
       .slice(0, 10);
 
-    _renderDashboard({total:totalPts, postPts, engPts, trackerPostCount, subsCount:subs.length, weekSubmitted, trackerThisWeek, trackerDots, leaderboard:lbMembers, myUid:uid});
+    _renderDashboard({total:totalPts, postPts, engPts, communityPts, trackerPostCount, subsCount:subs.length, weekSubmitted, trackerThisWeek, trackerDots, leaderboard:lbMembers, myUid:uid});
 
   } catch(e) {
     console.error('Dashboard load error:', e);
-    _renderDashboard({total:0, postPts:0, engPts:0, trackerPostCount:0, subsCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
+    _renderDashboard({total:0, postPts:0, engPts:0, communityPts:0, trackerPostCount:0, subsCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
   }
 };
 
@@ -4032,7 +4035,7 @@ function _dashCountUp(el, target, delay=0, duration=900) {
   }, delay);
 }
 
-function _renderDashboard({total, postPts, engPts, trackerPostCount, subsCount, weekSubmitted, trackerThisWeek, trackerDots, leaderboard, myUid}) {
+function _renderDashboard({total, postPts, engPts, communityPts, trackerPostCount, subsCount, weekSubmitted, trackerThisWeek, trackerDots, leaderboard, myUid}) {
   // Status pills
   const strip = document.getElementById('dash-status-strip');
   if (strip) {
@@ -4049,6 +4052,7 @@ function _renderDashboard({total, postPts, engPts, trackerPostCount, subsCount, 
   _dashCountUp(document.getElementById('dash-val-total'), total,            120);
   _dashCountUp(document.getElementById('dash-val-posts'), postPts,          200);
   _dashCountUp(document.getElementById('dash-val-eng'),   engPts,           280);
+  _dashCountUp(document.getElementById('dash-val-community'), communityPts || 0, 280);
   _dashCountUp(document.getElementById('dash-val-count'), subsCount,         360);
 
   // All-Star progress bar (24 total required updates across 12 weeks)
@@ -4125,9 +4129,11 @@ async function submitPost() {
       propsCount: 0,
       timestamp: Date.now()
     });
+    await updateDoc(doc(db, "wac_registry", currentUser.uid), { points: increment(PTS_POST) });
+    currentUser.points = (currentUser.points || 0) + PTS_POST;
     document.getElementById("feed-compose").value = "";
     document.getElementById("feed-url").value = "";
-    showToast("Posted!");
+    showToast(`Posted! +${PTS_POST} pt`);
     loadFeed();
   } catch (e) {
     console.error("submitPost error:", e);
