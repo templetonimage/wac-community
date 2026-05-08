@@ -6889,18 +6889,20 @@ const ZOOM_CALENDAR_URL = 'https://calendar.app.google/ax4wZJFwBH8xeGv28';
 
 async function zoomRSVP() {
   const btn = document.getElementById('zoom-rsvp-btn');
-  const alreadyDone = lsGet(ZOOM_RSVP_KEY);
-  if (alreadyDone) {
-    window.open(ZOOM_CALENDAR_URL, '_blank', 'noopener');
-    return;
-  }
   if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
   try {
+    const rsvpRef = doc(db, 'wac_zoom_rsvps', ZOOM_RSVP_KEY + '_' + currentUser.uid);
+    const existing = await getDoc(rsvpRef);
+    if (existing.exists()) {
+      _setZoomRSVPDone(btn);
+      window.open(ZOOM_CALENDAR_URL, '_blank', 'noopener');
+      return;
+    }
+    await setDoc(rsvpRef, { uid: currentUser.uid, name: currentUser.name || '', rsvpAt: Date.now() });
     await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_COWORK_RSVP) });
     currentUser.points = (currentUser.points || 0) + PTS_COWORK_RSVP;
-    lsSet(ZOOM_RSVP_KEY, '1');
     showToast(`RSVP confirmed! +${PTS_COWORK_RSVP} pts`);
-    if (btn) { btn.textContent = "RSVP'd"; btn.style.opacity = '0.6'; btn.style.cursor = 'default'; }
+    _setZoomRSVPDone(btn);
     window.open(ZOOM_CALENDAR_URL, '_blank', 'noopener');
   } catch(e) {
     showToast('Error: ' + (e.code || e.message));
@@ -6908,16 +6910,24 @@ async function zoomRSVP() {
   }
 }
 
-// Re-render zoom btn state on dashboard load
-function initZoomRSVPBtn() {
-  const btn = document.getElementById('zoom-rsvp-btn');
+function _setZoomRSVPDone(btn) {
   if (!btn) return;
-  if (lsGet(ZOOM_RSVP_KEY)) {
-    btn.textContent = "RSVP'd";
-    btn.style.opacity = '0.6';
-    btn.style.cursor = 'default';
-    btn.onclick = () => window.open(ZOOM_CALENDAR_URL, '_blank', 'noopener');
-  }
+  btn.textContent = "RSVP'd";
+  btn.disabled = false;
+  btn.style.opacity = '0.6';
+  btn.style.cursor = 'default';
+  btn.onclick = () => window.open(ZOOM_CALENDAR_URL, '_blank', 'noopener');
+}
+
+// Check Firestore on dashboard load to set btn state
+async function initZoomRSVPBtn() {
+  const btn = document.getElementById('zoom-rsvp-btn');
+  if (!btn || !db || !currentUser) return;
+  try {
+    const rsvpRef = doc(db, 'wac_zoom_rsvps', ZOOM_RSVP_KEY + '_' + currentUser.uid);
+    const snap = await getDoc(rsvpRef);
+    if (snap.exists()) _setZoomRSVPDone(btn);
+  } catch(e) { /* non-critical, leave button as-is */ }
 }
 window.zoomRSVP = zoomRSVP;
 
