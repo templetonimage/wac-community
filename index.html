@@ -2196,12 +2196,24 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div style="display:flex;align-items:center;gap:14px;">
           <span style="font-size:26px;flex-shrink:0;">📅</span>
           <div style="flex:1;">
-            <div style="font-weight:700;font-size:14px;color:var(--text);">WAC Zoom — May 7 @ 8pm ET</div>
+            <div style="font-weight:700;font-size:14px;color:var(--text);">WAC Zoom — Thursday, May 14 @ 8pm ET</div>
             <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Round 1 check-in. Add it to your calendar.</div>
           </div>
-          <a href="https://calendar.app.google/Kw6bJ8ski3SgQZE96" target="_blank" rel="noopener" class="btn btn-gold btn-sm" style="flex-shrink:0;">Add →</a>
+          <a href="https://calendar.app.google/ax4wZJFwBH8xeGv28" target="_blank" rel="noopener" class="btn btn-gold btn-sm" style="flex-shrink:0;">Add →</a>
         </div>
       </div>
+      <!-- COWORKING RSVP CARD (shown when active session exists) -->
+      <div id="cowork-card" class="dash-animate" style="display:none;animation-delay:0.548s;background:linear-gradient(135deg,rgba(184,134,11,0.07),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span style="font-size:26px;flex-shrink:0;">💻</span>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:14px;color:var(--text);" id="cowork-card-label">Coworking Session</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;" id="cowork-card-sub">RSVP to earn +2 pts. Attend to earn +5 pts.</div>
+          </div>
+          <button id="cowork-rsvp-btn" class="btn btn-gold btn-sm" style="flex-shrink:0;" onclick="rsvpCowork()">RSVP +2</button>
+        </div>
+      </div>
+
       <div class="dash-allstar-banner dash-animate" style="animation-delay:0.55s;">
         <div class="dash-allstar-top">
           <div class="dash-allstar-star">⭐</div>
@@ -2472,6 +2484,11 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="points-row"><span>On-time update</span><span class="pts-val">+10 pts</span></div>
         <div class="points-row"><span>Blog Post or New Page</span><span class="pts-val">+2 pts</span></div>
         <div class="points-row"><span>Weekly Challenge bonus</span><span class="pts-val">+5 pts</span></div>
+        <div class="points-row"><span>Peer Review Request</span><span class="pts-val">+5 pts</span></div>
+        <div class="points-row"><span>Expert Review Request</span><span class="pts-val">+10 pts</span></div>
+        <div class="points-row"><span>Backlink Directory listing</span><span class="pts-val">+15 pts</span></div>
+        <div class="points-row"><span>Coworking RSVP</span><span class="pts-val">+2 pts</span></div>
+        <div class="points-row"><span>Coworking attendance</span><span class="pts-val">+5 pts</span></div>
         <div class="points-row" style="display:none;"><span>Engagement (per member site)</span><span class="pts-val">+2 pts</span></div>
         <div class="points-row" style="display:none;"><span>Max engagements/week</span><span class="pts-val">5</span></div>
       </div>
@@ -2578,6 +2595,26 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <button class="btn btn-sm" onclick="deleteAllTrialSubmissions()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">Delete All Trial Submissions</button>
         </div>
         <div id="delete-trial-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
+      </div>
+
+      <!-- ADMIN: Coworking Sessions -->
+      <div id="admin-cowork-tool" style="display:none;margin-top:28px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">💻 Coworking Sessions</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Create a session to surface the RSVP card on members' dashboards. Mark attendees after the session to award +5 pts each. RSVP (+2 pts) is member self-service.</div>
+
+        <!-- Create Session -->
+        <div class="card" style="border:1.5px solid var(--border);margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Create Session</div>
+          <div class="form-group">
+            <label class="form-label">Session Label</label>
+            <input type="text" id="cowork-new-label" class="form-input" placeholder="e.g. Coworking — May 15, 2026 @ 10am ET" />
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="adminCreateCoworkSession()">Create Session</button>
+          <div id="cowork-create-status" style="font-size:12px;color:var(--text-muted);margin-top:8px;min-height:14px;"></div>
+        </div>
+
+        <!-- Session List -->
+        <div id="cowork-session-list"><div style="font-size:13px;color:var(--text-muted);padding:8px 0;">Loading sessions...</div></div>
       </div>
 
       <!-- ADMIN: WAC Pro Management (hidden until _PRO_GLOBAL_ACTIVE = true) -->
@@ -3172,6 +3209,11 @@ const PTS_SCREENSHOT = 2;
 const PTS_FORMAT_BONUS = 2; // Blog Post or New Page
 const PTS_ENGAGEMENT = 2;
 const PTS_CHALLENGE  = 5;
+const PTS_PVR        = 5;  // Posting a Peer Review Request
+const PTS_RER        = 10; // Posting an Expert Review Request
+const PTS_BACKLINK   = 15; // Adding listing to Backlink Repository
+const PTS_COWORK_RSVP   = 2;  // RSVP to a coworking session
+const PTS_COWORK_ATTEND = 5;  // Attending a coworking session (admin-awarded)
 
 const ZOOM_REPLAYS = [
   { title:"WAC Introductory Zoom",         date:"April 1, 2026",  url:"https://youtu.be/CZUVyytXaPY", emoji:"🎬" },
@@ -3642,7 +3684,7 @@ function bootApp() {
   if (_proNavBtn) _proNavBtn.style.display = userHasPro() ? "flex" : "none";
 
   // 5. Show/hide admin elements
-  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-delete-trial", "admin-submissions-tool"];
+  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-delete-trial", "admin-submissions-tool", "admin-cowork-tool"];
   adminBoxes.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
@@ -3665,6 +3707,9 @@ function bootApp() {
     // Expert webhook config visible to admin
     const _expertWebhook = document.getElementById("admin-expert-webhook");
     if (_expertWebhook) _expertWebhook.style.display = "block";
+    // Coworking tool visible to admin
+    const _coworkTool = document.getElementById("admin-cowork-tool");
+    if (_coworkTool) { _coworkTool.style.display = "block"; loadAdminCoworkSessions(); }
     populateAdminSubFilters();
   } else {
     const _proPanel = document.getElementById("admin-pro-panel");
@@ -3675,6 +3720,8 @@ function bootApp() {
     if (_subsTool) _subsTool.style.display = "none";
     const _expertWebhook = document.getElementById("admin-expert-webhook");
     if (_expertWebhook) _expertWebhook.style.display = "none";
+    const _coworkToolHide = document.getElementById("admin-cowork-tool");
+    if (_coworkToolHide) _coworkToolHide.style.display = "none";
   }
 
   // Expert panel — visible to Expert user on Reports page (loaded on navTo)
@@ -3891,6 +3938,9 @@ window.loadDashboard = async function() {
 
   const metaEl = document.getElementById('dash-date-meta');
   if (metaEl) metaEl.textContent = new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+
+  // Load coworking card (non-blocking, independent)
+  loadCoworkCard();
 
   if (!db || useLocalFallback) {
     _renderDashboard({total:0, postPts:0, engPts:0, trackerPostCount:0, subsCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
@@ -4500,10 +4550,13 @@ async function submitPVR() {
       propsCount: 0,
       timestamp: Date.now()
     });
+    const regRefPVR = doc(db, "wac_registry", currentUser.uid);
+    await updateDoc(regRefPVR, { points: increment(PTS_PVR) });
+    currentUser.points = (currentUser.points || 0) + PTS_PVR;
     document.getElementById("pvr-url").value = "";
     document.getElementById("pvr-prompt").value = "";
     switchComposeTab("post");
-    showToast("Peer Review Request posted!");
+    showToast(`Peer Review Request posted! +${PTS_PVR} pts`);
     loadFeed();
   } catch (e) {
     console.error("submitPVR error:", e);
@@ -6635,6 +6688,197 @@ window.toggleSeeMore = toggleSeeMore;
 window.togglePVRSeeMore = togglePVRSeeMore;
 window.submitPostReply = submitPostReply;
 window.switchComposeTab = switchComposeTab;
+
+// ==============================
+// COWORKING SESSIONS
+// ==============================
+
+async function loadCoworkCard() {
+  const card = document.getElementById('cowork-card');
+  const labelEl = document.getElementById('cowork-card-label');
+  const subEl = document.getElementById('cowork-card-sub');
+  const btn = document.getElementById('cowork-rsvp-btn');
+  if (!card || !db) return;
+  try {
+    const snap = await getDocs(query(collection(db, 'wac_coworking_sessions'), where('active', '==', true)));
+    if (snap.empty) { card.style.display = 'none'; return; }
+    // Use most recently created active session
+    const sessions = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    const session = sessions[0];
+    if (labelEl) labelEl.textContent = session.label || 'Coworking Session';
+    // Check if already RSVP'd
+    const rsvpRef = doc(db, 'wac_coworking_sessions', session.id, 'rsvps', currentUser.uid);
+    const rsvpSnap = await getDoc(rsvpRef);
+    if (rsvpSnap.exists()) {
+      if (btn) { btn.textContent = "RSVP'd"; btn.disabled = true; btn.style.opacity = '0.55'; btn.style.cursor = 'default'; }
+      if (subEl) subEl.textContent = "You're on the list! Attend to earn +5 pts.";
+    } else {
+      if (btn) { btn.textContent = 'RSVP +2'; btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
+      if (subEl) subEl.textContent = 'RSVP to earn +2 pts. Attend to earn +5 pts.';
+    }
+    card.style.display = 'block';
+    card._sessionId = session.id;
+  } catch(e) {
+    console.error('loadCoworkCard error:', e);
+    card.style.display = 'none';
+  }
+}
+
+async function rsvpCowork() {
+  const card = document.getElementById('cowork-card');
+  const btn = document.getElementById('cowork-rsvp-btn');
+  if (!card || !card._sessionId) { showToast('No active session found.'); return; }
+  const sessionId = card._sessionId;
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+  try {
+    const rsvpRef = doc(db, 'wac_coworking_sessions', sessionId, 'rsvps', currentUser.uid);
+    const existing = await getDoc(rsvpRef);
+    if (existing.exists()) { showToast('Already RSVP\'d!'); await loadCoworkCard(); return; }
+    await setDoc(rsvpRef, { uid: currentUser.uid, name: currentUser.name || '', rsvpAt: Date.now() });
+    await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_COWORK_RSVP) });
+    currentUser.points = (currentUser.points || 0) + PTS_COWORK_RSVP;
+    showToast(`RSVP confirmed! +${PTS_COWORK_RSVP} pts`);
+    await loadCoworkCard();
+  } catch(e) {
+    console.error('rsvpCowork error:', e);
+    showToast('RSVP failed: ' + (e.code || e.message));
+    if (btn) { btn.disabled = false; btn.textContent = 'RSVP +2'; }
+  }
+}
+
+// ---- Admin: Session Management ----
+
+async function adminCreateCoworkSession() {
+  const labelInput = document.getElementById('cowork-new-label');
+  const statusEl = document.getElementById('cowork-create-status');
+  const label = (labelInput?.value || '').trim();
+  if (!label) { if (statusEl) { statusEl.style.color = '#c0392b'; statusEl.textContent = 'Enter a session label.'; } return; }
+  if (statusEl) { statusEl.style.color = 'var(--text-muted)'; statusEl.textContent = 'Creating...'; }
+  try {
+    await addDoc(collection(db, 'wac_coworking_sessions'), {
+      label,
+      active: true,
+      createdAt: Date.now()
+    });
+    if (labelInput) labelInput.value = '';
+    if (statusEl) { statusEl.style.color = 'var(--gold-dark)'; statusEl.textContent = 'Session created!'; }
+    await loadAdminCoworkSessions();
+    await loadCoworkCard();
+  } catch(e) {
+    if (statusEl) { statusEl.style.color = '#c0392b'; statusEl.textContent = 'Error: ' + e.message; }
+  }
+}
+
+async function loadAdminCoworkSessions() {
+  const listEl = document.getElementById('cowork-session-list');
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">Loading...</div>';
+  try {
+    const snap = await getDocs(collection(db, 'wac_coworking_sessions'));
+    if (snap.empty) { listEl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">No sessions yet.</div>'; return; }
+    const sessions = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    listEl.innerHTML = sessions.map(s => `
+      <div style="border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;background:var(--surface);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+          <div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${esc(s.label)}</div>
+            <div style="font-size:11px;color:var(--text-muted);">Created ${new Date(s.createdAt||0).toLocaleDateString()} &bull; <span style="color:${s.active ? 'var(--gold-dark)' : 'var(--text-muted)'};">${s.active ? 'Active' : 'Closed'}</span></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0;">
+            <button class="btn btn-outline btn-sm" onclick="adminToggleCoworkSession('${s.id}', ${s.active})">${s.active ? 'Close' : 'Reopen'}</button>
+            <button class="btn btn-outline btn-sm" onclick="adminDeleteCoworkSession('${s.id}')">Delete</button>
+          </div>
+        </div>
+        <div id="cowork-attend-${s.id}">
+          <button class="btn btn-sm btn-outline" style="font-size:12px;" onclick="adminLoadAttendees('${s.id}', '${esc(s.label)}')">Mark Attendees (+${PTS_COWORK_ATTEND} pts each)</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    listEl.innerHTML = '<div style="color:#c0392b;font-size:13px;padding:8px;">Error loading sessions: ' + e.message + '</div>';
+  }
+}
+
+async function adminToggleCoworkSession(sessionId, currentActive) {
+  try {
+    await updateDoc(doc(db, 'wac_coworking_sessions', sessionId), { active: !currentActive });
+    await loadAdminCoworkSessions();
+    await loadCoworkCard();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function adminDeleteCoworkSession(sessionId) {
+  if (!confirm('Delete this session? RSVP/attendance records in subcollections are NOT deleted by this action (Firestore limitation — subcollections must be deleted manually if needed).')) return;
+  try {
+    await deleteDoc(doc(db, 'wac_coworking_sessions', sessionId));
+    await loadAdminCoworkSessions();
+    await loadCoworkCard();
+    showToast('Session deleted.');
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function adminLoadAttendees(sessionId, sessionLabel) {
+  const container = document.getElementById('cowork-attend-' + sessionId);
+  if (!container) return;
+  container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);">Loading members...</div>';
+  try {
+    const [regSnap, attendSnap] = await Promise.all([
+      getDocs(collection(db, 'wac_registry')),
+      getDocs(collection(db, 'wac_coworking_sessions', sessionId, 'attendees'))
+    ]);
+    const alreadyAwarded = new Set(attendSnap.docs.map(d => d.id));
+    const members = regSnap.docs
+      .map(d => ({uid: d.id, ...d.data()}))
+      .filter(m => m.email !== 'nate@templetonimage.com')
+      .sort((a,b) => (a.name||'').localeCompare(b.name||''));
+    container.innerHTML = `
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">Check members who attended. Already-awarded members are pre-checked and locked.</div>
+      <div style="max-height:220px;overflow-y:auto;margin-bottom:10px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;">
+        ${members.map(m => `
+          <label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:${alreadyAwarded.has(m.uid) ? 'default' : 'pointer'};">
+            <input type="checkbox" data-uid="${m.uid}" data-name="${esc(m.name)}" ${alreadyAwarded.has(m.uid) ? 'checked disabled' : ''} style="accent-color:var(--gold);" />
+            <span style="font-size:13px;${alreadyAwarded.has(m.uid) ? 'color:var(--text-muted);' : ''}">${esc(m.name)} ${alreadyAwarded.has(m.uid) ? '<span style="font-size:10px;color:var(--gold-dark);">(awarded)</span>' : ''}</span>
+          </label>`).join('')}
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="adminAwardAttendance('${sessionId}')">Award +${PTS_COWORK_ATTEND} pts to Checked</button>
+      <div id="cowork-award-status-${sessionId}" style="font-size:12px;color:var(--text-muted);margin-top:6px;min-height:14px;"></div>`;
+  } catch(e) {
+    container.innerHTML = '<div style="color:#c0392b;font-size:13px;">Error loading members: ' + e.message + '</div>';
+  }
+}
+
+async function adminAwardAttendance(sessionId) {
+  const statusEl = document.getElementById('cowork-award-status-' + sessionId);
+  const checkboxes = document.querySelectorAll(`#cowork-attend-${sessionId} input[type=checkbox]:not(:disabled):checked`);
+  if (!checkboxes.length) {
+    if (statusEl) { statusEl.style.color = '#c0392b'; statusEl.textContent = 'No new members checked.'; }
+    return;
+  }
+  if (statusEl) { statusEl.style.color = 'var(--text-muted)'; statusEl.textContent = `Awarding ${PTS_COWORK_ATTEND} pts to ${checkboxes.length} member(s)...`; }
+  let count = 0;
+  try {
+    for (const cb of checkboxes) {
+      const uid = cb.dataset.uid;
+      if (!uid) continue;
+      await setDoc(doc(db, 'wac_coworking_sessions', sessionId, 'attendees', uid), { uid, awardedAt: Date.now() });
+      await updateDoc(doc(db, 'wac_registry', uid), { points: increment(PTS_COWORK_ATTEND) });
+      count++;
+    }
+    if (statusEl) { statusEl.style.color = 'var(--gold-dark)'; statusEl.textContent = `Done — ${PTS_COWORK_ATTEND} pts awarded to ${count} member(s).`; }
+    showToast(`Attendance awarded to ${count} member(s).`);
+    await adminLoadAttendees(sessionId, '');
+  } catch(e) {
+    if (statusEl) { statusEl.style.color = '#c0392b'; statusEl.textContent = 'Error: ' + e.message; }
+  }
+}
+
+window.rsvpCowork = rsvpCowork;
+window.adminCreateCoworkSession = adminCreateCoworkSession;
+window.loadAdminCoworkSessions = loadAdminCoworkSessions;
+window.adminToggleCoworkSession = adminToggleCoworkSession;
+window.adminDeleteCoworkSession = adminDeleteCoworkSession;
+window.adminLoadAttendees = adminLoadAttendees;
+window.adminAwardAttendance = adminAwardAttendance;
+
 window.submitPVR = submitPVR;
 window.togglePVRReplies = togglePVRReplies;
 window.togglePVRCompose = togglePVRCompose;
@@ -7625,10 +7869,13 @@ async function submitRER() {
       }).catch(() => {});
     }
 
+    const regRefRER = doc(db, "wac_registry", currentUser.uid);
+    await updateDoc(regRefRER, { points: increment(PTS_RER) });
+    currentUser.points = (currentUser.points || 0) + PTS_RER;
     document.getElementById("rer-url").value = "";
     document.getElementById("rer-prompt").value = "";
     switchComposeTab("post");
-    showToast("Expert Review Request submitted!");
+    showToast(`Expert Review Request submitted! +${PTS_RER} pts`);
     loadRERStatus();
   } catch (e) {
     showToast("Failed to submit: " + (e.code || e.message));
@@ -8057,7 +8304,7 @@ async function renderMyListing() {
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
             <button class="btn btn-outline btn-sm" onclick="openEditListing()">Edit</button>
-            <button class="btn btn-outline btn-sm" style="color:#c0392b;border-color:#c0392b;" onclick="removeListing()">Remove</button>
+            <button class="btn btn-outline btn-sm" style="color:#c0392b;border-color:#c0392b;" onclick="removeListing()" title="Removing your listing deducts 15 pts">Remove</button>
           </div>
         </div>`;
     } else {
@@ -8143,7 +8390,10 @@ async function saveListing() {
   }
   msg.style.color = 'var(--text-muted)'; msg.textContent = 'Saving...';
   try {
-    await setDoc(doc(db, 'wac_backlinks', currentUser.uid), {
+    const blRef = doc(db, 'wac_backlinks', currentUser.uid);
+    const existingSnap = await getDoc(blRef);
+    const isNew = !existingSnap.exists();
+    await setDoc(blRef, {
       uid: currentUser.uid,
       displayName: currentUser.name || '',
       siteUrl: url,
@@ -8154,6 +8404,13 @@ async function saveListing() {
       listedAt: new Date(),
       isActive: true
     });
+    if (isNew) {
+      await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_BACKLINK) });
+      currentUser.points = (currentUser.points || 0) + PTS_BACKLINK;
+      showToast(`Listing added! +${PTS_BACKLINK} pts`);
+    } else {
+      showToast('Listing updated!');
+    }
     const overlay = document.getElementById('bl-edit-overlay');
     if (overlay) overlay.remove();
     await renderMyListing();
@@ -8165,9 +8422,12 @@ async function saveListing() {
 }
 
 async function removeListing() {
-  if (!confirm('Remove your listing from the directory?')) return;
+  if (!confirm(`Remove your listing from the Backlink Directory?\n\nNote: Removing your listing will deduct ${PTS_BACKLINK} points from your score.`)) return;
   try {
     await deleteDoc(doc(db, 'wac_backlinks', currentUser.uid));
+    await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(-PTS_BACKLINK) });
+    currentUser.points = Math.max(0, (currentUser.points || 0) - PTS_BACKLINK);
+    showToast(`Listing removed. -${PTS_BACKLINK} pts`);
     await renderMyListing();
     await loadBacklinkDirectory();
   } catch(e) { alert('Error removing listing. Try again.'); }
