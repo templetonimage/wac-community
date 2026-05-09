@@ -8529,8 +8529,7 @@ let _blAllListings = [];
 
 async function loadBacklinkPage() {
   if (!currentUser) return;
-  await renderMyListing();
-  await loadBacklinkDirectory();
+  await Promise.all([renderMyListing(), loadBacklinkDirectory()]);
   if (currentUser.isAdmin) {
     const ap = document.getElementById('bl-admin-panel');
     if (ap) ap.style.display = 'block';
@@ -8735,7 +8734,7 @@ function renderBacklinkDirectory() {
       <div><span class="backlink-tag gold">${esc(d.siteNiche)}</span><span class="backlink-tag">${exchangeLabel[d.exchangeType] || d.exchangeType}</span></div>
       <div class="backlink-dir-desc">${esc(d.siteDescription)}</div>
       <a href="mailto:${esc(d.contactEmail)}?subject=WAC%20Backlink%20Exchange%20%E2%80%94%20${encodeURIComponent(d.displayName || d.siteUrl)}"
-         class="btn btn-outline btn-sm" style="display:inline-block;text-decoration:none;">Contact for Exchange</a>
+         class="btn btn-sm" style="display:inline-block;text-decoration:none;background:var(--gold);color:#fff;border-color:var(--gold);">Contact for Exchange</a>
     </div>`).join('');
 }
 
