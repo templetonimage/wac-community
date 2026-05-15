@@ -2192,16 +2192,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <button onclick="openEEATAudit()" class="btn btn-sm" style="flex:1;background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold);color:#e8d5a0;">✅ Site Audit</button>
         </div>
       </div>
-      <div class="dash-animate" style="animation-delay:0.545s;background:linear-gradient(135deg,rgba(184,134,11,0.07),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <span style="font-size:26px;flex-shrink:0;">📅</span>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:14px;color:var(--text);">WAC Zoom — Thursday, May 14 @ 8pm ET</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Round 1 check-in. RSVP for <strong style="color:var(--gold);">+2 pts</strong>, attend for <strong style="color:var(--gold);">+5 pts</strong>.</div>
-          </div>
-          <button id="zoom-rsvp-btn" class="btn btn-gold btn-sm" style="flex-shrink:0;" onclick="zoomRSVP()">RSVP +2</button>
-        </div>
-      </div>
+
       <!-- COWORKING RSVP CARD (shown when active session exists) -->
       <div id="cowork-card" class="dash-animate" style="display:none;animation-delay:0.548s;background:linear-gradient(135deg,rgba(184,134,11,0.07),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);">
         <div style="display:flex;align-items:center;gap:14px;">
@@ -4012,7 +4003,6 @@ window.loadDashboard = async function() {
 
   // Load coworking card (non-blocking, independent)
   loadCoworkCard();
-  initZoomRSVPBtn();
 
   if (!db || useLocalFallback) {
     _renderDashboard({total:0, postPts:0, engPts:0, communityPts:0, trackerPostCount:0, subsCount:0, weekSubmitted:false, trackerThisWeek:false, trackerDots:[], leaderboard:[], myUid:''});
@@ -6876,8 +6866,17 @@ async function loadAdminCoworkSessions() {
           </div>
           <div style="display:flex;gap:8px;flex-shrink:0;">
             <button class="btn btn-outline btn-sm" onclick="adminToggleCoworkSession('${s.id}', ${s.active})">${s.active ? 'Close' : 'Reopen'}</button>
+            <button class="btn btn-outline btn-sm" onclick="adminShowRenameSession('${s.id}')">Edit</button>
             <button class="btn btn-outline btn-sm" onclick="adminDeleteCoworkSession('${s.id}')">Delete</button>
           </div>
+        </div>
+        <div id="cowork-rename-${s.id}" style="display:none;margin-bottom:10px;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="cowork-rename-input-${s.id}" class="form-input" value="${esc(s.label)}" style="flex:1;font-size:13px;padding:6px 10px;" />
+            <button class="btn btn-gold btn-sm" onclick="adminRenameSession('${s.id}')">Save</button>
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('cowork-rename-${s.id}').style.display='none'">Cancel</button>
+          </div>
+          <div id="cowork-rename-status-${s.id}" style="font-size:11px;color:var(--text-muted);margin-top:4px;min-height:12px;"></div>
         </div>
         <div id="cowork-attend-${s.id}">
           <button class="btn btn-sm btn-outline" style="font-size:12px;" onclick="adminLoadAttendees('${s.id}', '${esc(s.label)}')">Mark Attendees (+${PTS_COWORK_ATTEND} pts each)</button>
@@ -6904,6 +6903,27 @@ async function adminDeleteCoworkSession(sessionId) {
     await loadCoworkCard();
     showToast('Session deleted.');
   } catch(e) { showToast('Error: ' + e.message); }
+}
+
+function adminShowRenameSession(sessionId) {
+  const row = document.getElementById('cowork-rename-' + sessionId);
+  if (!row) return;
+  row.style.display = row.style.display === 'none' ? 'block' : 'none';
+}
+
+async function adminRenameSession(sessionId) {
+  const input = document.getElementById('cowork-rename-input-' + sessionId);
+  const statusEl = document.getElementById('cowork-rename-status-' + sessionId);
+  const label = (input?.value || '').trim();
+  if (!label) { if (statusEl) { statusEl.style.color = '#c0392b'; statusEl.textContent = 'Label cannot be empty.'; } return; }
+  try {
+    await updateDoc(doc(db, 'wac_coworking_sessions', sessionId), { label });
+    if (statusEl) { statusEl.style.color = 'var(--gold-dark)'; statusEl.textContent = 'Saved!'; }
+    await loadAdminCoworkSessions();
+    await loadCoworkCard();
+  } catch(e) {
+    if (statusEl) { statusEl.style.color = '#c0392b'; statusEl.textContent = 'Error: ' + e.message; }
+  }
 }
 
 async function adminLoadAttendees(sessionId, sessionLabel) {
@@ -6962,57 +6982,6 @@ async function adminAwardAttendance(sessionId) {
   }
 }
 
-
-// ==============================
-// ZOOM RSVP (dashboard card)
-// ==============================
-const ZOOM_RSVP_KEY = 'wac_zoom_rsvp_may14';
-const ZOOM_CALENDAR_URL = 'https://calendar.app.google/ax4wZJFwBH8xeGv28';
-
-async function zoomRSVP() {
-  const btn = document.getElementById('zoom-rsvp-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
-  try {
-    const rsvpRef = doc(db, 'wac_zoom_rsvps', ZOOM_RSVP_KEY + '_' + currentUser.uid);
-    const existing = await getDoc(rsvpRef);
-    if (existing.exists()) {
-      _setZoomRSVPDone(btn);
-      window.open(ZOOM_CALENDAR_URL, '_blank', 'noopener');
-      return;
-    }
-    await setDoc(rsvpRef, { uid: currentUser.uid, name: currentUser.name || '', rsvpAt: Date.now() });
-    await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_COWORK_RSVP) });
-    currentUser.points = (currentUser.points || 0) + PTS_COWORK_RSVP;
-    logCommunityPts(currentUser.uid, currentUser.name, 'Zoom RSVP', PTS_COWORK_RSVP);
-    showToast(`RSVP confirmed! +${PTS_COWORK_RSVP} pts`);
-    _setZoomRSVPDone(btn);
-    window.open(ZOOM_CALENDAR_URL, '_blank', 'noopener');
-  } catch(e) {
-    showToast('Error: ' + (e.code || e.message));
-    if (btn) { btn.disabled = false; btn.textContent = 'RSVP +2'; }
-  }
-}
-
-function _setZoomRSVPDone(btn) {
-  if (!btn) return;
-  btn.textContent = "RSVP'd";
-  btn.disabled = false;
-  btn.style.opacity = '0.6';
-  btn.style.cursor = 'default';
-  btn.onclick = () => window.open(ZOOM_CALENDAR_URL, '_blank', 'noopener');
-}
-
-// Check Firestore on dashboard load to set btn state
-async function initZoomRSVPBtn() {
-  const btn = document.getElementById('zoom-rsvp-btn');
-  if (!btn || !db || !currentUser) return;
-  try {
-    const rsvpRef = doc(db, 'wac_zoom_rsvps', ZOOM_RSVP_KEY + '_' + currentUser.uid);
-    const snap = await getDoc(rsvpRef);
-    if (snap.exists()) _setZoomRSVPDone(btn);
-  } catch(e) { /* non-critical, leave button as-is */ }
-}
-window.zoomRSVP = zoomRSVP;
 
 
 // ==============================
@@ -7132,6 +7101,8 @@ window.adminCreateCoworkSession = adminCreateCoworkSession;
 window.loadAdminCoworkSessions = loadAdminCoworkSessions;
 window.adminToggleCoworkSession = adminToggleCoworkSession;
 window.adminDeleteCoworkSession = adminDeleteCoworkSession;
+window.adminShowRenameSession = adminShowRenameSession;
+window.adminRenameSession = adminRenameSession;
 window.adminLoadAttendees = adminLoadAttendees;
 window.adminAwardAttendance = adminAwardAttendance;
 
@@ -8529,7 +8500,8 @@ let _blAllListings = [];
 
 async function loadBacklinkPage() {
   if (!currentUser) return;
-  await Promise.all([renderMyListing(), loadBacklinkDirectory()]);
+  await renderMyListing();
+  await loadBacklinkDirectory();
   if (currentUser.isAdmin) {
     const ap = document.getElementById('bl-admin-panel');
     if (ap) ap.style.display = 'block';
@@ -8734,7 +8706,7 @@ function renderBacklinkDirectory() {
       <div><span class="backlink-tag gold">${esc(d.siteNiche)}</span><span class="backlink-tag">${exchangeLabel[d.exchangeType] || d.exchangeType}</span></div>
       <div class="backlink-dir-desc">${esc(d.siteDescription)}</div>
       <a href="mailto:${esc(d.contactEmail)}?subject=WAC%20Backlink%20Exchange%20%E2%80%94%20${encodeURIComponent(d.displayName || d.siteUrl)}"
-         class="btn btn-sm" style="display:inline-block;text-decoration:none;background:var(--gold);color:#fff;border-color:var(--gold);">Contact for Exchange</a>
+         class="btn btn-outline btn-sm" style="display:inline-block;text-decoration:none;">Contact for Exchange</a>
     </div>`).join('');
 }
 
