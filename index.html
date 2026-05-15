@@ -4096,7 +4096,30 @@ function _dashCountUp(el, target, delay=0, duration=900) {
   }, delay);
 }
 
+function _updateSubmitBtnState(weekSubmitted) {
+  const btn = document.getElementById('submit-update-btn');
+  if (!btn) return;
+  if (weekSubmitted) {
+    btn.disabled = true;
+    btn.textContent = '✓ Update Submitted';
+    btn.style.background = 'var(--success, #27ae60)';
+    btn.style.borderColor = 'var(--success, #27ae60)';
+    btn.style.color = '#fff';
+    btn.style.opacity = '0.85';
+    btn.style.cursor = 'default';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Submit Update';
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+  }
+}
+
 function _renderDashboard({total, postPts, engPts, communityPts, trackerPostCount, subsCount, weekSubmitted, trackerThisWeek, trackerDots, leaderboard, myUid}) {
+  _updateSubmitBtnState(weekSubmitted);
   // Status pills
   const strip = document.getElementById('dash-status-strip');
   if (strip) {
@@ -5426,6 +5449,10 @@ async function loadMySubmissions() {
     const items = [];
     snap.forEach(d => { const data = d.data(); if (!data.isTrial) items.push({ id: d.id, ...data }); });
     items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    // Update submit button state based on whether this week is already submitted
+    const currentWeekIdx = getWeekIndex();
+    const weekSubmitted = currentWeekIdx >= 0 && items.some(s => s.weekIdx === currentWeekIdx);
+    _updateSubmitBtnState(weekSubmitted);
     const el = document.getElementById("my-submissions");
     if (!items.length) { el.innerHTML = '<p class="text-sm text-muted">No submissions yet.</p>'; return; }
     const now = Date.now();
@@ -5593,6 +5620,17 @@ async function toggleCheck(weekId) {
     await setDoc(ref, data, { merge: true });
     if (!currentUser.isAdmin) await checkAllStar(data);
     buildTracker();
+    // Update dashboard tracker pill immediately without full reload
+    const currentWeekId = getWeekIndex() >= 0 ? WEEKS[getWeekIndex()].id : null;
+    const trackerThisWeek = currentWeekId ? !!(data[currentWeekId]) : false;
+    const strip = document.getElementById('dash-status-strip');
+    if (strip) {
+      const pills = strip.querySelectorAll('.dash-status-pill');
+      if (pills[1]) {
+        pills[1].className = trackerThisWeek ? 'dash-status-pill done' : 'dash-status-pill pending';
+        pills[1].innerHTML = `<div class="dash-status-dot"></div>${trackerThisWeek ? 'Tracker updated' : 'Tracker not updated yet'}`;
+      }
+    }
   } catch (e) { showToast("Failed to update tracker."); }
 }
 
