@@ -2602,6 +2602,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <label class="form-label">Session Label</label>
             <input type="text" id="cowork-new-label" class="form-input" placeholder="e.g. Coworking — May 15, 2026 @ 10am ET" />
           </div>
+          <div class="form-group">
+            <label class="form-label">Google Calendar Link <span style="font-weight:400;color:var(--text-muted);">(optional — opened after RSVP)</span></label>
+            <input type="url" id="cowork-new-calurl" class="form-input" placeholder="https://calendar.app.google/..." />
+          </div>
           <button class="btn btn-gold btn-sm" onclick="adminCreateCoworkSession()">Create Session</button>
           <div id="cowork-create-status" style="font-size:12px;color:var(--text-muted);margin-top:8px;min-height:14px;"></div>
         </div>
@@ -6797,6 +6801,7 @@ async function loadCoworkCard() {
     }
     card.style.display = 'block';
     card._sessionId = session.id;
+    card._calendarUrl = session.calendarUrl || '';
   } catch(e) {
     console.error('loadCoworkCard error:', e);
     card.style.display = 'none';
@@ -6818,6 +6823,7 @@ async function rsvpCowork() {
     currentUser.points = (currentUser.points || 0) + PTS_COWORK_RSVP;
     logCommunityPts(currentUser.uid, currentUser.name, 'Coworking RSVP', PTS_COWORK_RSVP);
     showToast(`RSVP confirmed! +${PTS_COWORK_RSVP} pts`);
+    if (card._calendarUrl) window.open(card._calendarUrl, '_blank', 'noopener');
     await loadCoworkCard();
   } catch(e) {
     console.error('rsvpCowork error:', e);
@@ -6830,17 +6836,21 @@ async function rsvpCowork() {
 
 async function adminCreateCoworkSession() {
   const labelInput = document.getElementById('cowork-new-label');
+  const calUrlInput = document.getElementById('cowork-new-calurl');
   const statusEl = document.getElementById('cowork-create-status');
   const label = (labelInput?.value || '').trim();
+  const calendarUrl = (calUrlInput?.value || '').trim();
   if (!label) { if (statusEl) { statusEl.style.color = '#c0392b'; statusEl.textContent = 'Enter a session label.'; } return; }
   if (statusEl) { statusEl.style.color = 'var(--text-muted)'; statusEl.textContent = 'Creating...'; }
   try {
     await addDoc(collection(db, 'wac_coworking_sessions'), {
       label,
+      calendarUrl: calendarUrl || '',
       active: true,
       createdAt: Date.now()
     });
     if (labelInput) labelInput.value = '';
+    if (calUrlInput) calUrlInput.value = '';
     if (statusEl) { statusEl.style.color = 'var(--gold-dark)'; statusEl.textContent = 'Session created!'; }
     await loadAdminCoworkSessions();
     await loadCoworkCard();
@@ -6871,8 +6881,11 @@ async function loadAdminCoworkSessions() {
           </div>
         </div>
         <div id="cowork-rename-${s.id}" style="display:none;margin-bottom:10px;">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+            <input type="text" id="cowork-rename-input-${s.id}" class="form-input" value="${esc(s.label)}" style="flex:1;font-size:13px;padding:6px 10px;" placeholder="Session label" />
+          </div>
           <div style="display:flex;gap:8px;align-items:center;">
-            <input type="text" id="cowork-rename-input-${s.id}" class="form-input" value="${esc(s.label)}" style="flex:1;font-size:13px;padding:6px 10px;" />
+            <input type="url" id="cowork-rename-calurl-${s.id}" class="form-input" value="${esc(s.calendarUrl||'')}" style="flex:1;font-size:13px;padding:6px 10px;" placeholder="Google Calendar link (optional)" />
             <button class="btn btn-gold btn-sm" onclick="adminRenameSession('${s.id}')">Save</button>
             <button class="btn btn-outline btn-sm" onclick="document.getElementById('cowork-rename-${s.id}').style.display='none'">Cancel</button>
           </div>
@@ -6913,11 +6926,13 @@ function adminShowRenameSession(sessionId) {
 
 async function adminRenameSession(sessionId) {
   const input = document.getElementById('cowork-rename-input-' + sessionId);
+  const calUrlInput = document.getElementById('cowork-rename-calurl-' + sessionId);
   const statusEl = document.getElementById('cowork-rename-status-' + sessionId);
   const label = (input?.value || '').trim();
+  const calendarUrl = (calUrlInput?.value || '').trim();
   if (!label) { if (statusEl) { statusEl.style.color = '#c0392b'; statusEl.textContent = 'Label cannot be empty.'; } return; }
   try {
-    await updateDoc(doc(db, 'wac_coworking_sessions', sessionId), { label });
+    await updateDoc(doc(db, 'wac_coworking_sessions', sessionId), { label, calendarUrl: calendarUrl || '' });
     if (statusEl) { statusEl.style.color = 'var(--gold-dark)'; statusEl.textContent = 'Saved!'; }
     await loadAdminCoworkSessions();
     await loadCoworkCard();
