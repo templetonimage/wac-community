@@ -4052,7 +4052,9 @@ window.loadDashboard = async function() {
 
     // This-week submission check
     const currentWeekIdx = getWeekIndex();
-    const weekSubmitted = currentWeekIdx >= 0 && subs.some(s => s.weekIdx === currentWeekIdx);
+    const currentWeekRequired = currentWeekIdx >= 0 ? (WEEKS[currentWeekIdx].required || 1) : 1;
+    const currentWeekSubCount = currentWeekIdx >= 0 ? subs.filter(s => s.weekIdx === currentWeekIdx).length : 0;
+    const weekSubmitted = currentWeekSubCount >= currentWeekRequired;
 
     // Tracker updated this week
     const currentWeekId = currentWeekIdx >= 0 ? WEEKS[currentWeekIdx].id : null;
@@ -4076,7 +4078,7 @@ window.loadDashboard = async function() {
       .filter(m => !m.isAdmin && m.email !== ADMIN_EMAIL)
       .slice(0, 10);
 
-    _renderDashboard({total:totalPts, postPts, engPts, communityPts, trackerPostCount, subsCount:subs.length, weekSubmitted, trackerThisWeek, trackerDots, leaderboard:lbMembers, myUid:uid});
+    _renderDashboard({total:totalPts, postPts, engPts, communityPts, trackerPostCount, subsCount:subs.length, weekSubmitted, weekSubCount:currentWeekSubCount, weekRequired:currentWeekRequired, trackerThisWeek, trackerDots, leaderboard:lbMembers, myUid:uid});
 
   } catch(e) {
     console.error('Dashboard load error:', e);
@@ -4120,15 +4122,19 @@ function _updateSubmitBtnState(weekSubmitted) {
   }
 }
 
-function _renderDashboard({total, postPts, engPts, communityPts, trackerPostCount, subsCount, weekSubmitted, trackerThisWeek, trackerDots, leaderboard, myUid}) {
+function _renderDashboard({total, postPts, engPts, communityPts, trackerPostCount, subsCount, weekSubmitted, weekSubCount=0, weekRequired=1, trackerThisWeek, trackerDots, leaderboard, myUid}) {
   _updateSubmitBtnState(weekSubmitted);
   // Status pills
   const strip = document.getElementById('dash-status-strip');
   if (strip) {
+    const pillSubmitLabel = weekSubmitted
+      ? `Update${weekRequired > 1 ? 's' : ''} submitted this week`
+      : weekSubCount > 0
+        ? `${weekSubCount} of ${weekRequired} updates submitted`
+        : `No update submitted yet`;
+    const pillSubmitClass = weekSubmitted ? 'done' : weekSubCount > 0 ? 'pending' : 'pending';
     strip.innerHTML =
-      (weekSubmitted
-        ? `<div class="dash-status-pill done"><div class="dash-status-dot"></div>Update submitted this week</div>`
-        : `<div class="dash-status-pill pending"><div class="dash-status-dot"></div>No update submitted yet</div>`)
+      `<div class="dash-status-pill ${pillSubmitClass}"><div class="dash-status-dot"></div>${pillSubmitLabel}</div>`
       + (trackerThisWeek
         ? `<div class="dash-status-pill done"><div class="dash-status-dot"></div>Tracker updated</div>`
         : `<div class="dash-status-pill pending"><div class="dash-status-dot"></div>Tracker not updated yet</div>`);
@@ -5453,7 +5459,8 @@ async function loadMySubmissions() {
     items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     // Update submit button state based on whether this week is already submitted
     const currentWeekIdx = getWeekIndex();
-    const weekSubmitted = currentWeekIdx >= 0 && items.some(s => s.weekIdx === currentWeekIdx);
+    const currentWeekRequired = currentWeekIdx >= 0 ? (WEEKS[currentWeekIdx].required || 1) : 1;
+    const weekSubmitted = currentWeekIdx >= 0 && items.filter(s => s.weekIdx === currentWeekIdx).length >= currentWeekRequired;
     _updateSubmitBtnState(weekSubmitted);
     const el = document.getElementById("my-submissions");
     if (!items.length) { el.innerHTML = '<p class="text-sm text-muted">No submissions yet.</p>'; return; }
