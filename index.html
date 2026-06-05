@@ -2553,6 +2553,19 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         </div>
       </div>
 
+      <!-- EXPERT/ADMIN: Peer Review Requests panel -->
+      <div id="pvr-panel" style="display:none;margin-bottom:24px;">
+        <div class="expert-panel-card">
+          <div class="expert-panel-title">👁 Peer Review Requests</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Open peer review requests from members. Reply directly in the Community Feed.</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div id="pvr-panel-count" style="font-size:12px;color:var(--gold-dark);font-weight:600;"></div>
+            <button class="btn btn-outline btn-sm" onclick="loadPVRPanel()" style="border-color:var(--gold);color:var(--gold-dark);">↻ Refresh</button>
+          </div>
+          <div id="pvr-panel-body"><div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">Loading requests...</div></div>
+        </div>
+      </div>
+
       <!-- ADMIN: Expert Webhook URL Config -->
       <div id="admin-expert-webhook" style="display:none;margin-bottom:24px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🎯 Expert Email Alert Webhook</div>
@@ -3821,6 +3834,8 @@ function bootApp() {
   const _expertPanel = document.getElementById("expert-panel");
   if (_expertPanel) _expertPanel.style.display = (currentUser.isExpert || currentUser.isAdmin) ? "block" : "none";
 
+  const _pvrPanel = document.getElementById("pvr-panel");
+  if (_pvrPanel) _pvrPanel.style.display = (currentUser.isExpert || currentUser.isAdmin) ? "block" : "none";
   // 6. Load all data
   loadFeed();
   loadAnnouncements();
@@ -3880,7 +3895,7 @@ function navTo(page) {
   if (page === "reports") {
     loadTrackerReport();
     if (currentUser && currentUser.isAdmin) { loadBugReports(); populateAdminSubFilters(); loadAdminExpertWebhook(); }
-    if (currentUser && (currentUser.isExpert || currentUser.isAdmin)) loadExpertPanel();
+    if (currentUser && (currentUser.isExpert || currentUser.isAdmin)) { loadExpertPanel(); loadPVRPanel(); }
   }
   if (page === "pro") renderProPage();
 }
@@ -4340,6 +4355,7 @@ function renderFeed(posts) {
   if (!posts.length) { el.innerHTML = '<p class="text-sm text-muted text-center">No posts yet. Be the first!</p>'; return; }
   el.innerHTML = posts.map(p => {
     if (p.type === "pvr") return renderPVRCard(p);
+    if (p.type === "rer") return renderRERCard(p, posts);
     if (p.type === "expert-response") return renderExpertResponseCard(p);
     const memberData = _memberMap[p.authorUid];
     const photoURL = (p.authorUid === currentUser.uid ? currentUser.photoURL : (memberData && memberData.photoURL)) || "";
@@ -8298,6 +8314,21 @@ async function submitRER() {
       }).catch(() => {});
     }
 
+    // Post to Community Feed as rer type
+    await addDoc(collection(db, "posts"), {
+      author: currentUser.name,
+      authorUid: currentUser.uid,
+      type: "rer",
+      reviewId: docRef.id,
+      pageUrl: url,
+      feedbackRequest: prompt,
+      monthKey,
+      replies: [],
+      props: [],
+      propsCount: 0,
+      timestamp: Date.now()
+    });
+
     const regRefRER = doc(db, "wac_registry", currentUser.uid);
     await updateDoc(regRefRER, { points: increment(PTS_RER) });
     currentUser.points = (currentUser.points || 0) + PTS_RER;
@@ -8481,6 +8512,35 @@ async function submitExpertResponse(reviewId, requesterUid, requesterName, pageU
   } catch (e) {
     showToast("Error: " + (e.code || e.message));
   }
+}
+
+// Render rer (Expert Review Request) feed card
+function renderRERCard(p, allPosts) {
+  const isOwner = p.authorUid === currentUser.uid || currentUser.isAdmin;
+  const date = new Date(p.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const memberData = _memberMap?.[p.authorUid];
+  const photoURL = (p.authorUid === currentUser.uid ? currentUser.photoURL : (memberData?.photoURL)) || "";
+  const avatarContent = photoURL
+    ? `<img src="${esc(photoURL)}" alt="${esc(p.author)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
+    : getInitials(p.author);
+  const hasResponse = Array.isArray(allPosts) && allPosts.some(x => x.type === "expert-response" && x.reviewId === p.reviewId);
+  const statusPill = hasResponse
+    ? `<div style="font-size:11px;color:#2ecc71;padding:5px 10px;background:rgba(46,204,113,0.1);border-radius:6px;display:inline-block;">✅ Response posted</div>`
+    : `<div style="font-size:11px;color:var(--text-muted);padding:5px 10px;background:rgba(184,134,11,0.07);border-radius:6px;display:inline-block;">⏳ Awaiting expert response</div>`;
+  return `<div class="expert-response-card">
+    <div class="expert-response-eyebrow">🎯 EXPERT REVIEW REQUEST</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <div style="width:34px;height:34px;border-radius:50%;background:rgba(184,134,11,0.15);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;flex-shrink:0;overflow:hidden;border:1.5px solid rgba(184,134,11,0.4);">${avatarContent}</div>
+      <div>
+        <div style="font-weight:700;font-size:13px;color:var(--text);">${esc(p.author)}</div>
+        <div style="font-size:11px;color:var(--text-muted);">${date} · requested an expert review</div>
+      </div>
+    </div>
+    <div style="font-size:12px;margin-bottom:8px;"><a href="${esc(p.pageUrl)}" target="_blank" rel="noopener" style="color:var(--gold);word-break:break-all;">&#x1F310; ${esc(p.pageUrl)}</a></div>
+    <div style="font-size:13px;line-height:1.6;color:var(--text-muted);margin-bottom:10px;font-style:italic;">"${esc(p.feedbackRequest)}"</div>
+    ${statusPill}
+    ${isOwner ? `<button class="btn btn-sm btn-outline" onclick="deletePost('${p.id}')" style="color:var(--danger);border-color:var(--danger);font-size:11px;margin-left:8px;">Delete</button>` : ""}
+  </div>`;
 }
 
 // Render expert-response feed card
@@ -8688,6 +8748,50 @@ window.openExpertRespond = openExpertRespond;
 window.closeExpertRespond = closeExpertRespond;
 window.submitExpertResponse = submitExpertResponse;
 window.loadExpertPanel = loadExpertPanel;
+
+async function loadPVRPanel() {
+  if (!currentUser || (!currentUser.isExpert && !currentUser.isAdmin)) return;
+  const panel = document.getElementById("pvr-panel");
+  const body  = document.getElementById("pvr-panel-body");
+  const countEl = document.getElementById("pvr-panel-count");
+  if (!panel || !body) return;
+  panel.style.display = "block";
+  try {
+    let all = [];
+    try {
+      const q = query(collection(db, "posts"), where("type", "==", "pvr"), orderBy("timestamp", "desc"));
+      const snap = await getDocs(q);
+      snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+    } catch (idxErr) {
+      const snap = await getDocs(query(collection(db, "posts"), where("type", "==", "pvr")));
+      snap.forEach(d => all.push({ id: d.id, ...d.data() }));
+      all.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    }
+    if (countEl) countEl.textContent = all.length ? `${all.length} request${all.length !== 1 ? "s" : ""}` : "";
+    if (!all.length) {
+      body.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">No peer review requests yet.</div>`;
+      return;
+    }
+    body.innerHTML = all.map(r => {
+      const date = r.timestamp ? new Date(r.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
+      const replyCount = (r.replies || []).length;
+      const replyLabel = replyCount ? `${replyCount} repl${replyCount !== 1 ? "ies" : "y"} in feed` : "No replies yet";
+      const promptHtml = r.pvr_prompt ? `<div style="font-size:13px;color:var(--text);margin-bottom:10px;line-height:1.5;">${esc(r.pvr_prompt)}</div>` : "";
+      return `<div style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px;background:var(--surface2);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="font-size:12px;font-weight:700;color:var(--text);">${esc(r.author || "Member")}</span>
+          <span style="font-size:11px;color:var(--text-muted);">${date}</span>
+        </div>
+        ${promptHtml}
+        <a href="${esc(r.pvr_url || "#")}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--gold-dark);text-decoration:none;border:1px solid rgba(184,134,11,0.3);border-radius:6px;padding:5px 10px;background:rgba(184,134,11,0.07);">&#x1F310; Visit Page</a>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">${replyLabel}</div>
+      </div>`;
+    }).join("");
+  } catch (e) {
+    body.innerHTML = `<div style="color:#e74c3c;padding:12px;font-size:13px;">Error loading requests: ${e.message}</div>`;
+  }
+}
+window.loadPVRPanel = loadPVRPanel;
 window.dismissRERNotif = dismissRERNotif;
 window.dismissRERNotifOnly = dismissRERNotifOnly;
 window.saveExpertWebhook = saveExpertWebhook;
