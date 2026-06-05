@@ -524,6 +524,29 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .feed-author { font-weight: 600; font-size: 14px; }
 .feed-time { font-size: 12px; color: var(--text-muted); }
 .feed-body { font-size: 15px; line-height: 1.6; margin-bottom: 10px; word-break: break-word; }
+.feed-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.feed-clamp.expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+.feed-expand-btn {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 4px;
+  display: block;
+}
 .feed-actions { display: flex; gap: 12px; align-items: center; }
 .feed-actions button {
   background: none;
@@ -4410,8 +4433,9 @@ function renderFeed(posts) {
         </div>
       </div>
       <div id="post-body-${p.id}">
-        <div class="feed-body">${linkify(p.text)}</div>
+        <div class="feed-body feed-clamp" id="feed-clamp-${p.id}">${linkify(p.text)}</div>
         ${urlHtml}
+        <button class="feed-expand-btn" id="feed-expand-btn-${p.id}" onclick="toggleFeedExpand('${p.id}')">See More ▸</button>
       </div>
       <div class="feed-actions">
         <button onclick="giveProps('${p.id}')">👏 ${p.propsCount || 0}</button>
@@ -4438,6 +4462,13 @@ function renderFeed(posts) {
       </div>`}
     </div>`;
   }).join("");
+  // Hide "See More" buttons for posts whose content doesn't overflow 3 lines
+  requestAnimationFrame(() => {
+    el.querySelectorAll(".feed-clamp").forEach(clamp => {
+      const btn = document.getElementById("feed-expand-btn-" + clamp.id.replace("feed-clamp-", ""));
+      if (btn) btn.style.display = clamp.scrollHeight <= clamp.clientHeight + 2 ? "none" : "";
+    });
+  });
 }
 
 function renderPVRCard(p) {
@@ -7332,6 +7363,14 @@ window.submitAnnouncement = submitAnnouncement;
 window.deleteAnn = deleteAnn;
 window.archiveAnn = archiveAnn;
 window.unarchiveAnn = unarchiveAnn;
+function toggleFeedExpand(postId) {
+  const clamp = document.getElementById("feed-clamp-" + postId);
+  const btn   = document.getElementById("feed-expand-btn-" + postId);
+  if (!clamp || !btn) return;
+  const expanded = clamp.classList.toggle("expanded");
+  btn.textContent = expanded ? "See Less ▴" : "See More ▸";
+}
+window.toggleFeedExpand = toggleFeedExpand;
 window.toggleAnnBody = toggleAnnBody;
 window.openArchivedAnnsModal = openArchivedAnnsModal;
 window.closeArchivedAnnsModal = closeArchivedAnnsModal;
@@ -8541,7 +8580,8 @@ function renderRERCard(p, allPosts) {
       </div>
     </div>
     <div style="font-size:12px;margin-bottom:8px;"><a href="${esc(p.pageUrl)}" target="_blank" rel="noopener" style="color:var(--gold);word-break:break-all;">&#x1F310; ${esc(p.pageUrl)}</a></div>
-    <div style="font-size:13px;line-height:1.6;color:var(--text-muted);margin-bottom:10px;font-style:italic;">"${esc(p.feedbackRequest)}"</div>
+    <div class="feed-clamp" id="feed-clamp-${p.id}" style="font-size:13px;line-height:1.6;color:var(--text-muted);margin-bottom:4px;font-style:italic;">"${esc(p.feedbackRequest)}"</div>
+    <button class="feed-expand-btn" id="feed-expand-btn-${p.id}" onclick="toggleFeedExpand('${p.id}')" style="margin-bottom:10px;">See More ▸</button>
     ${statusPill}
     ${isOwner ? `<button class="btn btn-sm btn-outline" onclick="deletePost('${p.id}')" style="color:var(--danger);border-color:var(--danger);font-size:11px;margin-left:8px;">Delete</button>` : ""}
   </div>`;
@@ -8573,7 +8613,10 @@ function renderExpertResponseCard(p) {
         <button class="btn btn-sm" style="border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.6);border-radius:8px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;" onclick="closeExpertResponseEdit('${p.id}')">Cancel</button>
       </div>
     </div>
-    <div id="er-body-${p.id}" style="font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--text);margin-bottom:10px;">${esc(p.body)}</div>
+    <div id="er-body-${p.id}" style="font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--text);margin-bottom:4px;">
+      <span class="feed-clamp" id="feed-clamp-${p.id}">${esc(p.body)}</span>
+    </div>
+    <button class="feed-expand-btn" id="feed-expand-btn-${p.id}" onclick="toggleFeedExpand('${p.id}')" style="margin-bottom:10px;">See More ▸</button>
     ${isOwner ? `<div style="display:flex;gap:8px;">
       <button class="btn btn-sm btn-outline" onclick="openExpertResponseEdit('${p.id}')" style="font-size:11px;">✏️ Edit</button>
       <button class="btn btn-sm btn-outline" onclick="deletePost('${p.id}')" style="color:var(--danger);border-color:var(--danger);font-size:11px;">Delete</button>
