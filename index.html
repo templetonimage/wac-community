@@ -8482,6 +8482,9 @@ async function submitExpertResponse(reviewId, requesterUid, requesterName, pageU
   const responseText = (ta?.value || "").trim();
   if (!responseText) { showToast("Write your response first."); return; }
 
+  const btn = document.querySelector(`[onclick*="submitExpertResponse('${reviewId}"]`);
+  if (btn) { btn.disabled = true; btn.textContent = "Posting..."; }
+
   try {
     // 1. Post to Community Feed as expert-response type
     await addDoc(collection(db, "posts"), {
@@ -8511,6 +8514,7 @@ async function submitExpertResponse(reviewId, requesterUid, requesterName, pageU
     loadFeed();
   } catch (e) {
     showToast("Error: " + (e.code || e.message));
+    if (btn) { btn.disabled = false; btn.textContent = "Post Response to Feed"; }
   }
 }
 
@@ -8562,9 +8566,43 @@ function renderExpertResponseCard(p) {
       </div>
     </div>
     <div style="font-size:12px;margin-bottom:8px;"><a href="${esc(p.pageUrl)}" target="_blank" rel="noopener" style="color:var(--gold);word-break:break-all;">🌐 ${esc(p.pageUrl)}</a></div>
-    <div style="font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--text);margin-bottom:10px;">${esc(p.body)}</div>
-    ${isOwner ? `<button class="btn btn-sm btn-outline" onclick="deletePost('${p.id}')" style="color:var(--danger);border-color:var(--danger);font-size:11px;">Delete</button>` : ""}
+    <div class="pvr-edit-overlay" id="er-edit-${p.id}">
+      <textarea class="pvr-edit-textarea" id="er-edit-body-${p.id}" style="min-height:100px;">${esc(p.body || "")}</textarea>
+      <div class="pvr-edit-actions">
+        <button class="btn btn-gold btn-sm" onclick="saveExpertResponseEdit('${p.id}','${esc(p.reviewId || '')}')">Save</button>
+        <button class="btn btn-sm" style="border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.6);border-radius:8px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;" onclick="closeExpertResponseEdit('${p.id}')">Cancel</button>
+      </div>
+    </div>
+    <div id="er-body-${p.id}" style="font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--text);margin-bottom:10px;">${esc(p.body)}</div>
+    ${isOwner ? `<div style="display:flex;gap:8px;">
+      <button class="btn btn-sm btn-outline" onclick="openExpertResponseEdit('${p.id}')" style="font-size:11px;">✏️ Edit</button>
+      <button class="btn btn-sm btn-outline" onclick="deletePost('${p.id}')" style="color:var(--danger);border-color:var(--danger);font-size:11px;">Delete</button>
+    </div>` : ""}
   </div>`;
+}
+
+function openExpertResponseEdit(postId) {
+  document.getElementById("er-edit-" + postId)?.classList.add("open");
+  const body = document.getElementById("er-body-" + postId);
+  if (body) body.style.display = "none";
+}
+function closeExpertResponseEdit(postId) {
+  document.getElementById("er-edit-" + postId)?.classList.remove("open");
+  const body = document.getElementById("er-body-" + postId);
+  if (body) body.style.display = "";
+}
+async function saveExpertResponseEdit(postId, reviewId) {
+  const bodyEl = document.getElementById("er-edit-body-" + postId);
+  const newBody = bodyEl ? bodyEl.value.trim() : "";
+  if (!newBody) { showToast("Response can't be empty."); return; }
+  try {
+    await updateDoc(doc(db, "posts", postId), { body: newBody });
+    if (reviewId) {
+      await updateDoc(doc(db, "expert_reviews", reviewId), { responseText: newBody });
+    }
+    showToast("Response updated.");
+    loadFeed();
+  } catch (e) { showToast("Failed to save: " + (e.code || e.message)); }
 }
 
 // ==============================
@@ -8747,6 +8785,9 @@ window.submitRER = submitRER;
 window.openExpertRespond = openExpertRespond;
 window.closeExpertRespond = closeExpertRespond;
 window.submitExpertResponse = submitExpertResponse;
+window.openExpertResponseEdit = openExpertResponseEdit;
+window.closeExpertResponseEdit = closeExpertResponseEdit;
+window.saveExpertResponseEdit = saveExpertResponseEdit;
 window.loadExpertPanel = loadExpertPanel;
 
 async function loadPVRPanel() {
