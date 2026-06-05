@@ -8613,10 +8613,10 @@ function renderExpertResponseCard(p) {
         <button class="btn btn-sm" style="border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.6);border-radius:8px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;" onclick="closeExpertResponseEdit('${p.id}')">Cancel</button>
       </div>
     </div>
-    <div id="er-body-${p.id}" style="font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--text);margin-bottom:4px;">
-      <span class="feed-clamp" id="feed-clamp-${p.id}">${esc((p.body || "").trim())}</span>
+    <div id="er-body-${p.id}" style="font-size:13px;line-height:1.6;color:var(--text);margin-bottom:0;">
+      <span class="feed-clamp" id="feed-clamp-${p.id}" style="white-space:pre-wrap;">${esc((p.body || "").trim())}</span>
     </div>
-    <button class="feed-expand-btn" id="feed-expand-btn-${p.id}" onclick="toggleFeedExpand('${p.id}')" style="margin-bottom:10px;">See More ▸</button>
+    <button class="feed-expand-btn" id="feed-expand-btn-${p.id}" onclick="toggleFeedExpand('${p.id}')" style="margin-bottom:6px;">See More ▸</button>
     ${isOwner ? `<div style="display:flex;gap:8px;">
       <button class="btn btn-sm btn-outline" onclick="openExpertResponseEdit('${p.id}')" style="font-size:11px;">✏️ Edit</button>
       <button class="btn btn-sm btn-outline" onclick="deletePost('${p.id}')" style="color:var(--danger);border-color:var(--danger);font-size:11px;">Delete</button>
