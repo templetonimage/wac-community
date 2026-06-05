@@ -1526,11 +1526,19 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   transition: all 0.15s;
   font-size: 14px;
 }
-.tracker-week.checked .tracker-check {
+.tracker-week.checked .tracker-check,
+.tracker-check.checked {
   background: var(--gold);
   border-color: var(--gold);
   color: #fff;
 }
+.tracker-checks-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.tracker-check.clickable { cursor: pointer; }
+.tracker-check.clickable:hover { border-color: var(--gold-light); }
 
 /* ==============================
    LEADERBOARD
@@ -3390,6 +3398,23 @@ const WEEKS = [
 const MONTHS = ["May", "June", "July"];
 const MONTH_REQS = {"May":"1 update/week", "June":"2 updates/week", "July":"3 updates/week"};
 
+// Returns the array of completion checkboxes for a given week.
+// Reads from new shape `trackerData.tracked[w.id]` (array of booleans),
+// falls back to legacy top-level `trackerData[w.id]` boolean for back-compat.
+// Always returns an array padded/truncated to w.required length.
+function _weekChecks(trackerData, w) {
+  const required = w.required || 1;
+  const tracked = (trackerData && trackerData.tracked) || {};
+  let arr = [];
+  if (Array.isArray(tracked[w.id])) {
+    arr = tracked[w.id].slice();
+  } else if (trackerData && trackerData[w.id] === true) {
+    arr = [true];
+  }
+  while (arr.length < required) arr.push(false);
+  return arr.slice(0, required);
+}
+
 const TRIAL_WEEKS = [
   {id:"t1", label:"T1", dates:"Apr 1–7"},
   {id:"t2", label:"T2", dates:"Apr 8–14"},
@@ -3864,6 +3889,7 @@ function loadSubmitPage() {
   updatePtsPreview();
   loadEngHistory();
   loadMySubmissions();
+  refreshChallengeAvailability();
 
   // Trial mode: T1 only — challenge-only, no URL/format/screenshot
   const trialIdx = getTrialWeekIndex();
@@ -3959,6 +3985,67 @@ function loadWeeklyChallenge() {
   });
 }
 
+// Disables the Weekly Challenge checkbox if the member has already
+// claimed challengeCompleted on a submission this week. The +5 bonus
+// is one-per-week regardless of how many updates the member submits.
+async function refreshChallengeAvailability() {
+  const challengeEl = document.getElementById("submit-challenge");
+  const cardEl = document.getElementById("weekly-challenge-opt");
+  if (!challengeEl || !cardEl || !db || !currentUser || !currentUser.uid) return;
+
+  const trialIdx = getTrialWeekIndex();
+  const weekIdx = getWeekIndex();
+
+  // T1 trial = challenge-only mode, single submission per trial week — let it through
+  if (trialIdx === 0) {
+    challengeEl.disabled = false;
+    cardEl.style.opacity = "";
+    cardEl.style.pointerEvents = "";
+    const u0 = document.getElementById("submit-challenge-used");
+    if (u0) u0.style.display = "none";
+    return;
+  }
+
+  try {
+    const constraints = [where("authorUid", "==", currentUser.uid)];
+    if (trialIdx !== -1) {
+      constraints.push(where("trialWeekIdx", "==", trialIdx));
+    } else {
+      if (weekIdx < 0) return;
+      constraints.push(where("weekIdx", "==", weekIdx));
+    }
+    const q = query(collection(db, "submissions"), ...constraints);
+    const snap = await getDocs(q);
+    const alreadyUsed = snap.docs.some(d => d.data().challengeCompleted === true);
+
+    let usedEl = document.getElementById("submit-challenge-used");
+    if (alreadyUsed) {
+      challengeEl.checked = false;
+      challengeEl.disabled = true;
+      cardEl.style.opacity = "0.55";
+      cardEl.style.pointerEvents = "none";
+      if (!usedEl) {
+        usedEl = document.createElement("div");
+        usedEl.id = "submit-challenge-used";
+        usedEl.style.cssText = "margin-top:8px;font-size:11px;font-weight:600;color:var(--gold);background:rgba(184,134,11,0.15);padding:4px 10px;border-radius:4px;display:inline-block;letter-spacing:0.04em;";
+        usedEl.textContent = "✓ Challenge bonus already claimed this week";
+        const inner = cardEl.querySelector("label > div");
+        if (inner) inner.appendChild(usedEl);
+      } else {
+        usedEl.style.display = "inline-block";
+      }
+      updatePtsPreview();
+    } else {
+      challengeEl.disabled = false;
+      cardEl.style.opacity = "";
+      cardEl.style.pointerEvents = "";
+      if (usedEl) usedEl.style.display = "none";
+    }
+  } catch (e) {
+    console.error("refreshChallengeAvailability error:", e);
+  }
+}
+
 // ─────────────────────────────────────────────
 //  DASHBOARD
 // ─────────────────────────────────────────────
@@ -4045,9 +4132,8 @@ window.loadDashboard = async function() {
 
     // Tracker-based post count
     const trackerData = trackerSnap.exists() ? trackerSnap.data() : {};
-    const tracked = trackerData.tracked || {};
     const trackerPostCount = WEEKS.reduce((sum, w) => {
-      return sum + (tracked[w.id] || []).filter(Boolean).length;
+      return sum + _weekChecks(trackerData, w).filter(Boolean).length;
     }, 0);
 
     // This-week submission check
@@ -4058,11 +4144,12 @@ window.loadDashboard = async function() {
 
     // Tracker updated this week
     const currentWeekId = currentWeekIdx >= 0 ? WEEKS[currentWeekIdx].id : null;
-    const trackerThisWeek = currentWeekId ? ((tracked[currentWeekId] || []).some(Boolean)) : false;
+    const currentW = currentWeekIdx >= 0 ? WEEKS[currentWeekIdx] : null;
+    const trackerThisWeek = currentW ? _weekChecks(trackerData, currentW).some(Boolean) : false;
 
     // Week dots
     const trackerDots = WEEKS.map((w, i) => {
-      const checks = tracked[w.id] || [];
+      const checks = _weekChecks(trackerData, w);
       const met = checks.filter(Boolean).length >= w.required;
       if (i === currentWeekIdx) return 'current';
       if (met && i < currentWeekIdx) return 'complete';
@@ -5289,12 +5376,14 @@ async function submitUpdate() {
   // Check weekly limit (trial: 1 per trial week; round: normal required count)
   try {
     let alreadySubmitted = false;
+    let challengeAlreadyClaimed = false;
     if (isTrial) {
       const tq = query(collection(db, "submissions"),
         where("authorUid", "==", currentUser.uid),
         where("trialWeekIdx", "==", trialIdx));
       const tsnap = await getDocs(tq);
       if (tsnap.size >= 1) { showToast("You've already submitted for this trial week."); return; }
+      // Trial weeks are 1-per-week, so challenge dedup isn't needed here.
     } else {
       const required = WEEKS[weekIdx].required;
       const q = query(collection(db, "submissions"),
@@ -5302,12 +5391,14 @@ async function submitUpdate() {
         where("weekIdx", "==", weekIdx));
       const snap = await getDocs(q);
       if (snap.size >= required) { showToast(`You've already submitted ${required} update(s) this week.`); return; }
+      challengeAlreadyClaimed = snap.docs.some(d => d.data().challengeCompleted === true);
     }
 
     let pts = isLate ? PTS_LATE_24H : PTS_ON_TIME;
     if (_selectedFormat === "Blog Post" || _selectedFormat === "New Page") pts += PTS_FORMAT_BONUS;
     const challengeEl = document.getElementById("submit-challenge");
-    const challengeCompleted = challengeEl && challengeEl.checked;
+    // Server-side enforcement: only credit the +5 bonus if no prior submission this week already claimed it.
+    let challengeCompleted = !!(challengeEl && challengeEl.checked) && !challengeAlreadyClaimed;
     if (challengeCompleted) pts += PTS_CHALLENGE;
 
     const trialWeek = isTrial ? TRIAL_WEEKS[trialIdx] : null;
@@ -5354,6 +5445,7 @@ async function submitUpdate() {
     showToast(`Update submitted! +${pts} pts`);
     loadMySubmissions();
     updatePtsPreview();
+    refreshChallengeAvailability();
   } catch (e) {
     console.error("submitUpdate error:", e);
     showToast("Failed to submit update.");
@@ -5583,13 +5675,15 @@ async function buildTracker() {
     if (snap.exists()) trackerData = snap.data();
   } catch {}
 
-  const completed = WEEKS.filter(w => trackerData[w.id]).length;
-  const pct = Math.round((completed / 12) * 100);
+  const completed = WEEKS.filter(w => _weekChecks(trackerData, w).filter(Boolean).length >= w.required).length;
+  const totalUpdates = WEEKS.reduce((s, w) => s + _weekChecks(trackerData, w).filter(Boolean).length, 0);
+  const totalRequired = WEEKS.reduce((s, w) => s + (w.required || 1), 0);
+  const pct = Math.round((totalUpdates / totalRequired) * 100);
 
   const headerEl = document.getElementById("tracker-header");
   headerEl.innerHTML = `
     <div class="flex-between mb-8">
-      <span class="text-sm" style="font-weight:600;">${completed}/12 weeks complete</span>
+      <span class="text-sm" style="font-weight:600;">${completed}/12 weeks complete <span style="font-weight:400;color:var(--text-muted);">· ${totalUpdates}/${totalRequired} updates</span></span>
       <span class="text-sm text-muted">${pct}%</span>
     </div>
     <div class="tracker-progress"><div class="tracker-progress-bar" style="width:${pct}%"></div></div>
@@ -5604,13 +5698,21 @@ async function buildTracker() {
       <div class="tracker-month-title">${month}</div>
       <div class="tracker-month-req">${MONTH_REQS[month]}</div>`;
     for (const w of monthWeeks) {
-      const checked = trackerData[w.id] ? "checked" : "";
-      html += `<div class="tracker-week ${checked}" data-week="${w.id}" ${isLocked ? "" : `onclick="toggleCheck('${w.id}')"`}>
+      const checks = _weekChecks(trackerData, w);
+      const done = checks.filter(Boolean).length;
+      const weekComplete = done >= w.required;
+      const datesSuffix = w.required > 1 ? ` · ${done}/${w.required}` : "";
+      const checkboxes = checks.map((c, i) => {
+        const cls = `tracker-check${c ? ' checked' : ''}${isLocked ? '' : ' clickable'}`;
+        const onclick = isLocked ? '' : `onclick="toggleCheck('${w.id}', ${i})"`;
+        return `<div class="${cls}" ${onclick}>${c ? "✓" : ""}</div>`;
+      }).join("");
+      html += `<div class="tracker-week ${weekComplete ? 'checked' : ''}" data-week="${w.id}" style="cursor:default;">
         <div>
           <div class="tracker-week-label">${w.label}</div>
-          <div class="tracker-week-dates">${w.dates}</div>
+          <div class="tracker-week-dates">${w.dates}${datesSuffix}</div>
         </div>
-        <div class="tracker-check">${trackerData[w.id] ? "✓" : ""}</div>
+        <div class="tracker-checks-row">${checkboxes}</div>
       </div>`;
     }
     html += `</div>`;
@@ -5619,19 +5721,29 @@ async function buildTracker() {
 }
 
 
-async function toggleCheck(weekId) {
+async function toggleCheck(weekId, idx) {
   const trackerUid = currentUser.isAdmin ? "admin-test" : currentUser.uid;
+  const w = WEEKS.find(x => x.id === weekId);
+  if (!w) return;
+  if (typeof idx !== "number") idx = 0;
   try {
     const ref = doc(db, "trackers", trackerUid);
     const snap = await getDoc(ref);
     let data = snap.exists() ? snap.data() : { uid: trackerUid };
-    data[weekId] = !data[weekId];
-    await setDoc(ref, data, { merge: true });
+    // Read current array (with legacy fallback), toggle the requested slot
+    const tracked = data.tracked || {};
+    let arr = _weekChecks(data, w);
+    arr[idx] = !arr[idx];
+    tracked[weekId] = arr;
+    // Write only the tracked map; leaves legacy fields untouched
+    await setDoc(ref, { uid: trackerUid, tracked }, { merge: true });
+    data.tracked = tracked;
     if (!currentUser.isAdmin) await checkAllStar(data);
     buildTracker();
     // Update dashboard tracker pill immediately without full reload
     const currentWeekId = getWeekIndex() >= 0 ? WEEKS[getWeekIndex()].id : null;
-    const trackerThisWeek = currentWeekId ? !!(data[currentWeekId]) : false;
+    const currentW = currentWeekId ? WEEKS.find(x => x.id === currentWeekId) : null;
+    const trackerThisWeek = currentW ? _weekChecks(data, currentW).some(Boolean) : false;
     const strip = document.getElementById('dash-status-strip');
     if (strip) {
       const pills = strip.querySelectorAll('.dash-status-pill');
@@ -5653,7 +5765,7 @@ function toggleTrialCheck(weekId) {
 }
 
 async function checkAllStar(data) {
-  const allDone = WEEKS.every(w => data[w.id]);
+  const allDone = WEEKS.every(w => _weekChecks(data, w).filter(Boolean).length >= w.required);
   if (allDone) {
     const regRef = doc(db, "wac_registry", currentUser.uid);
     await updateDoc(regRef, { isAllStar: true });
@@ -5869,9 +5981,12 @@ async function openMemberProfile(member) {
     const snap = await getDoc(doc(db, "trackers", member.id));
     if (snap.exists()) trackerData = snap.data();
   } catch {}
-  const weeksCompleted = WEEKS.filter(w => trackerData[w.id]).length;
+  const weeksCompleted = WEEKS.filter(w => _weekChecks(trackerData, w).filter(Boolean).length >= w.required).length;
 
-  const dots = WEEKS.map(w => `<div class="member-dot ${trackerData[w.id] ? 'done' : ''}"></div>`).join("");
+  const dots = WEEKS.map(w => {
+    const done = _weekChecks(trackerData, w).filter(Boolean).length >= w.required;
+    return `<div class="member-dot ${done ? 'done' : ''}"></div>`;
+  }).join("");
   const websiteBtn = member.website ? `<a href="${esc(normalizeUrl(member.website))}" target="_blank" rel="noopener" class="btn btn-gold btn-block btn-sm mt-16">Visit Website</a>` : "";
   const modalAvatarContent = member.photoURL
     ? `<img src="${esc(member.photoURL)}" alt="${esc(member.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
@@ -5913,7 +6028,7 @@ async function loadTrackerReport() {
 
     let rows = members.map(m => {
       const t = trackerMap[m.id] || {};
-      const completed = WEEKS.filter(w => t[w.id]).length;
+      const completed = WEEKS.filter(w => _weekChecks(t, w).filter(Boolean).length >= w.required).length;
       return { ...m, tracker: t, completed };
     });
     rows.sort((a, b) => b.completed - a.completed || (b.points || 0) - (a.points || 0));
@@ -5927,7 +6042,9 @@ async function loadTrackerReport() {
     rows.forEach(r => {
       html += `<tr><td style="font-weight:600;font-size:12px;">${esc(r.name)}</td>`;
       WEEKS.forEach(w => {
-        html += `<td>${r.tracker[w.id] ? "✅" : "⬜"}</td>`;
+        const done = _weekChecks(r.tracker, w).filter(Boolean).length;
+        const cell = done >= w.required ? "✅" : (done > 0 ? `${done}/${w.required}` : "⬜");
+        html += `<td>${cell}</td>`;
       });
       html += `<td style="font-weight:700;">${r.completed}/12</td>`;
       html += `<td style="font-weight:700;color:var(--gold);">${r.points || 0}</td>`;
@@ -6004,20 +6121,43 @@ async function openAdminTrackerEditor(uid, name) {
 function renderAdminTrackerModal(name, data) {
   let html = `<h3 style="font-size:18px;font-weight:700;margin-bottom:16px;">Edit Tracker: ${esc(name)}</h3>`;
   WEEKS.forEach(w => {
-    const checked = data[w.id] ? "checked" : "";
-    html += `<label style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;cursor:pointer;">
-      <input type="checkbox" ${checked} onchange="adminToggleCheck('${w.id}', this.checked)" />
-      <span>${w.label} — ${w.dates}</span>
-    </label>`;
+    const checks = _weekChecks(data, w);
+    if (w.required === 1) {
+      const checked = checks[0] ? "checked" : "";
+      html += `<label style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;cursor:pointer;">
+        <input type="checkbox" ${checked} onchange="adminToggleCheck('${w.id}', 0, this.checked)" />
+        <span>${w.label} — ${w.dates}</span>
+      </label>`;
+    } else {
+      const boxes = checks.map((c, i) =>
+        `<label style="display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+          <input type="checkbox" ${c ? "checked" : ""} onchange="adminToggleCheck('${w.id}', ${i}, this.checked)" />
+          <span style="color:var(--text-muted);">#${i + 1}</span>
+        </label>`
+      ).join("");
+      html += `<div style="display:flex;align-items:center;gap:14px;padding:8px 0;font-size:14px;flex-wrap:wrap;">
+        <span style="min-width:160px;">${w.label} — ${w.dates}</span>
+        <div style="display:flex;gap:12px;">${boxes}</div>
+      </div>`;
+    }
   });
   document.getElementById("admin-tracker-content").innerHTML = html;
 }
 
-async function adminToggleCheck(weekId, val) {
+async function adminToggleCheck(weekId, idx, val) {
   if (!_editingTrackerUid) return;
+  const w = WEEKS.find(x => x.id === weekId);
+  if (!w) return;
+  if (typeof idx !== "number") idx = 0;
   try {
     const ref = doc(db, "trackers", _editingTrackerUid);
-    await setDoc(ref, { uid: _editingTrackerUid, [weekId]: val }, { merge: true });
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : { uid: _editingTrackerUid };
+    const tracked = data.tracked || {};
+    const arr = _weekChecks(data, w);
+    arr[idx] = !!val;
+    tracked[weekId] = arr;
+    await setDoc(ref, { uid: _editingTrackerUid, tracked }, { merge: true });
   } catch (e) { showToast("Failed to save."); }
 }
 
