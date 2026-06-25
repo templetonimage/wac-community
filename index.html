@@ -2110,6 +2110,100 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   transition: background 0.15s;
 }
 .zoom-replay-watch-btn:hover { background: #d4a017; }
+/* ===================== GET STARTED GUIDE (gs-) ===================== */
+#page-getstarted-wac{max-width:1100px;margin:0 auto;}
+.gs-back{background:none;border:none;color:var(--gold,#b8860b);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px;}
+.gs-back:hover{text-decoration:underline;}
+.gs-topbar{background:var(--surface,#fff);border:1.5px solid var(--border,#e6e6e6);border-radius:var(--radius,14px);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow,0 2px 10px rgba(0,0,0,0.05));}
+.gs-topbar-row1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.gs-name-input{flex:1;min-width:160px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:var(--text,#1a1a1a);background:var(--bg,#faf9f6);border:1.5px solid var(--border,#e6e6e6);border-radius:8px;padding:8px 12px;}
+.gs-name-input:focus{outline:none;border-color:var(--gold,#b8860b);}
+.gs-badge{flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#e8d5a0;background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold,#b8860b);border-radius:999px;padding:4px 12px;}
+.gs-topbar-btns{display:flex;gap:8px;flex-shrink:0;}
+.gs-tbtn{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;padding:8px 12px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold,#b8860b);white-space:nowrap;transition:all .15s;}
+.gs-tbtn:hover{background:var(--gold,#b8860b);color:#fff;}
+.gs-tbtn.gold{background:var(--gold,#b8860b);color:#fff;}
+.gs-tbtn.gold:hover{background:var(--gold-dark,#946c09);}
+.gs-prog-wrap{display:flex;align-items:center;gap:10px;}
+.gs-prog-track{flex:1;height:8px;background:var(--bg,#eee);border-radius:999px;overflow:hidden;}
+.gs-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold-dark,#946c09),var(--gold,#b8860b));border-radius:999px;width:0%;transition:width .3s;}
+.gs-prog-meta{font-size:11px;color:var(--text-muted,#777);font-weight:600;white-space:nowrap;}
+.gs-save{font-size:11px;color:var(--text-muted,#999);margin-top:6px;min-height:14px;}
+.gs-wrap{display:block;}
+.gs-rail-toggle{display:block;width:100%;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:10px;padding:10px;border:1.5px solid var(--border,#e6e6e6);background:var(--surface,#fff);color:var(--text,#1a1a1a);margin-bottom:12px;}
+.gs-rail{background:var(--surface,#fff);border:1.5px solid var(--border,#e6e6e6);border-radius:var(--radius,14px);padding:12px;margin-bottom:14px;display:none;}
+.gs-rail.open{display:block;}
+.gs-rail-sec{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted,#999);margin:12px 6px 6px;}
+.gs-rail-sec:first-child{margin-top:4px;}
+.gs-rail-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text,#1a1a1a);transition:background .12s;}
+.gs-rail-item:hover{background:var(--bg,#f5f4f0);}
+.gs-rail-item.active{background:linear-gradient(135deg,rgba(184,134,11,0.12),rgba(184,134,11,0.04));font-weight:600;}
+.gs-rail-item.locked{opacity:0.45;cursor:not-allowed;}
+.gs-rail-check{flex-shrink:0;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border,#ccc);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;}
+.gs-rail-item.done .gs-rail-check{background:var(--gold,#b8860b);border-color:var(--gold,#b8860b);}
+.gs-pane{background:var(--surface,#fff);border:1.5px solid var(--border,#e6e6e6);border-radius:var(--radius,14px);padding:20px 22px;box-shadow:var(--shadow,0 2px 10px rgba(0,0,0,0.05));}
+.gs-step-sec{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold,#b8860b);margin-bottom:4px;}
+.gs-step-title{font-size:20px;font-weight:800;color:var(--text,#1a1a1a);margin-bottom:10px;line-height:1.25;}
+.gs-step-instr{font-size:14px;line-height:1.65;color:var(--text,#333);white-space:pre-line;margin-bottom:14px;}
+.gs-credit{font-size:11px;color:var(--text-muted,#888);background:var(--bg,#f7f6f2);border-left:3px solid var(--gold,#b8860b);border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:14px;line-height:1.5;}
+.gs-credit a{color:var(--gold,#b8860b);font-weight:600;}
+.gs-sources{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.gs-source{font-size:12px;font-weight:600;color:var(--gold,#b8860b);text-decoration:none;border:1.5px solid var(--border,#e6e6e6);border-radius:999px;padding:6px 12px;transition:all .15s;}
+.gs-source:hover{border-color:var(--gold,#b8860b);background:rgba(184,134,11,0.06);}
+.gs-deeplinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.gs-field{margin-bottom:14px;}
+.gs-field-label{display:block;font-size:12px;font-weight:600;color:var(--text,#333);margin-bottom:5px;}
+.gs-input,.gs-textarea,.gs-select{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text,#1a1a1a);background:var(--bg,#faf9f6);border:1.5px solid var(--border,#e6e6e6);border-radius:8px;padding:9px 12px;box-sizing:border-box;}
+.gs-textarea{min-height:70px;resize:vertical;line-height:1.5;}
+.gs-input:focus,.gs-textarea:focus,.gs-select:focus{outline:none;border-color:var(--gold,#b8860b);}
+.gs-ai{background:linear-gradient(135deg,#1a1a1a,#221d0a);border:1.5px solid var(--gold,#b8860b);border-radius:12px;padding:14px;margin:16px 0;}
+.gs-ai-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.gs-ai-label{font-size:12px;font-weight:700;color:#e8d5a0;display:flex;align-items:center;gap:6px;}
+.gs-ai-copy{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;padding:6px 12px;border:1.5px solid var(--gold,#b8860b);background:var(--gold,#b8860b);color:#fff;}
+.gs-ai-copy:hover{background:var(--gold-dark,#946c09);}
+.gs-ai-text{width:100%;min-height:130px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;line-height:1.5;color:#f0ead6;background:rgba(0,0,0,0.35);border:1px solid rgba(184,134,11,0.35);border-radius:8px;padding:10px;box-sizing:border-box;resize:vertical;}
+.gs-ai-hint{font-size:10px;color:rgba(232,213,160,0.7);margin-top:6px;line-height:1.4;}
+.gs-notes-toggle{font-size:12px;font-weight:600;color:var(--text-muted,#888);background:none;border:none;cursor:pointer;padding:4px 0;font-family:'DM Sans',sans-serif;}
+.gs-notes-area{display:none;margin-top:8px;}
+.gs-notes-area.open{display:block;}
+.gs-done-row{display:flex;align-items:center;gap:10px;margin:18px 0 4px;padding:12px 14px;background:var(--bg,#f7f6f2);border-radius:10px;}
+.gs-done-toggle{position:relative;width:44px;height:24px;border-radius:999px;background:var(--border,#ccc);border:none;cursor:pointer;flex-shrink:0;transition:background .15s;}
+.gs-done-toggle::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;}
+.gs-done-toggle.on{background:var(--gold,#b8860b);}
+.gs-done-toggle.on::after{transform:translateX(20px);}
+.gs-done-label{font-size:13px;font-weight:600;color:var(--text,#333);}
+.gs-nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border,#eee);}
+.gs-nav-btn{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border-radius:10px;padding:11px 20px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold,#b8860b);transition:all .15s;}
+.gs-nav-btn:hover{background:rgba(184,134,11,0.08);}
+.gs-nav-btn.primary{background:var(--gold,#b8860b);color:#fff;}
+.gs-nav-btn.primary:hover{background:var(--gold-dark,#946c09);}
+.gs-nav-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.gs-fork{display:grid;grid-template-columns:1fr;gap:12px;margin:8px 0 4px;}
+.gs-fork-card{text-align:left;cursor:pointer;border:1.5px solid var(--border,#e6e6e6);border-radius:12px;padding:16px;background:var(--surface,#fff);transition:all .15s;font-family:'DM Sans',sans-serif;}
+.gs-fork-card:hover{border-color:var(--gold,#b8860b);box-shadow:0 4px 16px rgba(0,0,0,0.08);}
+.gs-fork-card.sel{border-color:var(--gold,#b8860b);background:linear-gradient(135deg,rgba(184,134,11,0.08),var(--surface,#fff));}
+.gs-fork-name{font-size:16px;font-weight:800;color:var(--text,#1a1a1a);margin-bottom:4px;}
+.gs-fork-desc{font-size:12px;color:var(--text-muted,#777);line-height:1.5;}
+.gs-briefs-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1200;padding:20px;overflow-y:auto;}
+.gs-briefs-overlay.open{display:block;}
+.gs-briefs-modal{max-width:520px;margin:40px auto;background:var(--surface,#fff);border-radius:var(--radius,14px);padding:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.gs-briefs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.gs-briefs-title{font-size:17px;font-weight:800;color:var(--text,#1a1a1a);}
+.gs-briefs-row{display:flex;align-items:center;gap:8px;padding:11px 12px;border:1.5px solid var(--border,#e6e6e6);border-radius:10px;margin-bottom:8px;}
+.gs-briefs-row.cur{border-color:var(--gold,#b8860b);background:rgba(184,134,11,0.05);}
+.gs-briefs-info{flex:1;min-width:0;}
+.gs-briefs-name{font-size:14px;font-weight:700;color:var(--text,#1a1a1a);}
+.gs-briefs-sub{font-size:11px;color:var(--text-muted,#999);margin-top:2px;}
+.gs-briefs-act{background:none;border:none;cursor:pointer;font-size:13px;padding:5px 7px;border-radius:6px;color:var(--text-muted,#888);}
+.gs-briefs-act:hover{background:var(--bg,#f0efe9);color:var(--text,#333);}
+@media(min-width:860px){
+  .gs-wrap{display:grid;grid-template-columns:240px 1fr;gap:18px;align-items:start;}
+  .gs-rail-toggle{display:none;}
+  .gs-rail{display:block;position:sticky;top:16px;margin-bottom:0;}
+  .gs-fork{grid-template-columns:1fr 1fr 1fr;}
+  .gs-topbar-row1{flex-wrap:nowrap;}
+}
+
 </style>
 </head>
 <body>
@@ -2179,6 +2273,19 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <button id="cowork-rsvp-btn" class="btn btn-gold btn-sm" style="flex-shrink:0;" onclick="rsvpCowork()">RSVP +2</button>
         </div>
       </div>
+      <div class="dash-animate" style="animation-delay:0.16s;background:linear-gradient(135deg,rgba(184,134,11,0.07),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+          <span style="font-size:26px;flex-shrink:0;">📖</span>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:14px;color:var(--text);">E-E-A-T Playbook</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Google's ranking framework — 7 slides built for your business.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="openEEATModal()" class="btn btn-gold btn-sm" style="flex:1;">View Guide →</button>
+          <button onclick="openEEATAudit()" class="btn btn-sm" style="flex:1;background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold);color:#e8d5a0;">✅ Site Audit</button>
+        </div>
+      </div>
       <div class="weekly-challenge-banner dash-animate" id="dash-challenge-banner" style="animation-delay:0.2s;">
         <div class="wc-inner">
           <div class="wc-icon">⚡</div>
@@ -2224,17 +2331,16 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <span class="dash-quick-btn-label">My Tracker<span class="dash-quick-btn-sub">Mark week complete</span></span>
         </button>
       </div>
-      <div class="dash-animate" style="animation-delay:0.54s;background:linear-gradient(135deg,rgba(184,134,11,0.07),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);">
+      <div class="dash-animate" style="animation-delay:0.54s;background:linear-gradient(135deg,rgba(184,134,11,0.1),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow);">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
-          <span style="font-size:26px;flex-shrink:0;">📖</span>
+          <span style="font-size:26px;flex-shrink:0;">🚀</span>
           <div style="flex:1;">
-            <div style="font-weight:700;font-size:14px;color:var(--text);">E-E-A-T Playbook</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Google's ranking framework — 7 slides built for your business.</div>
+            <div style="font-weight:700;font-size:14px;color:var(--text);">Get Started: Launch Your Website System</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">A guided, step-by-step build for Pixieset, Squarespace, or Showit — using StoryBrand.</div>
           </div>
         </div>
         <div style="display:flex;gap:8px;">
-          <button onclick="openEEATModal()" class="btn btn-gold btn-sm" style="flex:1;">View Guide →</button>
-          <button onclick="openEEATAudit()" class="btn btn-sm" style="flex:1;background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold);color:#e8d5a0;">✅ Site Audit</button>
+          <button onclick="wacGsOpen()" class="btn btn-gold btn-sm" style="flex:1;">Open the Guide →</button>
         </div>
       </div>
 
@@ -2349,12 +2455,27 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div id="feed-list"></div>
     </div>
 
+    <!-- PAGE: GET STARTED (WAC) -->
+    <div class="page" id="page-getstarted-wac">
+      <button class="gs-back" onclick="gsBackToResources()">&larr; Back to Resources</button>
+      <div class="gs-topbar" id="gs-topbar"></div>
+      <div class="gs-wrap">
+        <button class="gs-rail-toggle" onclick="gsToggleRail()">&#9776; Steps</button>
+        <aside class="gs-rail" id="gs-rail"></aside>
+        <main class="gs-pane" id="gs-pane"></main>
+      </div>
+      <div class="gs-briefs-overlay" id="gs-briefs-overlay" onclick="gsBriefsOverlayClick(event)">
+        <div class="gs-briefs-modal" id="gs-briefs-modal"></div>
+      </div>
+    </div>
+
     <!-- PAGE: RESOURCES -->
     <div class="page" id="page-resources">
       <div class="page-header">
         <div class="page-title">Resources</div>
         <div class="page-subtitle">Website strategy guides and tools — tap any card to read.</div>
         <div style="margin-top:10px;">
+          <button onclick="wacGsOpen()" class="btn btn-gold btn-sm" style="margin-right:8px;">🚀 Get Started Guide</button>
           <button onclick="openEEATAudit()" class="btn btn-sm" style="background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold);color:#e8d5a0;">✅ Open E-E-A-T Site Audit</button>
         </div>
       </div>
@@ -3913,6 +4034,7 @@ function navTo(page) {
   if (page === "ranks") { loadLeaderboard(); clearRanksBadge(); }
   if (page === "profile") { initProfilePhotoPreview(); loadRERStatus(); }
   if (page === "resources") loadResources();
+  if (page === "getstarted-wac") wacGsInit();
   if (page === "members") loadDirectory();
   if (page === "backlinks") loadBacklinkPage();
   if (page === "reports") {
@@ -5230,7 +5352,9 @@ function setFilter(tag) {
 }
 
 function renderResources() {
-  const filtered = _currentFilter === "All" ? _allResources : _allResources.filter(r => (r.tags || []).includes(_currentFilter));
+  const _gsCard = { id:'__gs_getstarted__', emoji:'🚀', title:'Get Started: Launch Your Website System', description:'A guided, step-by-step setup to launch or improve one page \u2014 built on the StoryBrand framework. Pixieset, Squarespace, or Showit.', tags:['getstarted','guide','website'] };
+  const _resList = [_gsCard].concat(_allResources);
+  const filtered = _currentFilter === "All" ? _resList : _resList.filter(r => (r.tags || []).includes(_currentFilter));
   const el = document.getElementById("resource-grid");
   if (!filtered.length) { el.innerHTML = '<p class="text-sm text-muted">No resources yet.</p>'; return; }
   el.innerHTML = filtered.map(r => {
@@ -5238,13 +5362,14 @@ function renderResources() {
     const isEEAT = (r.tags || []).includes("eeat-guide");
     const isCoreUpdate = r.title === "Google's March 2026 Core Update";
     const isPeopleFirst = r.title === "The People First Content Guide";
-    const clickHandler = isEEAT ? `openEEATModal()` : `openResModal('${r.id}')`;
-    const accentStyle = (isEEAT || isCoreUpdate || isPeopleFirst)
+    const isGetStarted = r.id === '__gs_getstarted__';
+    const clickHandler = isGetStarted ? `wacGsOpen()` : isEEAT ? `openEEATModal()` : `openResModal('${r.id}')`;
+    const accentStyle = (isGetStarted || isEEAT || isCoreUpdate || isPeopleFirst)
       ? `border:1.5px solid var(--gold);background:linear-gradient(135deg,rgba(184,134,11,0.06),var(--surface));`
       : "";
     return `<div class="resource-card" style="${accentStyle}" onclick="${clickHandler}">
       <div class="resource-emoji">${esc(r.emoji || "📄")}</div>
-      <div class="resource-title">${esc(r.title)}${isEEAT ? ' <span style="font-size:10px;background:var(--gold);color:#fff;padding:1px 6px;border-radius:4px;vertical-align:middle;font-weight:700;">GUIDE</span>' : ""}</div>
+      <div class="resource-title">${esc(r.title)}${isGetStarted ? ' <span style="font-size:10px;background:var(--gold);color:#fff;padding:1px 6px;border-radius:4px;vertical-align:middle;font-weight:700;">START HERE</span>' : ""}${isEEAT ? ' <span style="font-size:10px;background:var(--gold);color:#fff;padding:1px 6px;border-radius:4px;vertical-align:middle;font-weight:700;">GUIDE</span>' : ""}</div>
       <div class="resource-desc">${esc(r.description || "")}</div>
       <div class="resource-tags">${tagsHtml}</div>
     </div>`;
@@ -6663,6 +6788,11 @@ service cloud.firestore {
       allow write: if request.auth != null &&
         (request.auth.token.email == '${esc(ADMIN_EMAIL)}' ||
          request.auth.uid == userId);
+      match /siteBriefs/{briefId} {
+        allow read, write: if request.auth != null &&
+          (request.auth.token.email == '${esc(ADMIN_EMAIL)}' ||
+           request.auth.uid == userId);
+      }
     }
     match /announcements/{id} {
       allow read: if request.auth != null;
@@ -9160,6 +9290,548 @@ window.adminDeleteBacklink = adminDeleteBacklink;
 // ==============================
 // INIT COMPLETE
 // ==============================
+
+// ============================================================
+// GET STARTED GUIDE — Launch Your Website System (WAC)
+// Data-driven wizard + rail. Appends in module scope.
+// Subcollection: wac_registry/{uid}/siteBriefs/{id}
+// ============================================================
+let _gsBrief = null;       // active brief (full object)
+let _gsBriefs = [];        // list of brief metadata/objects
+let _gsSaveTimer = null;
+let _gsBooted = false;
+
+function _gsId(off){ return (off?'local_':'sb_') + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function _gsP(){ return _gsBrief && _gsBrief.platform ? _gsBrief.platform : ''; }
+function _gsPName(){ const p=_gsP(); return p && GS_PCFG[p] ? GS_PCFG[p].name : ''; }
+function _gsV(id){ return (_gsBrief && _gsBrief.values && _gsBrief.values[id]) ? _gsBrief.values[id] : ''; }
+function _gsVor(id, fallback){ const v=_gsV(id).trim(); return v || fallback; }
+
+// ---------- AI prompt builders (original wording; StoryBrand credited, not copied) ----------
+function _gsAiP1(){
+  return 'Act as a website strategist. My goal for this site is '+_gsVor('goalType','[goal]')+
+  '. The page I am improving first is '+_gsVor('goalPage','[page]')+
+  ' and the single action I want visitors to take is '+_gsVor('goalAction','[primary action]')+
+  '.\nGive me 3 sharper ways to phrase that action as a button, and name the one section this page most needs in order to earn that click.';
+}
+function _gsAiP3(){
+  return 'You are a brand messaging strategist who uses the StoryBrand framework by Donald Miller (the customer is the hero, my brand is the guide). Turn the notes below into (1) a one-sentence one-liner and (2) a two-line website hero: a headline and a subhead. Keep it plain, human, and specific.\n\n'+
+  '- Customer: '+_gsVor('sbChar','[who they are + what they want]')+'\n'+
+  '- External problem: '+_gsVor('sbExt','[tangible problem]')+'\n'+
+  '- Internal problem: '+_gsVor('sbInt','[how it makes them feel]')+'\n'+
+  '- What I help them believe: '+_gsVor('sbPhil','[the bigger why]')+'\n'+
+  '- My empathy: '+_gsVor('sbEmp','[I understand because...]')+'\n'+
+  '- My authority/proof: '+_gsVor('sbAuth','[credibility]')+'\n'+
+  '- The plan (steps): '+_gsVor('sbPlan','[3 simple steps]')+'\n'+
+  '- Direct CTA: '+_gsVor('sbCtaD','[buy/book/call]')+'\n'+
+  '- Transitional CTA: '+_gsVor('sbCtaT','[download/learn]')+'\n'+
+  '- Success looks like: '+_gsVor('sbSucc','[their win]')+'\n'+
+  '- Failure to avoid: '+_gsVor('sbFail','[what they risk]')+'\n\nReturn the one-liner first, then the hero.';
+}
+function _gsAiB1(){
+  return 'I am setting up my site on '+_gsVor2Plat()+'. My first page is '+_gsVor('goalPage','[page]')+
+  '. Give me a 5-item pre-build checklist specific to this platform (domain, plan, page creation, navigation, contact form) so I do not miss a setup step.';
+}
+function _gsAiB2(){
+  return 'Using the StoryBrand framework (customer = hero, my brand = guide), draft a section-by-section wireframe for my '+_gsVor('goalPage','[page]')+' page on '+_gsVor2Plat()+', in this order: header with one-liner + button, the stakes, value/benefits, guide (empathy + authority), the 3-step plan, an explanatory paragraph, footer. For each section give a heading and 1-2 lines of copy direction.\n\nInputs:\n- One-liner: '+_gsVor('sbOne','[one-liner]')+'\n- Customer: '+_gsVor('sbChar','[customer]')+'\n- External problem: '+_gsVor('sbExt','[problem]')+'\n- Plan: '+_gsVor('sbPlan','[steps]')+'\n- Direct CTA: '+_gsVor('sbCtaD','[CTA]');
+}
+function _gsAiB3(){
+  return 'Write 3 options for my website hero on '+_gsVor2Plat()+': an H1 headline (customer-focused, names what they get), a one-line subhead (names the problem and hints the solution), and a direct CTA button label. Keep each headline under 12 words, plain and human, no jargon.\n\n- One-liner: '+_gsVor('sbOne','[one-liner]')+'\n- Customer: '+_gsVor('sbChar','[customer]')+'\n- Direct CTA idea: '+_gsVor('sbCtaD','[CTA]');
+}
+function _gsAiB4(){
+  return 'Give me a heading outline for my '+_gsVor('goalPage','[page]')+' page: one H1 and 4-6 H2s in logical order, each including a natural keyword for "'+_gsVor('goalAction','[action]')+'". Keep them scannable and human.\n\n- My H1 draft: '+_gsVor('hgH1','[H1]')+'\n- Customer: '+_gsVor('sbChar','[customer]');
+}
+function _gsAiB5(){
+  return 'List the 5 most important images for my '+_gsVor('goalPage','[page]')+' page on '+_gsVor2Plat()+' and write descriptive, SEO-friendly alt text (under 125 characters each). Then give me 3 quick mobile checks specific to this platform.\n\n- Hero image: '+_gsVor('imgHero','[hero image]')+'\n- Customer: '+_gsVor('sbChar','[customer]');
+}
+function _gsAiB6(){
+  return 'Write an SEO title (under 60 characters) and a meta description (under 160 characters) for my '+_gsVor('goalPage','[page]')+' page on '+_gsVor2Plat()+', plus a clean lowercase URL slug. Make the meta description read like a one-line invitation, not a keyword list.\n\n- Target action: '+_gsVor('goalAction','[action]')+'\n- One-liner: '+_gsVor('sbOne','[one-liner]')+'\n- Customer: '+_gsVor('sbChar','[customer]');
+}
+function _gsAiB7(){
+  return 'I am about to publish my '+_gsVor('goalPage','[page]')+' page on '+_gsVor2Plat()+'. Give me a 6-point pre-publish QA checklist (links, contact form, mobile, H1, SEO title/description, page speed) and tell me what to screenshot as proof of this week\u2019s update.';
+}
+function _gsVor2Plat(){ return _gsPName() || '[my platform]'; }
+
+// ---------- Prep + fork steps ----------
+const GS_STEP = {
+  p1: { id:'p1', sec:'Prep', title:'Set your goal and pick your first page',
+    instr:'Decide what this website should do for your business, then pick the ONE page you will improve first and the single action you want a visitor to take on it.\nFocus beats breadth: one page, one job.',
+    fields:[
+      {id:'goalType',l:'What should this site do most?',t:'select',opts:['Leads','Bookings','Sales','Clarity / credibility','Other']},
+      {id:'goalPage',l:'The one page you will improve first',t:'text',ph:'e.g. Home, About, Wedding Films'},
+      {id:'goalAction',l:'The single primary action on that page',t:'text',ph:'e.g. Book a consultation'}
+    ], ai:_gsAiP1 },
+  p2: { id:'p2', sec:'Prep', title:'Learn the fundamentals',
+    instr:'Before you build, ground yourself in what makes a site worth ranking and trusting. Open the E-E-A-T Playbook, then run the Site Audit and note your biggest gaps.',
+    deeplinks:[{l:'\uD83D\uDCD6 Open E-E-A-T Playbook',fn:'openEEATModal()'},{l:'\u2705 Run Site Audit',fn:'openEEATAudit()'}],
+    fields:[{id:'auditGaps',l:'Top 1-2 gaps from your audit',t:'textarea',ph:'What did the audit flag that you want to fix this round?'}],
+    ai:function(){ return 'Based on these gaps from my website audit: '+_gsVor('auditGaps','[gaps]')+', give me the 3 highest-leverage fixes to make first and why each one matters for trust and search visibility.'; } },
+  p3: { id:'p3', sec:'Prep', title:'Build your Brand Story Worksheet',
+    credit:'Built on the StoryBrand SB7 framework by Donald Miller. For the original, see <em>Building a StoryBrand</em> and the free tool at <a href="https://www.mystorybrand.com/" target="_blank" rel="noopener">mystorybrand.com</a>.',
+    instr:'Clarify your message before you design. Fill in each line in your own words. These answers feed the copy prompts in every build step, so be specific. The customer is the hero; you are the guide.',
+    fields:[
+      {id:'sbChar',l:'Character: who is your customer and what do they want?',t:'text'},
+      {id:'sbExt',l:'External problem (the tangible thing they face)',t:'text'},
+      {id:'sbInt',l:'Internal problem (how that makes them feel)',t:'text'},
+      {id:'sbPhil',l:'What you help them believe (the bigger why)',t:'text'},
+      {id:'sbEmp',l:'Guide \u2014 empathy (show you understand)',t:'text'},
+      {id:'sbAuth',l:'Guide \u2014 authority (proof you can help)',t:'text'},
+      {id:'sbPlan',l:'The plan (3 simple steps to work with you)',t:'textarea'},
+      {id:'sbCtaD',l:'Direct call to action (book / buy / call)',t:'text'},
+      {id:'sbCtaT',l:'Transitional call to action (download / learn)',t:'text'},
+      {id:'sbSucc',l:'Success (what their life looks like after)',t:'text'},
+      {id:'sbFail',l:'Failure (what they avoid by acting)',t:'text'},
+      {id:'sbOne',l:'Your one-liner (one sentence that ties it together)',t:'textarea'}
+    ], ai:_gsAiP3 },
+  p4: { id:'p4', sec:'Prep', title:'Readiness check',
+    instr:'Confirm the basics are working before you build on top of them. Fix any "No" before you publish.',
+    fields:[
+      {id:'rdDomain',l:'Custom domain connected?',t:'select',opts:['Yes','Not yet']},
+      {id:'rdAnalytics',l:'Analytics installed?',t:'select',opts:['Yes','Not yet']},
+      {id:'rdForm',l:'Contact form actually sends?',t:'select',opts:['Yes','Not yet','No form yet']},
+      {id:'rdAssets',l:'Brand assets ready (logo, photos, colors)?',t:'select',opts:['Yes','Partly','Not yet']},
+      {id:'rdNotes',l:'Anything to fix first?',t:'textarea',ph:'Optional'}
+    ], ai:function(){ return 'Here is my site readiness: domain '+_gsVor('rdDomain','?')+', analytics '+_gsVor('rdAnalytics','?')+', contact form '+_gsVor('rdForm','?')+', brand assets '+_gsVor('rdAssets','?')+'. Tell me which of these to fix first and a quick way to confirm each one is working.'; } },
+  fork: { id:'fork', sec:'Choose Platform', title:'Pick your website platform', type:'fork',
+    instr:'Choose where your site lives. Your build steps will be tailored to that platform. You can switch later by coming back to this step.' }
+};
+
+// ---------- Platform configs (instructions + verified help-center sources) ----------
+const GS_PCFG = {
+  pixieset: { name:'Pixieset', desc:'Photographer-first builder with galleries, store, and a Website product.',
+    steps:{
+      b1:{instr:'Open Pixieset and go to Website. Confirm your plan, then connect your custom domain in Settings. Pick the page you are improving, or add one with +Add Page \u2192 Page and choose a template.',
+        src:[{l:'Pixieset: Adding pages',u:'https://help.pixieset.com/hc/en-us/articles/360034370771-Adding-pages-to-your-website'},{l:'Pixieset: Publishing',u:'https://help.pixieset.com/hc/en-us/articles/360034393211-Publishing-your-Pixieset-Website'}]},
+      b2:{instr:'Pixieset pages are built from sections and layers in the Flex Editor. Add your sections top to bottom in the StoryBrand order from your worksheet. Double-click any text or image block to edit it.',
+        src:[{l:'Pixieset: Website help',u:'https://help.pixieset.com/hc/en-us/categories/360002180692-Website'},{l:'Pixieset SEO guide (2026)',u:'https://saradoesseo.com/website-tips/pixieset-seo/'}]},
+      b3:{instr:'Edit your hero section: double-click the headline and subhead to replace the copy, and set your primary button text and link. Keep one clear action above the fold.',
+        src:[{l:'Pixieset: Adding pages',u:'https://help.pixieset.com/hc/en-us/articles/360034370771-Adding-pages-to-your-website'},{l:'Pixieset SEO guide (2026)',u:'https://saradoesseo.com/website-tips/pixieset-seo/'}]},
+      b4:{instr:'Use one H1 (your main page headline) and H2/H3 for the sections beneath it. Set heading levels through your text styles so search engines can read the page structure.',
+        src:[{l:'Pixieset: Getting started with SEO',u:'https://help.pixieset.com/hc/en-us/articles/360034400271-Getting-Started-with-SEO'},{l:'Pixieset SEO guide (2026)',u:'https://saradoesseo.com/website-tips/pixieset-seo/'}]},
+      b5:{instr:'Swap in your real images (double-click to replace), compress large files before uploading, then add alt text in the SEO Manager \u2192 Images. Preview on mobile before moving on.',
+        src:[{l:'Pixieset: Getting started with SEO',u:'https://help.pixieset.com/hc/en-us/articles/360034400271-Getting-Started-with-SEO'},{l:'Pixieset: Generating SEO content',u:'https://help.pixieset.com/hc/en-us/articles/32291043718285-Generating-SEO-Content-for-your-Website'}]},
+      b6:{instr:'Open the page\u2019s \u2022\u2022\u2022 \u2192 Settings \u2192 SEO and set the Page Title, Page Description, and URL slug (lowercase). Use the site-wide SEO Manager to review every page.',
+        src:[{l:'Pixieset: Page settings',u:'https://help.pixieset.com/hc/en-us/articles/4402429665805-Managing-your-Page-Settings'},{l:'Pixieset: Getting started with SEO',u:'https://help.pixieset.com/hc/en-us/articles/360034400271-Getting-Started-with-SEO'}]},
+      b7:{instr:'Hit Publish. Pixieset submits your site to search engines by default, though indexing can take a few weeks. Then log your update as this week\u2019s WAC proof.',
+        src:[{l:'Pixieset: Publishing',u:'https://help.pixieset.com/hc/en-us/articles/360034393211-Publishing-your-Pixieset-Website'}]}
+    }},
+  squarespace: { name:'Squarespace', desc:'All-in-one builder with strong built-in SEO panels (assumes 7.1).',
+    steps:{
+      b1:{instr:'In Squarespace, open the Pages panel and add or pick your page. Connect your domain in Settings \u2192 Domains. These steps assume version 7.1.',
+        src:[{l:'Squarespace: Page settings',u:'https://support.squarespace.com/hc/en-us/articles/206543657-Page-settings'},{l:'Squarespace: SEO checklist',u:'https://support.squarespace.com/hc/en-us/articles/360002090267-SEO-checklist'}]},
+      b2:{instr:'In 7.1, pages are built from stacked Sections. Use Add Section to lay them out top to bottom in your StoryBrand order, then edit text and buttons inline.',
+        src:[{l:'Squarespace: Page settings',u:'https://support.squarespace.com/hc/en-us/articles/206543657-Page-settings'},{l:'Squarespace SEO tips (2026)',u:'https://webgoyat.com/blog/squarespace-seo-tips'}]},
+      b3:{instr:'Edit your top section: set the headline and subhead text, and add a Button block for your primary CTA. Keep one clear action above the fold.',
+        src:[{l:'Squarespace: SEO checklist',u:'https://support.squarespace.com/hc/en-us/articles/360002090267-SEO-checklist'},{l:'Squarespace SEO tips (2026)',u:'https://webgoyat.com/blog/squarespace-seo-tips'}]},
+      b4:{instr:'Format your main page headline as Heading 1 and use Heading 2/3 for the sections below it. Use only one H1 per page so the structure is clear.',
+        src:[{l:'Squarespace SEO tips (2026)',u:'https://webgoyat.com/blog/squarespace-seo-tips'},{l:'Squarespace: SEO checklist',u:'https://support.squarespace.com/hc/en-us/articles/360002090267-SEO-checklist'}]},
+      b5:{instr:'Add your images, keep files reasonably small, and add alt text via each image\u2019s settings. Squarespace is mobile-responsive, but preview mobile and trim anything cluttered.',
+        src:[{l:'Squarespace: What Squarespace does for SEO',u:'https://support.squarespace.com/hc/en-us/articles/206744067-What-Squarespace-does-for-SEO'},{l:'Squarespace: SEO checklist',u:'https://support.squarespace.com/hc/en-us/articles/360002090267-SEO-checklist'}]},
+      b6:{instr:'Open Page Settings \u2192 SEO tab. Set the SEO Title and SEO Description (aim 50\u2013300 characters) and a clean URL slug. Add a site title and site description for your homepage.',
+        src:[{l:'Squarespace: Adding SEO descriptions',u:'https://support.squarespace.com/hc/en-us/articles/206016198-Adding-SEO-descriptions'},{l:'Squarespace: Page settings',u:'https://support.squarespace.com/hc/en-us/articles/206543657-Page-settings'}]},
+      b7:{instr:'Save to publish your changes, or publish the whole site if it is still private. Then log your update as this week\u2019s WAC proof.',
+        src:[{l:'Squarespace: SEO checklist',u:'https://support.squarespace.com/hc/en-us/articles/360002090267-SEO-checklist'}]}
+    }},
+  showit: { name:'Showit', desc:'Drag-anywhere canvas builder for creatives, with a WordPress blog option.',
+    steps:{
+      b1:{instr:'Load your Showit template and open the Pages panel (Home, About, Services, etc.). Connect your domain via your DNS records, and request blog setup if you are on a blog plan.',
+        src:[{l:'Showit: Get started',u:'https://showit.com/get-started'},{l:'Showit: Building your site',u:'https://learn.showit.com/en/collections/132110-building-your-site'}]},
+      b2:{instr:'Showit pages are built from canvases (sections). Add canvases top to bottom in your StoryBrand order. Design desktop and mobile side by side \u2014 they are independent in Showit.',
+        src:[{l:'Showit: Building your site',u:'https://learn.showit.com/en/collections/132110-building-your-site'},{l:'Showit SEO + canvas order',u:'https://thesmcollective.com/blog/showit-seo-settings/'}]},
+      b3:{instr:'Edit your hero canvas: set the headline and subhead text, then make your button element clickable with a link to your primary action.',
+        src:[{l:'Showit: Get started',u:'https://showit.com/get-started'},{l:'Showit SEO + canvas order',u:'https://thesmcollective.com/blog/showit-seo-settings/'}]},
+      b4:{instr:'Select your headline text and set its Text Tag to H1 in the smart panel (only one H1 per page). Tag sub-sections H2/H3. In Showit, the order of elements in the canvas also affects how Google reads the page.',
+        src:[{l:'Showit SEO + canvas order',u:'https://thesmcollective.com/blog/showit-seo-settings/'},{l:'Showit: Building your site',u:'https://learn.showit.com/en/collections/132110-building-your-site'}]},
+      b5:{instr:'Add your images and design the mobile canvas separately so nothing overflows. Reorder canvas elements to match the mobile reading order, and compress images to keep it fast.',
+        src:[{l:'Showit: Mobile design (2025)',u:'https://madebyapplet.com/blog/showit-mobile-design/'},{l:'Showit SEO + canvas order',u:'https://thesmcollective.com/blog/showit-seo-settings/'}]},
+      b6:{instr:'Open the page\u2019s SEO Settings section and fill in the Page Title, Meta Description, and share image. More SEO guidance lives at learn.showit.com.',
+        src:[{l:'Showit: Get started (SEO settings)',u:'https://showit.com/get-started'},{l:'Showit: Building your site',u:'https://learn.showit.com/en/collections/132110-building-your-site'}]},
+      b7:{instr:'Preview to test your links, contact form, and mobile layout, then click the blue Publish button. Then log your update as this week\u2019s WAC proof.',
+        src:[{l:'Showit: Get started',u:'https://showit.com/get-started'},{l:'Showit: Building your site',u:'https://learn.showit.com/en/collections/132110-building-your-site'}]}
+    }}
+};
+
+// ---------- Build-step shared meta ----------
+const GS_BUILD = [
+  {base:'b1', title:'Access and setup', fields:[
+      {id:'bPageUrl',l:'Which page are you building? (URL or name)',t:'text',ph:'e.g. yoursite.com/home'},
+      {id:'bPlan',l:'Plan / domain notes',t:'text',ph:'e.g. Pro plan, domain connected'}], ai:_gsAiB1},
+  {base:'b2', title:'StoryBrand homepage wireframe', fields:[
+      {id:'wirePromise',l:'Header promise (your one-liner, refined for this page)',t:'text'},
+      {id:'wirePlan',l:'Section plan, top to bottom',t:'textarea',ph:'Header \u2192 stakes \u2192 value \u2192 guide \u2192 plan \u2192 explanatory \u2192 footer'}], ai:_gsAiB2},
+  {base:'b3', title:'Hero headline and primary CTA', fields:[
+      {id:'copyHead',l:'H1 headline',t:'text'},
+      {id:'copySub',l:'Subheadline',t:'text'},
+      {id:'copyCta',l:'Primary button label',t:'text',ph:'e.g. Book a Call'}], ai:_gsAiB3},
+  {base:'b4', title:'Page structure and H-tags', fields:[
+      {id:'hgH1',l:'Your H1 (one only)',t:'text'},
+      {id:'hgH2',l:'H2 sections (one per line)',t:'textarea'}], ai:_gsAiB4},
+  {base:'b5', title:'Images, speed, and mobile', fields:[
+      {id:'imgHero',l:'Hero image (what it shows)',t:'text'},
+      {id:'imgAlt',l:'Alt text drafts',t:'textarea'}], ai:_gsAiB5},
+  {base:'b6', title:'SEO basics', fields:[
+      {id:'seoTitle',l:'SEO title (under 60 chars)',t:'text'},
+      {id:'seoMeta',l:'Meta description (under 160 chars)',t:'textarea'},
+      {id:'seoSlug',l:'URL slug (lowercase)',t:'text',ph:'e.g. wedding-films'}], ai:_gsAiB6},
+  {base:'b7', title:'Publish and submit proof', fields:[
+      {id:'liveUrl',l:'Live page URL',t:'text',ph:'https://...'}], ai:_gsAiB7,
+      deeplinks:[{l:'\uD83D\uDCE4 Go to Submit page',fn:"navTo('submit');loadSubmitPage();"}]}
+];
+
+// ---------- Branch builder ----------
+const GS_BRANCH = {};
+Object.keys(GS_PCFG).forEach(function(p){
+  GS_BRANCH[p] = GS_BUILD.map(function(b){
+    const cfg = GS_PCFG[p].steps[b.base];
+    return { id:p+'_'+b.base, sec:'Build', branch:p, title:b.title,
+      instr:cfg.instr, sources:cfg.src, fields:b.fields, ai:b.ai, deeplinks:b.deeplinks||null };
+  });
+});
+
+function gsVisibleSteps(){
+  const out = [GS_STEP.p1, GS_STEP.p2, GS_STEP.p3, GS_STEP.p4, GS_STEP.fork];
+  const p = _gsP();
+  if(p && GS_BRANCH[p]) out.push.apply(out, GS_BRANCH[p]);
+  return out;
+}
+function gsStepById(id){ return gsVisibleSteps().find(function(s){ return s.id===id; }); }
+
+// ---------- Persistence (triple-write: memory + localStorage + Firestore) ----------
+function _gsLsKey(id){ return 'wac_gs_brief_'+id; }
+function _gsLsIndexKey(){ const uid=(currentUser&&currentUser.uid)||'anon'; return 'wac_gs_index_'+uid; }
+function _gsLsIndex(){ try{ return JSON.parse(localStorage.getItem(_gsLsIndexKey())||'[]'); }catch(e){ return []; } }
+function _gsLsIndexSave(arr){ try{ localStorage.setItem(_gsLsIndexKey(), JSON.stringify(arr)); }catch(e){} }
+function _gsLsIndexAdd(b){
+  const arr=_gsLsIndex().filter(function(m){ return m.id!==b.id; });
+  arr.push({id:b.id,name:b.name,platform:b.platform,updatedAt:b.updatedAt});
+  _gsLsIndexSave(arr);
+}
+function _gsLsIndexRemove(id){ _gsLsIndexSave(_gsLsIndex().filter(function(m){ return m.id!==id; })); try{ localStorage.removeItem(_gsLsKey(id)); }catch(e){} }
+function _gsBriefDoc(b){ return { name:b.name||'', platform:b.platform||'', values:b.values||{}, notes:b.notes||{}, done:b.done||{}, currentStepId:b.currentStepId||'p1', createdAt:b.createdAt||Date.now(), updatedAt:b.updatedAt||Date.now() }; }
+
+function gsScheduleSave(){
+  if(_gsSaveTimer) clearTimeout(_gsSaveTimer);
+  _gsSetSave('Saving\u2026');
+  _gsSaveTimer = setTimeout(gsSave, 1000);
+}
+function gsSave(){
+  if(!_gsBrief) return;
+  _gsBrief.updatedAt = Date.now();
+  try{ localStorage.setItem(_gsLsKey(_gsBrief.id), JSON.stringify(_gsBrief)); _gsLsIndexAdd(_gsBrief); }catch(e){}
+  const uid = currentUser && currentUser.uid;
+  if(!uid){ _gsSetSave('Saved locally'); return; }
+  const ref = doc(db,'wac_registry',uid,'siteBriefs',_gsBrief.id);
+  setDoc(ref, _gsBriefDoc(_gsBrief), {merge:true}).then(function(){
+    updateDoc(doc(db,'wac_registry',uid), { activeSiteBriefId:_gsBrief.id }).catch(function(){});
+    _gsSetSave('All changes saved');
+  }).catch(function(){
+    _gsSetSave('Saved offline \u2014 will sync later');
+  });
+}
+function _gsSetSave(txt){ const el=document.getElementById('gs-save'); if(el) el.textContent = txt; }
+
+async function gsLoadBriefs(){
+  const uid = currentUser && currentUser.uid;
+  let list = [];
+  if(uid){
+    try{
+      const snap = await Promise.race([
+        getDocs(collection(db,'wac_registry',uid,'siteBriefs')),
+        new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, 6000); })
+      ]);
+      snap.forEach(function(d){ list.push(Object.assign({id:d.id}, d.data())); });
+    }catch(e){ /* fall through to local mirror */ }
+  }
+  _gsLsIndex().forEach(function(m){
+    if(!list.find(function(b){ return b.id===m.id; })){
+      try{ const raw=localStorage.getItem(_gsLsKey(m.id)); if(raw) list.push(JSON.parse(raw)); }catch(e){}
+    }
+  });
+  list.sort(function(a,b){ return (b.updatedAt||0)-(a.updatedAt||0); });
+  return list;
+}
+function _gsNewObj(name){
+  const off = !(currentUser && currentUser.uid);
+  return { id:_gsId(off), name:name||'My Website Brief', platform:'', values:{}, notes:{}, done:{}, currentStepId:'p1', createdAt:Date.now(), updatedAt:Date.now() };
+}
+
+// ---------- Init / open ----------
+function wacGsOpen(){ navTo('getstarted-wac'); }
+async function wacGsInit(){
+  const pane=document.getElementById('gs-pane');
+  if(pane && !_gsBooted) pane.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-muted);">Loading your guide\u2026</div>';
+  _gsBriefs = await gsLoadBriefs();
+  if(!_gsBriefs.length){
+    _gsBrief = _gsNewObj('My Website Brief');
+    _gsBriefs = [_gsBrief];
+    gsSave();
+  } else {
+    const wantId = currentUser && currentUser.activeSiteBriefId;
+    _gsBrief = (wantId && _gsBriefs.find(function(b){ return b.id===wantId; })) || _gsBriefs[0];
+    _gsBrief.values=_gsBrief.values||{}; _gsBrief.notes=_gsBrief.notes||{}; _gsBrief.done=_gsBrief.done||{};
+  }
+  _gsBooted = true;
+  if(!gsStepById(_gsBrief.currentStepId)) _gsBrief.currentStepId='p1';
+  gsRender();
+}
+
+// ---------- Render ----------
+function gsRender(){ gsRenderTopbar(); gsRenderRail(); gsRenderPane(); }
+
+function gsRenderTopbar(){
+  const el=document.getElementById('gs-topbar'); if(!el||!_gsBrief) return;
+  const vis=gsVisibleSteps().filter(function(s){ return s.type!=='fork'; });
+  const total=vis.length;
+  const done=vis.filter(function(s){ return _gsBrief.done[s.id]; }).length;
+  const pct = total? Math.round(done/total*100) : 0;
+  const idx = gsVisibleSteps().findIndex(function(s){ return s.id===_gsBrief.currentStepId; });
+  const badge = _gsPName() || 'Pick a platform';
+  el.innerHTML =
+    '<div class="gs-topbar-row1">'+
+      '<input class="gs-name-input" id="gs-name" value="'+esc(_gsBrief.name||'')+'" oninput="gsRenameInline(this.value)" placeholder="Name this brief">'+
+      '<span class="gs-badge">'+esc(badge)+'</span>'+
+      '<span class="gs-topbar-btns">'+
+        '<button class="gs-tbtn" onclick="gsOpenBriefs()">Briefs</button>'+
+        '<button class="gs-tbtn gold" onclick="gsExport()">Download</button>'+
+      '</span>'+
+    '</div>'+
+    '<div class="gs-prog-wrap">'+
+      '<div class="gs-prog-track"><div class="gs-prog-fill" style="width:'+pct+'%"></div></div>'+
+      '<span class="gs-prog-meta">'+done+'/'+total+' done</span>'+
+      '<span class="gs-prog-meta">Step '+(idx>=0?idx+1:1)+' of '+gsVisibleSteps().length+'</span>'+
+    '</div>'+
+    '<div class="gs-save" id="gs-save">All changes saved</div>';
+}
+
+function gsRenderRail(){
+  const el=document.getElementById('gs-rail'); if(!el||!_gsBrief) return;
+  const steps=gsVisibleSteps();
+  let html=''; let lastSec='';
+  steps.forEach(function(s){
+    if(s.sec!==lastSec){ html+='<div class="gs-rail-sec">'+esc(s.sec)+'</div>'; lastSec=s.sec; }
+    const isDone=!!_gsBrief.done[s.id];
+    const isActive=s.id===_gsBrief.currentStepId;
+    const cls='gs-rail-item'+(isActive?' active':'')+(isDone?' done':'');
+    html+='<div class="'+cls+'" onclick="gsGoStep(\''+s.id+'\')">'+
+      '<span class="gs-rail-check">'+(isDone?'\u2713':'')+'</span>'+
+      '<span>'+esc(s.title)+'</span></div>';
+  });
+  if(!_gsP()){
+    html+='<div class="gs-rail-sec">Build</div>'+
+      '<div class="gs-rail-item locked"><span class="gs-rail-check"></span><span>Pick a platform to unlock</span></div>';
+  }
+  el.innerHTML=html;
+}
+
+function gsRenderPane(){
+  const el=document.getElementById('gs-pane'); if(!el||!_gsBrief) return;
+  const s=gsStepById(_gsBrief.currentStepId) || GS_STEP.p1;
+  if(s.type==='fork'){ el.innerHTML=gsForkHtml(s); return; }
+  const vis=gsVisibleSteps();
+  const i=vis.findIndex(function(x){ return x.id===s.id; });
+  let h='';
+  h+='<div class="gs-step-sec">'+esc(s.sec)+'</div>';
+  h+='<div class="gs-step-title">'+esc(s.title)+'</div>';
+  if(s.credit){ h+='<div class="gs-credit">'+s.credit+'</div>'; }
+  h+='<div class="gs-step-instr">'+esc(s.instr)+'</div>';
+  if(s.deeplinks){
+    h+='<div class="gs-deeplinks">';
+    s.deeplinks.forEach(function(d){ h+='<button class="gs-source" style="cursor:pointer;background:none;" onclick="'+d.fn+'">'+esc(d.l)+'</button>'; });
+    h+='</div>';
+  }
+  if(s.sources){
+    h+='<div class="gs-sources">';
+    s.sources.forEach(function(src){ h+='<a class="gs-source" href="'+esc(src.u)+'" target="_blank" rel="noopener">'+esc(src.l)+' \u2197</a>'; });
+    h+='</div>';
+  }
+  (s.fields||[]).forEach(function(f){
+    const v=_gsV(f.id);
+    h+='<div class="gs-field"><label class="gs-field-label">'+esc(f.l)+'</label>';
+    if(f.t==='textarea'){
+      h+='<textarea class="gs-textarea" oninput="gsField(\''+f.id+'\',this.value)" placeholder="'+esc(f.ph||'')+'">'+esc(v)+'</textarea>';
+    } else if(f.t==='select'){
+      h+='<select class="gs-select" onchange="gsField(\''+f.id+'\',this.value)">';
+      h+='<option value=""'+(v?'':' selected')+'>Select\u2026</option>';
+      (f.opts||[]).forEach(function(o){ h+='<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>'; });
+      h+='</select>';
+    } else {
+      h+='<input class="gs-input" type="text" value="'+esc(v)+'" oninput="gsField(\''+f.id+'\',this.value)" placeholder="'+esc(f.ph||'')+'">';
+    }
+    h+='</div>';
+  });
+  if(s.ai){
+    h+='<div class="gs-ai"><div class="gs-ai-top">'+
+      '<span class="gs-ai-label">\u2728 Generate with AI</span>'+
+      '<button class="gs-ai-copy" onclick="gsCopyAi()">Copy</button></div>'+
+      '<textarea class="gs-ai-text" id="gs-ai-text">'+esc(s.ai(_gsBrief.values))+'</textarea>'+
+      '<div class="gs-ai-hint">Paste this into your own AI assistant or the WAC resources. This guide gives you the prompt \u2014 the writing and building stay yours.</div></div>';
+  }
+  const noteOpen=!!(_gsBrief.notes[s.id]);
+  h+='<button class="gs-notes-toggle" onclick="gsToggleNotes(\''+s.id+'\')">\uD83D\uDCDD Notes</button>'+
+     '<div class="gs-notes-area'+(noteOpen?' open':'')+'" id="gs-notes-'+s.id+'">'+
+     '<textarea class="gs-textarea" oninput="gsNote(\''+s.id+'\',this.value)" placeholder="Private notes for this step">'+esc(_gsBrief.notes[s.id]||'')+'</textarea></div>';
+  const isDone=!!_gsBrief.done[s.id];
+  h+='<div class="gs-done-row"><button class="gs-done-toggle'+(isDone?' on':'')+'" onclick="gsToggleDone(\''+s.id+'\')"></button>'+
+     '<span class="gs-done-label">'+(isDone?'Marked complete':'Mark this step complete')+'</span></div>';
+  h+='<div class="gs-nav">'+
+     '<button class="gs-nav-btn" onclick="gsBack()"'+(i<=0?' disabled':'')+'>\u2190 Back</button>'+
+     '<button class="gs-nav-btn primary" onclick="gsNext()"'+(i>=vis.length-1?' disabled':'')+'>Next \u2192</button></div>';
+  el.innerHTML=h;
+}
+
+function gsForkHtml(s){
+  let h='<div class="gs-step-sec">'+esc(s.sec)+'</div><div class="gs-step-title">'+esc(s.title)+'</div>';
+  h+='<div class="gs-step-instr">'+esc(s.instr)+'</div><div class="gs-fork">';
+  Object.keys(GS_PCFG).forEach(function(p){
+    const c=GS_PCFG[p]; const sel=_gsP()===p;
+    h+='<button class="gs-fork-card'+(sel?' sel':'')+'" onclick="gsPickPlatform(\''+p+'\')">'+
+      '<div class="gs-fork-name">'+esc(c.name)+(sel?' \u2713':'')+'</div>'+
+      '<div class="gs-fork-desc">'+esc(c.desc)+'</div></button>';
+  });
+  h+='</div>';
+  const vis=gsVisibleSteps(); const i=vis.findIndex(function(x){ return x.id===s.id; });
+  h+='<div class="gs-nav"><button class="gs-nav-btn" onclick="gsBack()"'+(i<=0?' disabled':'')+'>\u2190 Back</button>'+
+     '<button class="gs-nav-btn primary" onclick="gsNext()"'+(_gsP()?'':' disabled')+'>Next \u2192</button></div>';
+  return h;
+}
+
+// ---------- Interactions ----------
+function gsField(id,val){ if(!_gsBrief) return; _gsBrief.values[id]=val; gsScheduleSave(); gsRefreshAi(); }
+function gsRefreshAi(){
+  const s=gsStepById(_gsBrief.currentStepId);
+  if(s && s.ai){ const t=document.getElementById('gs-ai-text'); if(t) t.value=s.ai(_gsBrief.values); }
+}
+function gsNote(id,val){ if(!_gsBrief) return; _gsBrief.notes[id]=val; gsScheduleSave(); }
+function gsToggleNotes(id){ const a=document.getElementById('gs-notes-'+id); if(a) a.classList.toggle('open'); }
+function gsToggleDone(id){ if(!_gsBrief) return; _gsBrief.done[id]=!_gsBrief.done[id]; gsScheduleSave(); gsRender(); }
+function gsGoStep(id){ if(!_gsBrief) return; const s=gsStepById(id); if(!s) return; _gsBrief.currentStepId=id; gsScheduleSave(); gsRender(); const r=document.getElementById('gs-rail'); if(r) r.classList.remove('open'); }
+function gsNext(){ const vis=gsVisibleSteps(); const i=vis.findIndex(function(x){ return x.id===_gsBrief.currentStepId; }); if(i>=0 && i<vis.length-1) gsGoStep(vis[i+1].id); }
+function gsBack(){ const vis=gsVisibleSteps(); const i=vis.findIndex(function(x){ return x.id===_gsBrief.currentStepId; }); if(i>0) gsGoStep(vis[i-1].id); }
+function gsPickPlatform(p){ if(!_gsBrief) return; _gsBrief.platform=p; gsScheduleSave(); const b=GS_BRANCH[p]; if(b&&b[0]) _gsBrief.currentStepId=b[0].id; gsRender(); }
+function gsToggleRail(){ const r=document.getElementById('gs-rail'); if(r) r.classList.toggle('open'); }
+function gsRenameInline(val){ if(!_gsBrief) return; _gsBrief.name=val; gsScheduleSave(); }
+function gsBackToResources(){ navTo('resources'); }
+
+function gsCopyAi(){
+  const t=document.getElementById('gs-ai-text'); if(!t) return;
+  const txt=t.value;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){ _gsFlashCopy(); }).catch(function(){ _gsCopyFallback(t); });
+  } else { _gsCopyFallback(t); }
+}
+function _gsCopyFallback(t){ t.focus(); t.select(); try{ document.execCommand('copy'); _gsFlashCopy(); }catch(e){} }
+function _gsFlashCopy(){ const b=document.querySelector('.gs-ai-copy'); if(b){ const o=b.textContent; b.textContent='Copied \u2713'; setTimeout(function(){ b.textContent=o; },1400); } }
+
+// ---------- Briefs library ----------
+function gsOpenBriefs(){
+  const ov=document.getElementById('gs-briefs-overlay'); const m=document.getElementById('gs-briefs-modal');
+  if(!ov||!m) return;
+  let rows=_gsBriefs.map(function(b){
+    const cur=b.id===_gsBrief.id; const plat=b.platform?GS_PCFG[b.platform].name:'No platform yet';
+    return '<div class="gs-briefs-row'+(cur?' cur':'')+'">'+
+      '<div class="gs-briefs-info"><div class="gs-briefs-name">'+esc(b.name||'Untitled')+'</div>'+
+      '<div class="gs-briefs-sub">'+esc(plat)+'</div></div>'+
+      (cur?'':'<button class="gs-briefs-act" title="Open" onclick="gsOpenBriefId(\''+b.id+'\')">Open</button>')+
+      '<button class="gs-briefs-act" title="Rename" onclick="gsRenameBrief(\''+b.id+'\')">\u270F\uFE0F</button>'+
+      '<button class="gs-briefs-act" title="Duplicate" onclick="gsDuplicateBrief(\''+b.id+'\')">\u29C9</button>'+
+      '<button class="gs-briefs-act" title="Delete" onclick="gsDeleteBrief(\''+b.id+'\')">\uD83D\uDDD1\uFE0F</button>'+
+      '</div>';
+  }).join('');
+  m.innerHTML='<div class="gs-briefs-head"><div class="gs-briefs-title">Your Briefs</div>'+
+    '<button class="gs-briefs-act" onclick="gsCloseBriefs()">\u2715</button></div>'+
+    rows+
+    '<button class="gs-tbtn gold" style="width:100%;margin-top:8px;" onclick="gsCreateBrief()">+ New Brief</button>';
+  ov.classList.add('open');
+}
+function gsCloseBriefs(){ const ov=document.getElementById('gs-briefs-overlay'); if(ov) ov.classList.remove('open'); }
+function gsBriefsOverlayClick(e){ if(e.target && e.target.id==='gs-briefs-overlay') gsCloseBriefs(); }
+function gsCreateBrief(){
+  const name=prompt('Name this brief:', 'Website Brief '+(_gsBriefs.length+1));
+  if(name===null) return;
+  const b=_gsNewObj(name.trim()||'Untitled');
+  _gsBrief=b; _gsBriefs.unshift(b); gsSave(); gsCloseBriefs(); gsRender();
+}
+function gsOpenBriefId(id){
+  const b=_gsBriefs.find(function(x){ return x.id===id; }); if(!b) return;
+  b.values=b.values||{}; b.notes=b.notes||{}; b.done=b.done||{};
+  _gsBrief=b; if(!gsStepById(_gsBrief.currentStepId)) _gsBrief.currentStepId='p1';
+  gsSave(); gsCloseBriefs(); gsRender();
+}
+function gsRenameBrief(id){
+  const b=_gsBriefs.find(function(x){ return x.id===id; }); if(!b) return;
+  const name=prompt('Rename brief:', b.name||''); if(name===null) return;
+  b.name=name.trim()||'Untitled';
+  if(_gsBrief.id===id) _gsBrief.name=b.name;
+  gsSaveBriefObj(b); gsOpenBriefs(); gsRenderTopbar();
+}
+function gsDuplicateBrief(id){
+  const b=_gsBriefs.find(function(x){ return x.id===id; }); if(!b) return;
+  const off=!(currentUser&&currentUser.uid);
+  const copy=JSON.parse(JSON.stringify(b));
+  copy.id=_gsId(off); copy.name=(b.name||'Untitled')+' (copy)'; copy.createdAt=Date.now(); copy.updatedAt=Date.now();
+  _gsBriefs.unshift(copy); gsSaveBriefObj(copy); gsOpenBriefs();
+}
+function gsDeleteBrief(id){
+  if(!confirm('Delete this brief? This cannot be undone.')) return;
+  _gsBriefs=_gsBriefs.filter(function(x){ return x.id!==id; });
+  _gsLsIndexRemove(id);
+  const uid=currentUser&&currentUser.uid;
+  if(uid) deleteDoc(doc(db,'wac_registry',uid,'siteBriefs',id)).catch(function(){});
+  if(_gsBrief && _gsBrief.id===id){
+    if(_gsBriefs.length){ _gsBrief=_gsBriefs[0]; } else { _gsBrief=_gsNewObj('My Website Brief'); _gsBriefs=[_gsBrief]; gsSave(); }
+    if(!gsStepById(_gsBrief.currentStepId)) _gsBrief.currentStepId='p1';
+  }
+  gsOpenBriefs(); gsRender();
+}
+function gsSaveBriefObj(b){
+  b.updatedAt=Date.now();
+  try{ localStorage.setItem(_gsLsKey(b.id), JSON.stringify(b)); _gsLsIndexAdd(b); }catch(e){}
+  const uid=currentUser&&currentUser.uid; if(!uid) return;
+  setDoc(doc(db,'wac_registry',uid,'siteBriefs',b.id), _gsBriefDoc(b), {merge:true}).catch(function(){});
+}
+
+// ---------- Markdown export ----------
+function gsExport(){
+  if(!_gsBrief) return;
+  const b=_gsBrief; const L=[];
+  L.push('# Website Brief \u2014 '+(b.name||'Untitled'));
+  L.push('');
+  L.push('Platform: '+(b.platform?GS_PCFG[b.platform].name:'(not chosen)'));
+  L.push('');
+  gsVisibleSteps().forEach(function(s){
+    if(s.type==='fork') return;
+    L.push('## '+s.title);
+    (s.fields||[]).forEach(function(f){
+      const val=(b.values[f.id]||'').trim();
+      if(val) L.push('- '+f.l+': '+val);
+    });
+    const note=(b.notes[s.id]||'').trim();
+    if(note) L.push('- Notes: '+note);
+    L.push('- Status: '+(b.done[s.id]?'complete':'in progress'));
+    L.push('');
+  });
+  const blob=new Blob([L.join('\n')],{type:'text/markdown'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='Website Brief - '+(b.name||'Untitled').replace(/[^\w\- ]+/g,'').trim()+'.md';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+
+// ---------- window exposure ----------
+window.wacGsOpen=wacGsOpen; window.wacGsInit=wacGsInit;
+window.gsGoStep=gsGoStep; window.gsNext=gsNext; window.gsBack=gsBack;
+window.gsField=gsField; window.gsNote=gsNote; window.gsToggleNotes=gsToggleNotes;
+window.gsToggleDone=gsToggleDone; window.gsPickPlatform=gsPickPlatform;
+window.gsToggleRail=gsToggleRail; window.gsRenameInline=gsRenameInline; window.gsBackToResources=gsBackToResources;
+window.gsCopyAi=gsCopyAi; window.gsExport=gsExport;
+window.gsOpenBriefs=gsOpenBriefs; window.gsCloseBriefs=gsCloseBriefs; window.gsBriefsOverlayClick=gsBriefsOverlayClick;
+window.gsCreateBrief=gsCreateBrief; window.gsOpenBriefId=gsOpenBriefId; window.gsRenameBrief=gsRenameBrief;
+window.gsDuplicateBrief=gsDuplicateBrief; window.gsDeleteBrief=gsDeleteBrief;
+// ============================================================
+// END GET STARTED GUIDE
+// ============================================================
+
 </script>
 
 <!-- BUG REPORT MODAL -->
