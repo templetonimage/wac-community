@@ -368,7 +368,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   justify-content: center;
   min-height: 100dvh;
   padding: 40px 24px;
-  background: #111111;
+  background: var(--bg);
 }
 .auth-card-wrap {
   background: #1a1a1a;
@@ -382,9 +382,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .auth-logo {
   font-family: 'Sora', sans-serif;
+  font-weight: 800;
   font-size: 96px;
   color: var(--gold);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.02em;
   line-height: 1;
   margin-bottom: 8px;
   text-align: center;
@@ -427,16 +428,16 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .auth-form-input {
   width: 100%;
   padding: 16px 18px;
-  border: 1px solid #333;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #111;
+  background: #ffffff;
   font-size: 16px;
-  color: #fff;
+  color: #17140f;
   outline: none;
   transition: border-color 0.15s;
 }
 .auth-form-input:focus { border-color: var(--gold); }
-.auth-form-input::placeholder { color: rgba(255,255,255,0.3); }
+.auth-form-input::placeholder { color: #8a8577; }
 .auth-form-group { margin-bottom: 20px; }
 .auth-btn {
   width: 100%;
