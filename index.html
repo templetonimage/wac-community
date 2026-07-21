@@ -3189,8 +3189,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div class="pro-feature-card" id="pro-action-plan-card">
         <div class="pro-feature-icon">🗓</div>
         <div class="pro-feature-title">Weekly Website Action Plan</div>
-        <div class="pro-feature-desc">Get a personalized website update plan for the week — tailored to your niche, current streak, and this week's requirement. No more staring at your site wondering what to change. Just open this, read the plan, and execute.</div>
-        <div class="pro-coming-soon">Coming at Pro Launch</div>
+        <div class="pro-feature-desc">Your personalized website update plan for this week — tailored to your niche, current streak, and this week's requirement.</div>
+        <div id="pro-action-plan-body" style="margin-top:14px;"></div>
       </div>
 
       <!-- Website Copy Assist -->
@@ -3452,6 +3452,9 @@ import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
   deleteDoc, query, where, orderBy, limit, increment, arrayUnion, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getFunctions, httpsCallable
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
 
 // ==============================
 // FIREBASE CONFIG
@@ -3651,7 +3654,7 @@ function getTrialWeekIndex() {
 // ==============================
 // APP STATE
 // ==============================
-let app, auth, db;
+let app, auth, db, functions;
 let currentUser = null;
 let useLocalFallback = false;
 let _booted = false;
@@ -3755,6 +3758,7 @@ function initFirebase() {
     app = initializeApp(FIREBASE_CONFIG);
     auth = getAuth(app);
     db = getFirestore(app);
+    functions = getFunctions(app);
   } catch (e) {
     console.error("Firebase init failed:", e);
     useLocalFallback = true;
@@ -6978,7 +6982,85 @@ function renderProPage() {
       trialBanner.style.display = "none";
     }
   }
+  loadActionPlan();
 }
+
+// ==============================
+// WAC PRO — Weekly Website Action Plan
+// ==============================
+
+// Consecutive completed weeks immediately before the current week.
+async function _computeCurrentStreak(weekIdx) {
+  try {
+    const trackerSnap = await getDoc(doc(db, "trackers", currentUser.uid));
+    const trackerData = trackerSnap.exists() ? trackerSnap.data() : {};
+    let streak = 0;
+    for (let i = weekIdx - 1; i >= 0; i--) {
+      const w = WEEKS[i];
+      const checks = _weekChecks(trackerData, w);
+      const met = checks.filter(Boolean).length >= (w.required || 1);
+      if (met) streak++; else break;
+    }
+    return streak;
+  } catch (e) {
+    console.error("Streak compute failed:", e);
+    return 0;
+  }
+}
+
+function _renderActionPlanState(html) {
+  const el = document.getElementById("pro-action-plan-body");
+  if (el) el.innerHTML = html;
+}
+
+function _formatActionPlanText(text) {
+  return esc(text).replace(/\n/g, "<br>");
+}
+
+async function loadActionPlan() {
+  if (!currentUser || !(userHasPro() || currentUser.isAdmin)) return;
+  _renderActionPlanState(`<div style="font-size:13px;color:var(--text-muted);">Generating your plan…</div>`);
+
+  try {
+    const weekIdx = getWeekIndex();
+    const [streak, weekSubCount] = await Promise.all([
+      _computeCurrentStreak(weekIdx),
+      (async () => {
+        if (weekIdx < 0) return 0;
+        const q = query(collection(db, "submissions"),
+          where("authorUid", "==", currentUser.uid),
+          where("weekIdx", "==", weekIdx));
+        const snap = await getDocs(q);
+        return snap.size;
+      })(),
+    ]);
+
+    const generatePlan = httpsCallable(functions, "generateWeeklyActionPlan");
+    const result = await generatePlan({
+      businessType: currentUser.type || "",
+      streak,
+      weekSubCount,
+    });
+
+    const { plan } = result.data || {};
+    if (!plan) throw new Error("Empty plan response.");
+
+    const required = weekIdx >= 0 ? (WEEKS[weekIdx].required || 1) : 1;
+    _renderActionPlanState(`
+      <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;">
+        ${weekIdx >= 0 ? "Week " + (weekIdx + 1) : "This week"} · ${weekSubCount}/${required} submitted · ${streak}-week streak
+      </div>
+      <div style="font-size:14px;line-height:1.7;">${_formatActionPlanText(plan)}</div>
+    `);
+  } catch (e) {
+    console.error("Action plan load failed:", e);
+    _renderActionPlanState(`
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Couldn't generate your plan right now.</div>
+      <button class="btn btn-sm" onclick="loadActionPlan()">Try Again</button>
+    `);
+  }
+}
+window.loadActionPlan = loadActionPlan;
 
 // ==============================
 // WAC PRO — In-App Notification Sequence
