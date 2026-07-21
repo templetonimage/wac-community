@@ -3191,6 +3191,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="pro-feature-title">Weekly Website Action Plan</div>
         <div class="pro-feature-desc">Your personalized website update plan for this week — tailored to your niche, current streak, and this week's requirement.</div>
         <div id="pro-action-plan-body" style="margin-top:14px;"></div>
+        <div id="pro-action-plan-archive" style="margin-top:12px;"></div>
       </div>
 
       <!-- Website Copy Assist -->
@@ -6982,7 +6983,7 @@ function renderProPage() {
       trialBanner.style.display = "none";
     }
   }
-  loadActionPlan();
+  renderActionPlanCard();
 }
 
 // ==============================
@@ -7008,7 +7009,7 @@ async function _computeCurrentStreak(weekIdx) {
   }
 }
 
-function _renderActionPlanState(html) {
+function _renderActionPlanBody(html) {
   const el = document.getElementById("pro-action-plan-body");
   if (el) el.innerHTML = html;
 }
@@ -7022,9 +7023,81 @@ function _actionPlanItemRow(item) {
     </label>`;
 }
 
-async function loadActionPlan() {
+function _weekMetaLabel(weekIdx) {
+  const w = WEEKS[weekIdx];
+  return w ? `${w.label} (${w.dates})` : `Week ${weekIdx + 1}`;
+}
+
+// Renders the current week's plan (or a Generate button) plus the archive
+// of past weeks — entirely from a direct read of the member's own memory
+// doc. No Cloud Function call happens just from viewing the page.
+async function renderActionPlanCard() {
   if (!currentUser || !(userHasPro() || currentUser.isAdmin)) return;
-  _renderActionPlanState(`<div style="font-size:13px;color:var(--text-muted);">Generating your plan…</div>`);
+  const archiveEl = document.getElementById("pro-action-plan-archive");
+  if (archiveEl) archiveEl.innerHTML = "";
+  _renderActionPlanBody(`<div style="font-size:13px;color:var(--text-muted);">Loading…</div>`);
+
+  const weekIdx = getWeekIndex();
+  let memory = { items: [], weeklyPlans: {} };
+  try {
+    const memSnap = await getDoc(doc(db, "wac_action_plan_memory", currentUser.uid));
+    if (memSnap.exists()) memory = memSnap.data();
+  } catch (e) {
+    console.error("Action plan memory read failed:", e);
+  }
+  memory.items = memory.items || [];
+  memory.weeklyPlans = memory.weeklyPlans || {};
+
+  const thisWeekIds = memory.weeklyPlans[weekIdx];
+  if (thisWeekIds) {
+    const byId = new Map(memory.items.map((it) => [it.id, it]));
+    const items = thisWeekIds.map((id) => byId.get(id)).filter(Boolean);
+    _renderActionPlanBody(`
+      <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;">
+        ${_weekMetaLabel(weekIdx)}
+      </div>
+      <div>${items.map(_actionPlanItemRow).join("")}</div>
+    `);
+  } else {
+    _renderActionPlanBody(`
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">No plan generated yet for ${_weekMetaLabel(weekIdx)}.</div>
+      <button class="btn btn-gold btn-sm" onclick="generateActionPlanNow()">Generate Weekly Action Plan</button>
+    `);
+  }
+
+  _renderActionPlanArchive(memory, weekIdx);
+}
+
+function _renderActionPlanArchive(memory, currentWeekIdx) {
+  const archiveEl = document.getElementById("pro-action-plan-archive");
+  if (!archiveEl) return;
+  const byId = new Map(memory.items.map((it) => [it.id, it]));
+  const pastWeekIdxs = Object.keys(memory.weeklyPlans)
+    .map(Number)
+    .filter((wi) => wi < currentWeekIdx)
+    .sort((a, b) => b - a);
+
+  if (!pastWeekIdxs.length) { archiveEl.innerHTML = ""; return; }
+
+  const weeksHtml = pastWeekIdxs.map((wi) => {
+    const items = (memory.weeklyPlans[wi] || []).map((id) => byId.get(id)).filter(Boolean);
+    return `
+      <div style="padding:10px 0;border-top:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;">${_weekMetaLabel(wi)}</div>
+        <div>${items.map(_actionPlanItemRow).join("")}</div>
+      </div>`;
+  }).join("");
+
+  archiveEl.innerHTML = `
+    <details>
+      <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text-muted);">Archive · ${pastWeekIdxs.length} past week${pastWeekIdxs.length > 1 ? "s" : ""}</summary>
+      <div style="margin-top:6px;">${weeksHtml}</div>
+    </details>
+  `;
+}
+
+async function generateActionPlanNow() {
+  _renderActionPlanBody(`<div style="font-size:13px;color:var(--text-muted);">Generating your plan…</div>`);
 
   try {
     const weekIdx = getWeekIndex();
@@ -7041,31 +7114,23 @@ async function loadActionPlan() {
     ]);
 
     const generatePlan = httpsCallable(functions, "generateWeeklyActionPlan");
-    const result = await generatePlan({
+    await generatePlan({
       businessType: currentUser.type || "",
       streak,
       weekSubCount,
     });
 
-    const { items } = result.data || {};
-    if (!Array.isArray(items) || !items.length) throw new Error("Empty plan response.");
-
-    const required = weekIdx >= 0 ? (WEEKS[weekIdx].required || 1) : 1;
-    _renderActionPlanState(`
-      <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;">
-        ${weekIdx >= 0 ? "Week " + (weekIdx + 1) : "This week"} · ${weekSubCount}/${required} submitted · ${streak}-week streak
-      </div>
-      <div id="pro-action-plan-items">${items.map(_actionPlanItemRow).join("")}</div>
-    `);
+    // Re-render from a fresh read of memory now that the function has written it.
+    await renderActionPlanCard();
   } catch (e) {
-    console.error("Action plan load failed:", e);
-    _renderActionPlanState(`
+    console.error("Action plan generation failed:", e);
+    _renderActionPlanBody(`
       <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">Couldn't generate your plan right now.</div>
-      <button class="btn btn-sm" onclick="loadActionPlan()">Try Again</button>
+      <button class="btn btn-sm" onclick="generateActionPlanNow()">Try Again</button>
     `);
   }
 }
-window.loadActionPlan = loadActionPlan;
+window.generateActionPlanNow = generateActionPlanNow;
 
 async function toggleActionPlanItemUI(itemId, done, checkboxEl) {
   const label = checkboxEl.nextElementSibling;
