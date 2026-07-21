@@ -875,7 +875,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .backlink-tag {
   display: inline-block;
   font-size: 10px;
-  font-family: 'DM Mono', monospace;
+  font-family: 'Space Mono', monospace;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 2px 8px;
@@ -907,7 +907,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .backlink-filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
 .backlink-filter-btn {
   font-size: 11px;
-  font-family: 'DM Mono', monospace;
+  font-family: 'Space Mono', monospace;
   letter-spacing: 0.06em;
   padding: 5px 12px;
   border-radius: 20px;
@@ -1382,9 +1382,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border-radius: var(--radius);
   padding: 16px;
   cursor: pointer;
-  transition: box-shadow 0.15s, transform 0.15s;
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
 }
-.resource-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.resource-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); border-color: var(--gold); }
 .resource-emoji { font-size: 28px; margin-bottom: 8px; }
 .resource-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
 .resource-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
@@ -1412,7 +1412,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   cursor: pointer;
   transition: all 0.15s;
 }
-.filter-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+.filter-btn.active { background: var(--gold); color: var(--black); border-color: var(--gold); }
 
 /* ==============================
    MODAL (bottom-sheet)
@@ -1653,19 +1653,20 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border-radius: var(--radius);
   padding: 16px;
   cursor: pointer;
-  transition: box-shadow 0.15s, transform 0.15s;
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
   text-align: center;
 }
-.member-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.member-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); border-color: var(--gold); }
 .member-card-avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   background: var(--gold);
-  color: #fff;
+  color: var(--black);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Sora', sans-serif;
   font-weight: 700;
   font-size: 18px;
   margin: 0 auto 8px;
@@ -1674,7 +1675,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .member-card-biz { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
 .member-card-link {
   font-size: 12px;
-  color: var(--gold);
+  color: var(--gold-dark);
   display: inline-block;
 }
 
@@ -1792,15 +1793,16 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   height: 72px;
   border-radius: 50%;
   background: var(--gold);
-  color: #fff;
+  color: var(--black);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Sora', sans-serif;
   font-weight: 700;
   font-size: 28px;
   margin: 0 auto 12px;
 }
-.profile-name { font-weight: 700; font-size: 20px; margin-bottom: 2px; }
+.profile-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.01em; margin-bottom: 2px; }
 .profile-subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
 .profile-badges { margin-bottom: 12px; }
 .profile-stats {
@@ -1808,7 +1810,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   justify-content: center;
   gap: 24px;
 }
-.profile-stat-num { font-weight: 700; font-size: 20px; color: var(--gold); }
+.profile-stat-num { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; color: var(--gold-dark); }
 .profile-stat-label { font-size: 11px; color: var(--text-muted); }
 
 .push-notif-card {
@@ -1851,7 +1853,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   transition: all 0.15s;
 }
 .admin-member-controls button:hover { border-color: var(--gold); }
-.admin-member-controls button.active-flag { background: var(--gold); color: #fff; border-color: var(--gold); }
+.admin-member-controls button.active-flag { background: var(--gold); color: var(--black); border-color: var(--gold); }
 
 /* ==============================
    WELCOME MODAL
@@ -2083,16 +2085,16 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   display: flex;
   align-items: center;
   gap: 14px;
-  background: linear-gradient(135deg, #b8860b 0%, #d4a017 50%, #c9960e 100%);
+  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 50%, var(--gold) 100%);
   border-radius: 14px;
   padding: 16px 18px;
   margin-bottom: 14px;
   cursor: pointer;
   user-select: none;
-  box-shadow: 0 2px 10px rgba(184,134,11,0.25);
+  box-shadow: 0 2px 10px rgba(201,168,76,0.25);
   transition: opacity 0.15s, transform 0.2s, box-shadow 0.2s;
 }
-.replay-banner:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(184,134,11,0.35); }
+.replay-banner:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,76,0.35); }
 .replay-banner:active { opacity: 0.85; }
 .replay-banner-icon { font-size: 28px; flex-shrink: 0; }
 .replay-banner-text { flex: 1; }
@@ -2507,7 +2509,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="page-subtitle">Website strategy guides and tools — tap any card to read.</div>
         <div style="margin-top:10px;">
           <button onclick="wacGsOpen()" class="btn btn-gold btn-sm" style="margin-right:8px;">🚀 Get Started Guide</button>
-          <button onclick="openEEATAudit()" class="btn btn-sm" style="background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold);color:#e8d5a0;">✅ Open E-E-A-T Site Audit</button>
+          <button onclick="openEEATAudit()" class="btn btn-sm" style="background:linear-gradient(135deg,var(--black),#1f1708);border:1.5px solid var(--gold);color:#e8d5a0;">✅ Open E-E-A-T Site Audit</button>
         </div>
       </div>
       <!-- Admin resource compose -->
@@ -3042,7 +3044,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <!-- Add to Device card (always visible) -->
       <div class="card" id="add-to-device-card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
-          <img src="icons/icon-192.png" alt="WAC icon" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);" onerror="this.outerHTML='<div style=\'width:52px;height:52px;border-radius:12px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-shrink:0;\'><span style=\'font-family:Sora,sans-serif;font-size:20px;color:#c9a84c;letter-spacing:0.06em;\'>WAC</span></div>'" />
+          <img src="icons/icon-192.png" alt="WAC icon" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);" onerror="this.outerHTML='<div style=\'width:52px;height:52px;border-radius:12px;background:var(--black);display:flex;align-items:center;justify-content:center;flex-shrink:0;\'><span style=\'font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:#C9A84C;letter-spacing:0.02em;\'>WAC</span></div>'" />
           <div>
             <div style="font-family:'Sora',sans-serif;font-size:20px;letter-spacing:0.04em;">Add WAC to Your Device</div>
             <div class="text-sm text-muted">Access WAC like a native app — no App Store needed.</div>
@@ -3058,15 +3060,15 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">On iPhone or iPad, follow these steps in Safari:</div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:flex-start;gap:10px;">
-              <div style="background:var(--gold);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;">1</div>
+              <div style="background:var(--gold);color:var(--black);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;">1</div>
               <div style="font-size:13px;line-height:1.5;">Tap the <strong>Share</strong> button at the bottom of your browser <span style="font-size:15px;">⬆</span></div>
             </div>
             <div style="display:flex;align-items:flex-start;gap:10px;">
-              <div style="background:var(--gold);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;">2</div>
+              <div style="background:var(--gold);color:var(--black);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;">2</div>
               <div style="font-size:13px;line-height:1.5;">Scroll down and tap <strong>Add to Home Screen</strong></div>
             </div>
             <div style="display:flex;align-items:flex-start;gap:10px;">
-              <div style="background:var(--gold);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;">3</div>
+              <div style="background:var(--gold);color:var(--black);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;">3</div>
               <div style="font-size:13px;line-height:1.5;">Tap <strong>Add</strong> — WAC will appear on your home screen</div>
             </div>
           </div>
@@ -3150,7 +3152,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:8px;">
         <div class="backlink-section-label" style="margin:0;">Directory</div>
-        <div id="bl-dir-count" style="font-size:12px;color:var(--text-muted);font-family:'DM Mono',monospace;"></div>
+        <div id="bl-dir-count" style="font-size:12px;color:var(--text-muted);font-family:'Space Mono',monospace;"></div>
       </div>
       <div class="backlink-filter-row">
         <button class="backlink-filter-btn active" id="blf-all" onclick="blFilter('all')">All</button>
@@ -6141,7 +6143,7 @@ async function renderMemberGrid() {
     const igHandle = m.ig ? m.ig.trim().replace(/^@+/, "") : "";
     const igUrl = igHandle ? `https://www.instagram.com/${igHandle}` : "";
     const websiteBtn = m.website
-      ? `<a href="${esc(normalizeUrl(m.website))}" target="_blank" rel="noopener" class="member-card-link" onclick="event.stopPropagation()" style="display:block;text-align:center;font-size:11px;color:var(--gold);margin-top:4px;word-break:break-all;">🌐 Visit Site</a>`
+      ? `<a href="${esc(normalizeUrl(m.website))}" target="_blank" rel="noopener" class="member-card-link" onclick="event.stopPropagation()" style="display:block;text-align:center;font-size:11px;color:var(--gold-dark);margin-top:4px;word-break:break-all;">🌐 Visit Site</a>`
       : "";
     const igBtn = igUrl
       ? `<a href="${igUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:block;text-align:center;font-size:11px;color:var(--text-muted);margin-top:2px;">📸 ${esc(m.ig)}</a>`
@@ -9081,7 +9083,7 @@ async function renderMyListing() {
               <span class="backlink-tag">${exchangeLabel[d.exchangeType] || d.exchangeType}</span>
             </div>
             <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">${esc(d.siteDescription)}</div>
-            <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;">Listed ${new Date(d.listedAt && d.listedAt.toDate ? d.listedAt.toDate() : d.listedAt).toLocaleDateString()}</div>
+            <div style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;">Listed ${new Date(d.listedAt && d.listedAt.toDate ? d.listedAt.toDate() : d.listedAt).toLocaleDateString()}</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
             <button class="btn btn-outline btn-sm" onclick="openEditListing()">Edit</button>
@@ -9291,11 +9293,11 @@ async function loadAdminBacklinks() {
     container.innerHTML = rows.map(d => `
       <div class="backlink-dir-card" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
         <div style="flex:1;min-width:0;">
-          <div class="backlink-dir-name">${esc(d.displayName)} <span style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text-muted);">${esc(d.uid)}</span></div>
+          <div class="backlink-dir-name">${esc(d.displayName)} <span style="font-size:10px;font-family:'Space Mono',monospace;color:var(--text-muted);">${esc(d.uid)}</span></div>
           <a href="${esc(d.siteUrl)}" target="_blank" rel="noopener" class="backlink-dir-url">${esc(d.siteUrl)}</a>
           <div><span class="backlink-tag gold">${esc(d.siteNiche)}</span><span class="backlink-tag">${exchangeLabel[d.exchangeType] || d.exchangeType}</span></div>
           <div class="backlink-dir-desc">${esc(d.siteDescription)}</div>
-          <div style="font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;">${esc(d.contactEmail)}</div>
+          <div style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;">${esc(d.contactEmail)}</div>
         </div>
         <button class="btn btn-sm" onclick="adminDeleteBacklink('${d.id}')" style="background:#c0392b;color:#fff;border-color:#c0392b;flex-shrink:0;">Delete</button>
       </div>`).join('');
