@@ -1013,7 +1013,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   overflow: hidden;
 }
 .expert-archive-header {
-  background: linear-gradient(135deg, rgba(184,134,11,0.08), var(--surface));
+  background: linear-gradient(135deg, var(--accent-bg), var(--surface));
   border-bottom: 1px solid var(--border);
   padding: 16px 20px;
   display: flex;
@@ -1028,7 +1028,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .expert-archive-response {
   margin-top: 8px;
   padding: 10px 12px;
-  background: rgba(184,134,11,0.05);
+  background: var(--accent-bg);
   border-left: 3px solid var(--gold);
   border-radius: 0 6px 6px 0;
   font-size: 13px;
@@ -1058,7 +1058,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   overflow: hidden;
 }
 .eeat-audit-header {
-  background: linear-gradient(135deg, rgba(184,134,11,0.1), var(--surface));
+  background: linear-gradient(135deg, var(--accent-bg), var(--surface));
   border-bottom: 1px solid var(--border);
   padding: 16px 20px;
   display: flex;
@@ -1080,10 +1080,12 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .eeat-audit-body { padding: 12px 20px 24px; }
 .eeat-audit-pillar {
-  font-family: 'Sora', sans-serif;
-  font-size: 16px;
-  letter-spacing: 0.08em;
-  color: var(--gold);
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
   margin: 18px 0 8px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--border);
@@ -1131,7 +1133,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .eeat-audit-note-toggle {
   font-size: 11px;
-  color: var(--gold);
+  color: var(--gold-dark);
   background: none;
   border: none;
   padding: 0;
@@ -1881,18 +1883,21 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   animation: slideUp 0.3s ease;
 }
 .welcome-header {
-  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  background: linear-gradient(135deg, var(--black), #1f1708);
   padding: 28px 24px;
   text-align: center;
   color: #fff;
+  border-bottom: 3px solid var(--gold);
 }
 .welcome-header .welcome-logo {
   font-family: 'Sora', sans-serif;
-  font-size: 48px;
-  letter-spacing: 0.08em;
+  font-weight: 800;
+  font-size: 40px;
+  letter-spacing: -0.01em;
+  color: var(--gold);
 }
 .welcome-body { padding: 24px; }
-.welcome-body h3 { font-family: 'Sora', sans-serif; font-size: 22px; margin-bottom: 16px; }
+.welcome-body h3 { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.01em; margin-bottom: 16px; }
 .welcome-step {
   display: flex;
   gap: 12px;
@@ -1939,8 +1944,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .submission-info { flex: 1; }
 .submission-week { font-weight: 600; font-size: 13px; }
-.submission-url { font-size: 12px; color: var(--gold); word-break: break-all; }
-.submission-pts { font-weight: 700; color: var(--gold); }
+.submission-url { font-size: 12px; color: var(--gold-dark); word-break: break-all; }
+.submission-pts { font-weight: 700; color: var(--gold-dark); }
 .submission-del {
   background: none;
   border: none;
@@ -2114,7 +2119,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .zoom-replay-overlay.open { opacity: 1; pointer-events: all; }
 .zoom-replay-sheet {
-  background: #1e1e1e;
+  background: var(--black);
   border-radius: 20px 20px 0 0;
   width: 100%; max-width: 540px;
   max-height: 82vh;
@@ -2132,7 +2137,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .zoom-replay-header-icon { font-size: 28px; flex-shrink: 0; }
 .zoom-replay-header-text { flex: 1; }
-.zoom-replay-header-title { font-size: 18px; font-weight: 700; color: #fff; line-height: 1.2; }
+.zoom-replay-header-title { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: #fff; line-height: 1.2; }
 .zoom-replay-header-sub { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 3px; }
 .zoom-replay-close {
   background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
@@ -2152,13 +2157,13 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .zoom-replay-item-title { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.3; }
 .zoom-replay-item-date { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
 .zoom-replay-watch-btn {
-  background: #b8860b; color: #fff; border: none; border-radius: 8px;
+  background: var(--gold); color: var(--black); border: none; border-radius: 8px;
   padding: 7px 13px; font-size: 12px; font-weight: 700;
   cursor: pointer; flex-shrink: 0; white-space: nowrap;
   text-decoration: none; display: inline-block;
   transition: background 0.15s;
 }
-.zoom-replay-watch-btn:hover { background: #d4a017; }
+.zoom-replay-watch-btn:hover { background: var(--gold-light); }
 /* ===================== GET STARTED GUIDE (gs-) ===================== */
 #page-getstarted-wac{max-width:1100px;margin:0 auto;}
 .gs-back{background:none;border:none;color:var(--gold-dark,#b8860b);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px;}
@@ -3364,7 +3369,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   <div class="expert-archive-modal">
     <div class="expert-archive-header">
       <div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);">📁 Expert Review Archive</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">📁 Expert Review Archive</div>
         <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">All responded requests.</div>
       </div>
       <button onclick="closeExpertArchive()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">✕</button>
@@ -3380,7 +3385,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   <div class="eeat-audit-modal">
     <div class="eeat-audit-header">
       <div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);">E-E-A-T Site Audit</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">E-E-A-T Site Audit</div>
         <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">Track your fixes. Notes save automatically.</div>
       </div>
       <button onclick="closeEEATAudit()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">✕</button>
@@ -3411,7 +3416,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <div class="modal-overlay" id="eeat-modal-overlay" onclick="closeEEATModalDirect(event)">
   <div class="modal-sheet" style="max-height:90dvh;height:90dvh;display:flex;flex-direction:column;overflow:hidden;padding:0;">
     <div class="modal-header" style="flex-shrink:0;padding:16px 20px;">
-      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);">E-E-A-T Playbook</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">E-E-A-T Playbook</div>
       <button class="modal-close" onclick="closeEEATModal()">✕</button>
     </div>
     <!-- Slide container -->
@@ -4223,7 +4228,7 @@ async function refreshChallengeAvailability() {
       if (!usedEl) {
         usedEl = document.createElement("div");
         usedEl.id = "submit-challenge-used";
-        usedEl.style.cssText = "margin-top:8px;font-size:11px;font-weight:600;color:var(--gold);background:rgba(184,134,11,0.15);padding:4px 10px;border-radius:4px;display:inline-block;letter-spacing:0.04em;";
+        usedEl.style.cssText = "margin-top:8px;font-size:11px;font-weight:600;color:var(--gold-dark);background:rgba(184,134,11,0.15);padding:4px 10px;border-radius:4px;display:inline-block;letter-spacing:0.04em;";
         usedEl.textContent = "✓ Challenge bonus already claimed this week";
         const inner = cardEl.querySelector("label > div");
         if (inner) inner.appendChild(usedEl);
@@ -6094,7 +6099,7 @@ async function renderAdminRegistry() {
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;">
             <span style="font-weight:600;">${esc(m.name)}</span>
             ${m.isFounder ? `<span style="font-size:10px;background:var(--gold);color:#000;padding:1px 6px;border-radius:4px;font-weight:700;">🏅 Founder</span>` : ""}
-            ${m.isExpert ? `<span style="font-size:10px;background:rgba(184,134,11,0.12);color:var(--gold);padding:1px 6px;border-radius:4px;font-weight:700;">🎯 Expert</span>` : ""}
+            ${m.isExpert ? `<span style="font-size:10px;background:rgba(184,134,11,0.12);color:var(--gold-dark);padding:1px 6px;border-radius:4px;font-weight:700;">🎯 Expert</span>` : ""}
             ${m.isVIP ? `<span style="font-size:10px;background:#e8f4fd;color:#2980b9;padding:1px 6px;border-radius:4px;font-weight:700;">⚡ VIP</span>` : ""}
             ${m.isAllStar ? `<span style="font-size:10px;background:#fffbf0;color:var(--gold-dark);padding:1px 6px;border-radius:4px;font-weight:700;">⭐ All-Star</span>` : ""}
             ${proBadgeHtml}${trialHtml}
@@ -6112,7 +6117,7 @@ async function renderAdminRegistry() {
             <button class="${(m.rounds||[]).includes('R2')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R2')">R2 ${(m.rounds||[]).includes("R2")?"✓":""}</button>
             <button class="${(m.rounds||[]).includes('R3')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R3')">R3 ${(m.rounds||[]).includes("R3")?"✓":""}</button>
             <button class="${m.isFounder?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isFounder')">🏅 Founder</button>
-            <button class="${m.isExpert?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isExpert')" style="${m.isExpert ? 'background:rgba(184,134,11,0.12);border-color:var(--gold);color:var(--gold);font-weight:600;' : ''}">🎯 Expert</button>
+            <button class="${m.isExpert?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isExpert')" style="${m.isExpert ? 'background:rgba(184,134,11,0.12);border-color:var(--gold);color:var(--gold-dark);font-weight:600;' : ''}">🎯 Expert</button>
             <button class="${m.isVIP?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isVIP')">⚡ VIP</button>
             <button class="${m.isAllStar?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isAllStar')">⭐ All-Star</button>
             <button onclick="editRegistryEmail('${docId}','${esc(m.email)}')">✏️ Email</button>
@@ -8263,7 +8268,7 @@ function renderEEATSlide() {
     ? `<button class="btn btn-outline btn-sm" style="margin-top:16px;" onclick="copyEEATTemplate()">📋 Copy Template</button>`
     : "";
   const coreUpdateLink = _eeatSlide === 0
-    ? `<div style="margin-top:16px;padding:12px 14px;background:rgba(184,134,11,0.08);border:1px solid var(--gold-light);border-radius:8px;font-size:12px;line-height:1.6;"><strong style="color:var(--gold);">🔔 March 2026 Core Update is live.</strong> Google is actively rewarding sites that demonstrate E-E-A-T right now. <span style="color:var(--gold);font-weight:600;cursor:pointer;" onclick="closeEEATModal();setTimeout(()=>navTo('resources'),150);">See the Core Update resource card in Resources →</span></div>`
+    ? `<div style="margin-top:16px;padding:12px 14px;background:rgba(184,134,11,0.08);border:1px solid var(--gold-light);border-radius:8px;font-size:12px;line-height:1.6;"><strong style="color:var(--gold-dark);">🔔 March 2026 Core Update is live.</strong> Google is actively rewarding sites that demonstrate E-E-A-T right now. <span style="color:var(--gold-dark);font-weight:600;cursor:pointer;" onclick="closeEEATModal();setTimeout(()=>navTo('resources'),150);">See the Core Update resource card in Resources →</span></div>`
     : "";
 
   wrap.innerHTML = `
@@ -9876,7 +9881,7 @@ window.gsDuplicateBrief=gsDuplicateBrief; window.gsDeleteBrief=gsDeleteBrief;
 <div id="bug-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;padding:20px;">
   <div style="background:var(--surface);border-radius:12px;max-width:480px;margin:40px auto;padding:24px;border:1px solid var(--border);box-shadow:var(--shadow-lg);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.01em;">🐛 Report a Bug</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.01em;">🐛 Report a Bug</div>
       <button onclick="closeBugReport()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">✕</button>
     </div>
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Something not working right? Let Nate know and it'll get fixed.</p>
