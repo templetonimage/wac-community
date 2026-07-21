@@ -898,8 +898,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .backlink-section-label {
   font-family: 'Sora', sans-serif;
-  font-size: 18px;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
   color: var(--text);
   margin-bottom: 12px;
   margin-top: 20px;
@@ -917,12 +918,12 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   cursor: pointer;
   transition: all 0.15s;
 }
-.backlink-filter-btn.active { border-color: var(--gold); color: var(--gold-dark); background: rgba(184,134,11,0.07); }
+.backlink-filter-btn.active { border-color: var(--gold); color: var(--gold-dark); background: var(--accent-bg); }
 .backlink-empty { text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px; }
 
 /* Expert Panel (Reports page) */
 .expert-panel-card {
-  background: linear-gradient(135deg, rgba(184,134,11,0.07), var(--surface));
+  background: linear-gradient(135deg, var(--accent-bg), var(--surface));
   border: 1.5px solid var(--gold);
   border-radius: var(--radius);
   padding: 16px;
@@ -930,8 +931,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .expert-panel-title {
   font-family: 'Sora', sans-serif;
-  font-size: 22px;
-  letter-spacing: 0.05em;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
   color: var(--gold-dark);
   margin-bottom: 4px;
 }
@@ -1682,26 +1684,26 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 /* ==============================
    WAC PRO
    ============================== */
-.pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Sora',sans-serif;font-size:11px;letter-spacing:0.08em;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;line-height:1.4;}
+.pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:11px;letter-spacing:-0.01em;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;line-height:1.4;}
 .pro-locked-label{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Sora',sans-serif;font-size:12px;letter-spacing:0.1em;padding:3px 10px;border-radius:20px;margin-bottom:10px;}
-.pro-locked-title{font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:4px;}
+.pro-locked-title{font-family:'Sora',sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.01em;margin-bottom:4px;}
 .pro-locked-desc{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:14px;}
-.btn-upgrade{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;border:none;border-radius:var(--radius);font-family:'Sora',sans-serif;font-size:18px;letter-spacing:0.06em;cursor:pointer;text-decoration:none;transition:opacity .15s;}
+.btn-upgrade{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;border:none;border-radius:var(--radius);font-family:'Sora',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.01em;cursor:pointer;text-decoration:none;transition:opacity .15s;}
 .btn-upgrade:hover{opacity:.85;}
-.pro-page-header{background:linear-gradient(135deg,#1a1500,#2d2000);border-radius:var(--radius);padding:20px;margin-bottom:20px;border:1px solid var(--gold);}
-.pro-page-title{font-family:'Sora',sans-serif;font-size:32px;letter-spacing:0.06em;color:var(--gold);line-height:1;}
+.pro-page-header{background:linear-gradient(135deg,var(--black),#1f1708);border-radius:var(--radius);padding:20px;margin-bottom:20px;border:1px solid var(--gold);}
+.pro-page-title{font-family:'Sora',sans-serif;font-weight:800;font-size:30px;letter-spacing:-0.01em;color:var(--gold);line-height:1;}
 .pro-page-sub{font-size:13px;color:rgba(201,168,76,.7);margin-top:4px;}
 .pro-feature-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);}
 .pro-feature-icon{font-size:28px;margin-bottom:10px;}
-.pro-feature-title{font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:6px;}
+.pro-feature-title{font-family:'Sora',sans-serif;font-weight:700;font-size:17px;letter-spacing:-0.01em;margin-bottom:6px;}
 .pro-feature-desc{font-size:13px;color:var(--text-muted);line-height:1.6;}
 .pro-coming-soon{display:inline-block;background:var(--surface2);color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:20px;margin-top:8px;}
-.pro-admin-section{background:linear-gradient(135deg,#fffbf0,#fdf5e0);border:1.5px solid var(--gold);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
-.pro-admin-title{font-family:'Sora',sans-serif;font-size:18px;letter-spacing:0.05em;margin-bottom:4px;color:var(--gold-dark);}
+.pro-admin-section{background:linear-gradient(135deg,var(--accent-bg),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+.pro-admin-title{font-family:'Sora',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.01em;margin-bottom:4px;color:var(--gold-dark);}
 .pro-global-danger{background:#fff5f5;border:1.5px solid #e74c3c;border-radius:var(--radius);padding:14px;margin-top:12px;}
-.pro-global-danger-title{font-family:'Sora',sans-serif;font-size:16px;color:#e74c3c;margin-bottom:4px;}
+.pro-global-danger-title{font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--danger);margin-bottom:4px;}
 .pro-notif-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#e74c3c;border-radius:50%;border:2px solid var(--surface);}
-.lb-pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Sora',sans-serif;font-size:9px;letter-spacing:0.08em;padding:1px 6px;border-radius:20px;margin-left:4px;vertical-align:middle;}
+.lb-pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:9px;letter-spacing:-0.01em;padding:1px 6px;border-radius:20px;margin-left:4px;vertical-align:middle;}
 
 /* ==============================
    MEMBER PROFILE MODAL
@@ -1711,10 +1713,11 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   height: 64px;
   border-radius: 50%;
   background: var(--gold);
-  color: #fff;
+  color: var(--black);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Sora', sans-serif;
   font-weight: 700;
   font-size: 24px;
   margin: 0 auto 12px;
@@ -1734,7 +1737,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border-radius: 8px;
   padding: 12px 8px;
 }
-.member-stat-num { font-weight: 700; font-size: 20px; color: var(--gold); }
+.member-stat-num { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; color: var(--gold-dark); }
 .member-stat-label { font-size: 11px; color: var(--text-muted); }
 .member-dot-grid {
   display: grid;
@@ -2158,17 +2161,17 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .zoom-replay-watch-btn:hover { background: #d4a017; }
 /* ===================== GET STARTED GUIDE (gs-) ===================== */
 #page-getstarted-wac{max-width:1100px;margin:0 auto;}
-.gs-back{background:none;border:none;color:var(--gold,#b8860b);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px;}
+.gs-back{background:none;border:none;color:var(--gold-dark,#b8860b);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px;}
 .gs-back:hover{text-decoration:underline;}
 .gs-topbar{background:var(--surface,#fff);border:1.5px solid var(--border,#e6e6e6);border-radius:var(--radius,14px);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow,0 2px 10px rgba(0,0,0,0.05));}
 .gs-topbar-row1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
 .gs-name-input{flex:1;min-width:160px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;color:var(--text,#1a1a1a);background:var(--bg,#faf9f6);border:1.5px solid var(--border,#e6e6e6);border-radius:8px;padding:8px 12px;}
 .gs-name-input:focus{outline:none;border-color:var(--gold,#b8860b);}
-.gs-badge{flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#e8d5a0;background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold,#b8860b);border-radius:999px;padding:4px 12px;}
+.gs-badge{flex-shrink:0;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#e8d5a0;background:linear-gradient(135deg,var(--black),#1f1708);border:1.5px solid var(--gold,#b8860b);border-radius:999px;padding:4px 12px;}
 .gs-topbar-btns{display:flex;gap:8px;flex-shrink:0;}
-.gs-tbtn{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;padding:8px 12px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold,#b8860b);white-space:nowrap;transition:all .15s;}
-.gs-tbtn:hover{background:var(--gold,#b8860b);color:#fff;}
-.gs-tbtn.gold{background:var(--gold,#b8860b);color:#fff;}
+.gs-tbtn{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;padding:8px 12px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold-dark,#b8860b);white-space:nowrap;transition:all .15s;}
+.gs-tbtn:hover{background:var(--gold,#b8860b);color:var(--black);}
+.gs-tbtn.gold{background:var(--gold,#b8860b);color:var(--black);}
 .gs-tbtn.gold:hover{background:var(--gold-dark,#946c09);}
 .gs-prog-wrap{display:flex;align-items:center;gap:10px;}
 .gs-prog-track{flex:1;height:8px;background:var(--bg,#eee);border-radius:999px;overflow:hidden;}
@@ -2185,16 +2188,16 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .gs-rail-item:hover{background:var(--bg,#f5f4f0);}
 .gs-rail-item.active{background:linear-gradient(135deg,rgba(184,134,11,0.12),rgba(184,134,11,0.04));font-weight:600;}
 .gs-rail-item.locked{opacity:0.45;cursor:not-allowed;}
-.gs-rail-check{flex-shrink:0;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border,#ccc);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;}
+.gs-rail-check{flex-shrink:0;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border,#ccc);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--black);}
 .gs-rail-item.done .gs-rail-check{background:var(--gold,#b8860b);border-color:var(--gold,#b8860b);}
 .gs-pane{background:var(--surface,#fff);border:1.5px solid var(--border,#e6e6e6);border-radius:var(--radius,14px);padding:20px 22px;box-shadow:var(--shadow,0 2px 10px rgba(0,0,0,0.05));}
-.gs-step-sec{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold,#b8860b);margin-bottom:4px;}
-.gs-step-title{font-size:20px;font-weight:800;color:var(--text,#1a1a1a);margin-bottom:10px;line-height:1.25;}
+.gs-step-sec{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold-dark,#b8860b);margin-bottom:4px;}
+.gs-step-title{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.01em;color:var(--text,#1a1a1a);margin-bottom:10px;line-height:1.25;}
 .gs-step-instr{font-size:14px;line-height:1.65;color:var(--text,#333);white-space:pre-line;margin-bottom:14px;}
 .gs-credit{font-size:11px;color:var(--text-muted,#888);background:var(--bg,#f7f6f2);border-left:3px solid var(--gold,#b8860b);border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:14px;line-height:1.5;}
-.gs-credit a{color:var(--gold,#b8860b);font-weight:600;}
+.gs-credit a{color:var(--gold-dark,#b8860b);font-weight:600;}
 .gs-sources{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
-.gs-source{font-size:12px;font-weight:600;color:var(--gold,#b8860b);text-decoration:none;border:1.5px solid var(--border,#e6e6e6);border-radius:999px;padding:6px 12px;transition:all .15s;}
+.gs-source{font-size:12px;font-weight:600;color:var(--gold-dark,#b8860b);text-decoration:none;border:1.5px solid var(--border,#e6e6e6);border-radius:999px;padding:6px 12px;transition:all .15s;}
 .gs-source:hover{border-color:var(--gold,#b8860b);background:rgba(184,134,11,0.06);}
 .gs-deeplinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
 .gs-field{margin-bottom:14px;}
@@ -2202,10 +2205,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .gs-input,.gs-textarea,.gs-select{width:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--text,#1a1a1a);background:var(--bg,#faf9f6);border:1.5px solid var(--border,#e6e6e6);border-radius:8px;padding:9px 12px;box-sizing:border-box;}
 .gs-textarea{min-height:70px;resize:vertical;line-height:1.5;}
 .gs-input:focus,.gs-textarea:focus,.gs-select:focus{outline:none;border-color:var(--gold,#b8860b);}
-.gs-ai{background:linear-gradient(135deg,#1a1a1a,#221d0a);border:1.5px solid var(--gold,#b8860b);border-radius:12px;padding:14px;margin:16px 0;}
+.gs-ai{background:linear-gradient(135deg,var(--black),#1f1708);border:1.5px solid var(--gold,#b8860b);border-radius:12px;padding:14px;margin:16px 0;}
 .gs-ai-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
 .gs-ai-label{font-size:12px;font-weight:700;color:#e8d5a0;display:flex;align-items:center;gap:6px;}
-.gs-ai-copy{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;padding:6px 12px;border:1.5px solid var(--gold,#b8860b);background:var(--gold,#b8860b);color:#fff;}
+.gs-ai-copy{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;padding:6px 12px;border:1.5px solid var(--gold,#b8860b);background:var(--gold,#b8860b);color:var(--black);}
 .gs-ai-copy:hover{background:var(--gold-dark,#946c09);}
 .gs-ai-text{width:100%;min-height:130px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;line-height:1.5;color:#f0ead6;background:rgba(0,0,0,0.35);border:1px solid rgba(184,134,11,0.35);border-radius:8px;padding:10px;box-sizing:border-box;resize:vertical;}
 .gs-ai-hint{font-size:10px;color:rgba(232,213,160,0.7);margin-top:6px;line-height:1.4;}
@@ -2219,9 +2222,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .gs-done-toggle.on::after{transform:translateX(20px);}
 .gs-done-label{font-size:13px;font-weight:600;color:var(--text,#333);}
 .gs-nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border,#eee);}
-.gs-nav-btn{font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border-radius:10px;padding:11px 20px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold,#b8860b);transition:all .15s;}
+.gs-nav-btn{font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border-radius:10px;padding:11px 20px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold-dark,#b8860b);transition:all .15s;}
 .gs-nav-btn:hover{background:rgba(184,134,11,0.08);}
-.gs-nav-btn.primary{background:var(--gold,#b8860b);color:#fff;}
+.gs-nav-btn.primary{background:var(--gold,#b8860b);color:var(--black);}
 .gs-nav-btn.primary:hover{background:var(--gold-dark,#946c09);}
 .gs-nav-btn:disabled{opacity:0.4;cursor:not-allowed;}
 .gs-fork{display:grid;grid-template-columns:1fr;gap:12px;margin:8px 0 4px;}
@@ -2709,7 +2712,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <!-- ADMIN: Bug Reports Viewer -->
       <div id="admin-bug-reports" style="display:none;margin-bottom:28px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;">🐛 Bug Reports</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;">🐛 Bug Reports</div>
           <button class="btn btn-outline btn-sm" onclick="loadBugReports()">↻ Refresh</button>
         </div>
         <div id="bug-reports-body"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">No bug reports yet.</div></div>
@@ -2745,7 +2748,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Expert Webhook URL Config -->
       <div id="admin-expert-webhook" style="display:none;margin-bottom:24px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🎯 Expert Email Alert Webhook</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">🎯 Expert Email Alert Webhook</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">Paste your Make.com webhook URL below. When a member submits an Expert Review Request, WAC will POST the request details to this URL so you can trigger an email to the Expert.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div class="form-group">
@@ -2768,31 +2771,31 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Reset Points Tool -->
       <div id="admin-reset-points" style="display:none;margin-top:28px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🔄 Reset Member Points</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">🔄 Reset Member Points</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Zeroes out <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">points</code> and <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">totalPosts</code> for every member in the registry. Submission and engagement history in Firestore is preserved. Use at the end of the April trial before Round 1 begins.</div>
         <div class="pro-global-danger">
           <div class="pro-global-danger-title">⚠️ Destructive Action</div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">This cannot be undone. All member point totals will be set to zero. Requires double confirmation.</div>
-          <button class="btn btn-sm" onclick="resetAllPoints()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">Recompute All Points from Submissions</button>
+          <button class="btn btn-sm" onclick="resetAllPoints()" style="background:var(--danger);color:#fff;border-color:var(--danger);">Recompute All Points from Submissions</button>
         </div>
         <div id="reset-points-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
       </div>
 
       <!-- ADMIN: Delete Trial Submissions -->
       <div id="admin-delete-trial" style="display:none;margin-top:28px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🗑 Delete Trial Submissions</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">🗑 Delete Trial Submissions</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Permanently deletes all submission documents flagged <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">isTrial: true</code> from Firestore for all members. Run this after resetting points to fully clear trial data.</div>
         <div class="pro-global-danger">
           <div class="pro-global-danger-title">⚠️ Destructive Action</div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">This cannot be undone. All trial submission records will be permanently deleted. Requires double confirmation.</div>
-          <button class="btn btn-sm" onclick="deleteAllTrialSubmissions()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">Delete All Trial Submissions</button>
+          <button class="btn btn-sm" onclick="deleteAllTrialSubmissions()" style="background:var(--danger);color:#fff;border-color:var(--danger);">Delete All Trial Submissions</button>
         </div>
         <div id="delete-trial-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
       </div>
 
       <!-- ADMIN: Coworking Sessions -->
       <div id="admin-cowork-tool" style="display:none;margin-top:28px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">💻 Coworking Sessions</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">💻 Coworking Sessions</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Create a session to surface the RSVP card on members' dashboards. Mark attendees after the session to award +5 pts each. RSVP (+2 pts) is member self-service.</div>
 
         <!-- Create Session -->
@@ -2816,7 +2819,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Community Points Log -->
       <div id="admin-community-pts-tool" style="display:none;margin-top:28px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">💬 Community Points Log</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">💬 Community Points Log</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">All community point events — Feed posts, PVR, RER, Backlink, Zoom RSVP, Coworking. Logged going forward; prior events are not backfilled.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
@@ -2845,7 +2848,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         </div>
 
         <!-- Backfill Tool -->
-        <div style="font-family:'Sora',sans-serif;font-size:20px;letter-spacing:0.05em;margin:24px 0 4px;">🔧 Backfill Missing Points</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.01em;margin:24px 0 4px;">🔧 Backfill Missing Points</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Award community points retroactively for a member who missed an event before logging was in place. Writes a log entry and increments their registry total.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
@@ -2878,7 +2881,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: WAC Pro Management (hidden until _PRO_GLOBAL_ACTIVE = true) -->
       <div id="admin-pro-panel" style="display:none;margin-top:28px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">★ WAC Pro Management</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">★ WAC Pro Management</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Global Pro controls — inactive until Pro launch. Per-member Pro toggle and trial access are in the Member Directory.</div>
         <div class="pro-admin-section">
           <div class="pro-admin-title">Global Enable Pro</div>
@@ -2886,7 +2889,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div class="pro-global-danger">
             <div class="pro-global-danger-title">⚠️ One-Way Action</div>
             <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">Grants Pro to everyone currently in the registry. Requires double confirmation. Use per-member toggle in Directory for individual access.</div>
-            <button class="btn btn-sm" onclick="enableProForAll()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">Grant Pro to All Members</button>
+            <button class="btn btn-sm" onclick="enableProForAll()" style="background:var(--danger);color:#fff;border-color:var(--danger);">Grant Pro to All Members</button>
           </div>
           <div id="pro-global-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
         </div>
@@ -2894,7 +2897,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Clear Feed Posts by Week (always visible to admin) -->
       <div id="admin-clear-feed-tool" style="display:none;margin-top:28px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🗑 Clear Feed Posts by Week</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">🗑 Clear Feed Posts by Week</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Remove all feed posts for a completed week after you've verified them. Only deletes the social wall cards — tracker submissions, engagement records, and points are NOT touched.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="margin-bottom:14px;">
@@ -2918,14 +2921,14 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div style="background:#fff5f5;border:1px solid #f5c6c6;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#c0392b;line-height:1.5;">
             ⚠️ Deletes feed posts only. Tracker submissions, engagement records, and points are safe.
           </div>
-          <button class="btn btn-sm" onclick="clearFeedPostsByWeek()" style="background:#e74c3c;color:#fff;border-color:#e74c3c;">🗑 Clear Feed Posts for Selected Week</button>
+          <button class="btn btn-sm" onclick="clearFeedPostsByWeek()" style="background:var(--danger);color:#fff;border-color:var(--danger);">🗑 Clear Feed Posts for Selected Week</button>
           <div id="clear-feed-status" style="display:none;margin-top:12px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
         </div>
       </div>
 
       <!-- ADMIN: Submissions & Points Editor -->
       <div id="admin-submissions-tool" style="display:none;margin-top:28px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">📋 Submissions & Points Editor</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">📋 Submissions & Points Editor</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">View and edit all member submissions (including trial). Adjust points directly or delete a submission. Point changes update the member's registry total.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
@@ -2948,7 +2951,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div id="admin-sub-list"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Select a filter or click Refresh to load submissions.</div></div>
         </div>
         <!-- Admin Edit Points by User -->
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;margin-top:28px;">🎯 Edit Member Points Directly</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;margin-top:28px;">🎯 Edit Member Points Directly</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Set a member's point total to any value. This updates the registry only — submission records are not changed.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
@@ -3046,7 +3049,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
           <img src="icons/icon-192.png" alt="WAC icon" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);" onerror="this.outerHTML='<div style=\'width:52px;height:52px;border-radius:12px;background:var(--black);display:flex;align-items:center;justify-content:center;flex-shrink:0;\'><span style=\'font-family:Sora,sans-serif;font-weight:800;font-size:16px;color:#C9A84C;letter-spacing:0.02em;\'>WAC</span></div>'" />
           <div>
-            <div style="font-family:'Sora',sans-serif;font-size:20px;letter-spacing:0.04em;">Add WAC to Your Device</div>
+            <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.01em;">Add WAC to Your Device</div>
             <div class="text-sm text-muted">Access WAC like a native app — no App Store needed.</div>
           </div>
         </div>
@@ -3163,7 +3166,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div id="bl-directory"><div class="backlink-empty">Loading directory...</div></div>
       <!-- ADMIN: Backlink Listings Management -->
       <div id="bl-admin-panel" style="display:none;margin-top:32px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">All Backlink Listings</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">All Backlink Listings</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">All member listings. Delete any listing for abuse or spam.</div>
         <div id="bl-admin-body"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Loading...</div></div>
       </div>
@@ -3349,7 +3352,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <div class="modal-overlay" id="archived-anns-overlay" onclick="closeArchivedAnnsModalDirect(event)">
   <div class="modal-sheet">
     <div class="modal-header">
-      <div style="font-family:'Sora',sans-serif;font-size:20px;letter-spacing:0.05em;">Previous Announcements</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.01em;">Previous Announcements</div>
       <button class="modal-close" onclick="closeArchivedAnnsModal()">✕</button>
     </div>
     <div id="archived-anns-content" style="padding-bottom:8px;"></div>
@@ -3397,7 +3400,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <div class="rer-notif-overlay" id="rer-notif-overlay">
   <div class="rer-notif-modal">
     <div style="font-size:42px;margin-bottom:10px;">🎯</div>
-    <div style="font-family:'Sora',sans-serif;font-size:26px;letter-spacing:0.04em;margin-bottom:8px;">Expert Review Answered</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.01em;margin-bottom:8px;">Expert Review Answered</div>
     <div id="rer-notif-body" style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;"></div>
     <button class="btn btn-gold btn-block" onclick="dismissRERNotif()">View in Feed</button>
     <button onclick="dismissRERNotifOnly()" style="margin-top:10px;background:none;border:none;font-family:'Inter',sans-serif;font-size:12px;color:var(--text-muted);cursor:pointer;text-decoration:underline;">Dismiss</button>
@@ -6254,7 +6257,7 @@ async function loadTrackerReport() {
         html += `<td>${cell}</td>`;
       });
       html += `<td style="font-weight:700;">${r.completed}/12</td>`;
-      html += `<td style="font-weight:700;color:var(--gold);">${r.points || 0}</td>`;
+      html += `<td style="font-weight:700;color:var(--gold-dark);">${r.points || 0}</td>`;
       if (currentUser.isAdmin) {
         html += `<td><button onclick="openAdminTrackerEditor('${r.id}','${esc(r.name)}')" style="background:none;border:none;cursor:pointer;">✏️</button></td>`;
       }
@@ -8265,7 +8268,7 @@ function renderEEATSlide() {
 
   wrap.innerHTML = `
     <div style="font-size:40px;margin-bottom:10px;">${slide.emoji}</div>
-    <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:14px;color:var(--text);">${esc(slide.title)}</div>
+    <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:22px;letter-spacing:-0.01em;margin-bottom:14px;color:var(--text);">${esc(slide.title)}</div>
     <div style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text);">${linkify(slide.body)}</div>
     ${copyBtn}
     ${coreUpdateLink}
@@ -9112,7 +9115,7 @@ function openEditListing() {
   overlay.innerHTML = `
     <div style="background:var(--surface);border-radius:14px 14px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;max-height:90dvh;overflow-y:auto;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;">Add / Edit Listing</div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;">Add / Edit Listing</div>
         <button onclick="document.getElementById('bl-edit-overlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">&#x2715;</button>
       </div>
       <div class="form-group">
@@ -9873,7 +9876,7 @@ window.gsDuplicateBrief=gsDuplicateBrief; window.gsDeleteBrief=gsDeleteBrief;
 <div id="bug-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;padding:20px;">
   <div style="background:var(--surface);border-radius:12px;max-width:480px;margin:40px auto;padding:24px;border:1px solid var(--border);box-shadow:var(--shadow-lg);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-      <div style="font-family:'Sora',sans-serif;font-size:26px;letter-spacing:0.04em;">🐛 Report a Bug</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.01em;">🐛 Report a Bug</div>
       <button onclick="closeBugReport()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">✕</button>
     </div>
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Something not working right? Let Nate know and it'll get fixed.</p>
