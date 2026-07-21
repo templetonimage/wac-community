@@ -3199,7 +3199,12 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="pro-feature-icon">✍️</div>
         <div class="pro-feature-title">Website Copy Assist</div>
         <div class="pro-feature-desc">Got a page or section you want to improve? Drop in your idea and get 3 copy directions to choose from. You pick, you edit, you publish. It supports your voice — it doesn't replace it.</div>
-        <div class="pro-coming-soon">Coming at Pro Launch</div>
+        <div style="margin-top:14px;">
+          <textarea id="copy-assist-brief" maxlength="500" rows="3" placeholder="What do you need copy for? e.g. 'Homepage hero section' or 'Instagram bio for a wedding photographer'" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;resize:vertical;"></textarea>
+          <button class="btn btn-gold btn-sm" style="margin-top:8px;" onclick="generateWebsiteCopyNow()">Generate Copy</button>
+        </div>
+        <div id="copy-assist-body" style="margin-top:14px;"></div>
+        <div id="copy-assist-archive" style="margin-top:12px;"></div>
       </div>
 
       <!-- Advanced Streak Analytics -->
@@ -6984,6 +6989,7 @@ function renderProPage() {
     }
   }
   renderActionPlanCard();
+  renderCopyAssistArchive();
 }
 
 // ==============================
@@ -7150,6 +7156,83 @@ async function toggleActionPlanItemUI(itemId, done, checkboxEl) {
   }
 }
 window.toggleActionPlanItemUI = toggleActionPlanItemUI;
+
+// ==============================
+// WAC PRO — Website Copy Assist
+// ==============================
+
+function _copyDirectionBlock(direction) {
+  return `
+    <div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">${esc(direction.label)}</div>
+      <div style="font-size:14px;line-height:1.6;white-space:pre-wrap;">${esc(direction.copy)}</div>
+    </div>`;
+}
+
+function _copyEntryBlock(entry, opts) {
+  opts = opts || {};
+  const dateStr = entry.createdAt ? new Date(entry.createdAt).toLocaleDateString() : "";
+  return `
+    <div style="${opts.bordered ? "border-top:1px solid var(--border);padding-top:12px;margin-top:12px;" : ""}">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">"${esc(entry.brief)}"${dateStr ? " · " + dateStr : ""}</div>
+      ${entry.directions.map(_copyDirectionBlock).join("")}
+    </div>`;
+}
+
+async function generateWebsiteCopyNow() {
+  const input = document.getElementById("copy-assist-brief");
+  const brief = (input?.value || "").trim();
+  const bodyEl = document.getElementById("copy-assist-body");
+  if (!brief) {
+    showToast("Tell me what you need copy for first.");
+    return;
+  }
+  if (bodyEl) bodyEl.innerHTML = `<div style="font-size:13px;color:var(--text-muted);">Generating copy…</div>`;
+
+  try {
+    const generateCopy = httpsCallable(functions, "generateWebsiteCopy");
+    const result = await generateCopy({ brief, businessType: currentUser.type || "" });
+    const entry = result.data?.entry;
+    if (!entry) throw new Error("Empty response.");
+
+    if (bodyEl) bodyEl.innerHTML = _copyEntryBlock(entry);
+    if (input) input.value = "";
+    await renderCopyAssistArchive();
+  } catch (e) {
+    console.error("Website copy generation failed:", e);
+    const msg = e?.code === "functions/resource-exhausted"
+      ? "Give it a moment before generating again."
+      : "Couldn't generate copy right now. Try again.";
+    if (bodyEl) bodyEl.innerHTML = `<div style="font-size:13px;color:var(--text-muted);">${esc(msg)}</div>`;
+  }
+}
+window.generateWebsiteCopyNow = generateWebsiteCopyNow;
+
+async function renderCopyAssistArchive() {
+  if (!currentUser || !(userHasPro() || currentUser.isAdmin)) return;
+  const archiveEl = document.getElementById("copy-assist-archive");
+  if (!archiveEl) return;
+
+  let entries = [];
+  try {
+    const snap = await getDoc(doc(db, "wac_copy_assist", currentUser.uid));
+    if (snap.exists()) entries = snap.data().entries || [];
+  } catch (e) {
+    console.error("Copy assist archive read failed:", e);
+  }
+
+  if (!entries.length) { archiveEl.innerHTML = ""; return; }
+
+  const sorted = [...entries].reverse();
+  const html = sorted.map((entry, i) => _copyEntryBlock(entry, { bordered: i > 0 })).join("");
+  archiveEl.innerHTML = `
+    <details>
+      <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text-muted);">Archive · ${entries.length} generated ${entries.length > 1 ? "batches" : "batch"}</summary>
+      <div style="margin-top:6px;">${html}</div>
+    </details>
+  `;
+}
+window.renderCopyAssistArchive = renderCopyAssistArchive;
 
 // ==============================
 // WAC PRO — In-App Notification Sequence
