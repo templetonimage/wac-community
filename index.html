@@ -7013,8 +7013,13 @@ function _renderActionPlanState(html) {
   if (el) el.innerHTML = html;
 }
 
-function _formatActionPlanText(text) {
-  return esc(text).replace(/\n/g, "<br>");
+function _actionPlanItemRow(item) {
+  const safeText = esc(item.text);
+  return `
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;">
+      <input type="checkbox" ${item.done ? "checked" : ""} onchange="toggleActionPlanItemUI('${item.id}', this.checked, this)" style="margin-top:3px;flex-shrink:0;">
+      <span style="font-size:14px;line-height:1.5;${item.done ? "color:var(--text-muted);text-decoration:line-through;" : ""}">${safeText}</span>
+    </label>`;
 }
 
 async function loadActionPlan() {
@@ -7042,15 +7047,15 @@ async function loadActionPlan() {
       weekSubCount,
     });
 
-    const { plan } = result.data || {};
-    if (!plan) throw new Error("Empty plan response.");
+    const { items } = result.data || {};
+    if (!Array.isArray(items) || !items.length) throw new Error("Empty plan response.");
 
     const required = weekIdx >= 0 ? (WEEKS[weekIdx].required || 1) : 1;
     _renderActionPlanState(`
       <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;">
         ${weekIdx >= 0 ? "Week " + (weekIdx + 1) : "This week"} · ${weekSubCount}/${required} submitted · ${streak}-week streak
       </div>
-      <div style="font-size:14px;line-height:1.7;">${_formatActionPlanText(plan)}</div>
+      <div id="pro-action-plan-items">${items.map(_actionPlanItemRow).join("")}</div>
     `);
   } catch (e) {
     console.error("Action plan load failed:", e);
@@ -7061,6 +7066,27 @@ async function loadActionPlan() {
   }
 }
 window.loadActionPlan = loadActionPlan;
+
+async function toggleActionPlanItemUI(itemId, done, checkboxEl) {
+  const label = checkboxEl.nextElementSibling;
+  if (label) {
+    label.style.textDecoration = done ? "line-through" : "none";
+    label.style.color = done ? "var(--text-muted)" : "";
+  }
+  try {
+    const toggleItem = httpsCallable(functions, "toggleActionPlanItem");
+    await toggleItem({ itemId, done });
+  } catch (e) {
+    console.error("Toggle action plan item failed:", e);
+    checkboxEl.checked = !done;
+    if (label) {
+      label.style.textDecoration = !done ? "line-through" : "none";
+      label.style.color = !done ? "var(--text-muted)" : "";
+    }
+    showToast("Couldn't save that — try again.");
+  }
+}
+window.toggleActionPlanItemUI = toggleActionPlanItemUI;
 
 // ==============================
 // WAC PRO — In-App Notification Sequence
