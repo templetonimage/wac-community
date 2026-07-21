@@ -3188,7 +3188,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <!-- Weekly Website Action Plan Generator -->
       <div class="pro-feature-card" id="pro-action-plan-card">
         <div class="pro-feature-icon">🗓</div>
-        <div class="pro-feature-title">Weekly Website Action Plan</div>
+        <div class="pro-feature-title">Weekly Website Action Plan <span id="pro-action-plan-week-badge" class="pro-coming-soon" style="text-transform:none;letter-spacing:0.02em;"></span></div>
         <div class="pro-feature-desc">Your personalized website update plan for this week — tailored to your niche, current streak, and this week's requirement.</div>
         <div id="pro-action-plan-body" style="margin-top:14px;"></div>
         <div id="pro-action-plan-archive" style="margin-top:12px;"></div>
@@ -7038,6 +7038,9 @@ async function renderActionPlanCard() {
   _renderActionPlanBody(`<div style="font-size:13px;color:var(--text-muted);">Loading…</div>`);
 
   const weekIdx = getWeekIndex();
+  const badgeEl = document.getElementById("pro-action-plan-week-badge");
+  if (badgeEl) badgeEl.textContent = _weekMetaLabel(weekIdx);
+
   let memory = { items: [], weeklyPlans: {} };
   try {
     const memSnap = await getDoc(doc(db, "wac_action_plan_memory", currentUser.uid));
@@ -7052,12 +7055,7 @@ async function renderActionPlanCard() {
   if (thisWeekIds) {
     const byId = new Map(memory.items.map((it) => [it.id, it]));
     const items = thisWeekIds.map((id) => byId.get(id)).filter(Boolean);
-    _renderActionPlanBody(`
-      <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;">
-        ${_weekMetaLabel(weekIdx)}
-      </div>
-      <div>${items.map(_actionPlanItemRow).join("")}</div>
-    `);
+    _renderActionPlanBody(`<div>${items.map(_actionPlanItemRow).join("")}</div>`);
   } else {
     _renderActionPlanBody(`
       <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">No plan generated yet for ${_weekMetaLabel(weekIdx)}.</div>
