@@ -9,42 +9,47 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="WAC" />
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 <style>
 /* ==============================
    CSS VARIABLES & RESET
    ============================== */
 :root {
-  --gold: #c9a84c;
-  --gold-light: #d4bc6a;
-  --gold-dark: #a8893a;
-  --bg: #fbf9f5;
-  --surface: #ffffff;
-  --surface2: #f3f1ed;
-  --border: #e8e4de;
-  --text: #1a1a1a;
-  --text-muted: #6b6b6b;
+  --gold: #C9A84C;
+  --gold-light: #d9c078;
+  --gold-dark: #b8860b;
+  --black: #0d0d0d;
+  --off-black: #141414;
+  --bg: #f7f3ea;
+  --surface: #fdfbf6;
+  --surface2: #f0ece0;
+  --border: #e8e2d4;
+  --text: #17140f;
+  --text-muted: #6b6558;
   --radius: 12px;
-  --shadow: 0 2px 16px rgba(0,0,0,0.07);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+  --shadow: 0 4px 16px rgba(23,20,15,.05);
+  --shadow-lg: 0 8px 32px rgba(23,20,15,.10);
   --danger: #c0392b;
   --success: #27ae60;
+  /* legacy aliases kept for any un-migrated references */
+  --surface2-old: #f3f1ed;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { height: 100%; height: 100dvh; }
 body {
   height: 100%; height: 100dvh; overflow: hidden;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
-h1, h2, h3, h4 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; }
-a { color: var(--gold); text-decoration: none; }
+h1, h2, h3, h4 { font-family: 'Sora', sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+a { color: var(--gold-dark); text-decoration: none; }
 a:hover { text-decoration: underline; }
-button { cursor: pointer; font-family: 'DM Sans', sans-serif; }
-input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
+button { cursor: pointer; font-family: 'Inter', sans-serif; }
+input, textarea, select { font-family: 'Inter', sans-serif; font-size: 15px; }
+.mono, .label-mono { font-family: 'Space Mono', monospace; letter-spacing: 0.02em; }
 
 /* ==============================
    APP SHELL
@@ -59,8 +64,8 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 200;
-  background: #1a1a1a;
-  border-bottom: 1px solid #333;
+  background: var(--black);
+  border-bottom: 1px solid var(--off-black);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -68,10 +73,11 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   height: 60px;
 }
 .topnav-brand {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 32px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
   color: var(--gold);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.02em;
   cursor: pointer;
 }
 .topnav-user {
@@ -89,19 +95,20 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   height: 34px;
   border-radius: 50%;
   background: var(--gold);
-  color: #fff;
+  color: var(--black);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
   font-size: 14px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   cursor: pointer;
   border: 2px solid var(--gold);
   flex-shrink: 0;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, box-shadow 0.15s;
 }
-.topnav-avatar:hover { opacity: 0.85; }
+.topnav-avatar:hover { opacity: 0.85; box-shadow: 0 0 0 3px var(--accent-bg, rgba(201,168,76,.18)); }
 .topnav-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
 
 /* Profile photo upload */
@@ -117,13 +124,14 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   height: 80px;
   border-radius: 50%;
   background: var(--gold);
-  color: #fff;
+  color: var(--black);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
   font-size: 28px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   overflow: hidden;
   border: 3px solid var(--gold);
   flex-shrink: 0;
@@ -139,9 +147,9 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   border-radius: 6px;
   padding: 5px 12px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
-.profile-photo-upload-btn:hover { background: var(--gold); color: #fff; }
+.profile-photo-upload-btn:hover { background: var(--gold); color: var(--black); }
 .profile-photo-remove-btn {
   font-size: 13px;
   color: var(--text-muted);
@@ -150,7 +158,7 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   border-radius: 6px;
   padding: 5px 12px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   display: none;
 }
 .profile-photo-remove-btn:hover { color: var(--danger); border-color: var(--danger); }
@@ -190,8 +198,8 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   position: fixed;
   bottom: 0; left: 0; right: 0;
   z-index: 200;
-  background: #1a1a1a;
-  border-top: 1px solid #333;
+  background: var(--black);
+  border-top: 1px solid var(--off-black);
   display: flex;
   align-items: stretch;
   min-height: 68px;
@@ -204,22 +212,32 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   cursor: pointer;
   border: none;
   background: transparent;
-  color: rgba(255,255,255,0.7);
+  color: rgba(240,236,224,0.55);
   font-size: 9px;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  font-family: 'Space Mono', monospace;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   transition: color 0.15s;
   padding: 8px 2px;
   position: relative;
 }
-.nav-item svg { width: 20px; height: 20px; transition: color 0.15s; }
-.nav-item.active svg { color: var(--gold); }
-.nav-item.active { color: rgba(255,255,255,0.9); }
+.nav-item svg { width: 19px; height: 19px; stroke-width: 1.75; transition: color 0.15s, transform 0.15s; }
+.nav-item.active svg { color: var(--gold); transform: translateY(-1px); }
+.nav-item.active { color: var(--white, #f0ece0); }
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 50%;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--gold);
+  transform: translateX(-50%);
+}
 .nav-item:hover { color: #fff; }
 
 /* ==============================
@@ -242,10 +260,11 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
 .page.active { display: block; }
 .page-header { margin-bottom: 24px; }
 .page-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 40px;
-  letter-spacing: 0.04em;
-  line-height: 1;
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 30px;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
   color: var(--text);
   margin-bottom: 0;
 }
@@ -265,11 +284,19 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   padding: 20px;
   margin-bottom: 16px;
   box-shadow: var(--shadow);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 .card-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
   margin-bottom: 12px;
+}
+/* Clickable cards get the lifted hover treatment; add this class per-page where a card is interactive */
+.card-interactive { cursor: pointer; }
+.card-interactive:hover {
+  border-color: var(--gold);
+  box-shadow: var(--shadow-lg);
 }
 
 /* ==============================
@@ -284,9 +311,9 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 15px; }
   font-size: 15px;
   color: var(--text);
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-.form-input:focus { border-color: var(--gold); }
+.form-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.12); }
 textarea.form-input { resize: vertical; min-height: 80px; }
 .form-label {
   display: block;
@@ -310,20 +337,21 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   font-weight: 600;
   font-size: 15px;
   border: none;
-  transition: background 0.15s, opacity 0.15s;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
 }
+/* Primary action: black default, gold on hover — gold is an earned accent, not a default fill */
 .btn-gold {
-  background: var(--gold);
+  background: var(--black);
   color: #fff;
 }
-.btn-gold:hover { background: var(--gold-dark); }
+.btn-gold:hover { background: var(--gold); color: var(--black); }
 .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-outline {
   background: transparent;
-  color: var(--gold);
-  border: 1.5px solid var(--gold);
+  color: var(--text);
+  border: 1.5px solid var(--text);
 }
-.btn-outline:hover { background: rgba(184,134,11,0.06); }
+.btn-outline:hover { background: var(--gold); border-color: var(--gold); color: var(--black); }
 .btn-sm { padding: 8px 16px; font-size: 13px; }
 .btn-danger { background: var(--danger); color: #fff; }
 .btn-danger:hover { background: #a93226; }
@@ -352,7 +380,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: 1px solid #2e2e2e;
 }
 .auth-logo {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 96px;
   color: var(--gold);
   letter-spacing: 0.1em;
@@ -361,7 +389,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   text-align: center;
 }
 .auth-subtitle {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 400;
   font-size: 16px;
   color: rgba(255,255,255,0.6);
@@ -376,7 +404,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: none;
   border-radius: 24px;
   padding: 8px 24px;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 16px;
   letter-spacing: 0.08em;
   color: #fff;
@@ -389,7 +417,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .auth-form-label {
   display: block;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 14px;
   letter-spacing: 0.08em;
   color: rgba(255,255,255,0.75);
@@ -416,7 +444,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: none;
   background: var(--gold);
   color: #fff;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 20px;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -541,7 +569,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   color: var(--gold);
   font-size: 12px;
   font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   padding: 0;
   margin-top: 4px;
@@ -584,7 +612,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border-radius: 8px;
   border: 1.5px solid var(--border);
   background: transparent;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
@@ -633,7 +661,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -652,7 +680,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: none;
   color: rgba(255,255,255,0.5);
   font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   padding: 0;
   margin-bottom: 8px;
@@ -677,7 +705,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 11px;
   flex-shrink: 0;
   overflow: hidden;
@@ -705,7 +733,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 8px;
   padding: 8px 10px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: #fff;
   resize: none;
@@ -719,7 +747,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: none;
   border-radius: 8px;
   padding: 8px 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -733,7 +761,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   color: var(--gold);
   border-radius: 8px;
   padding: 6px 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -865,7 +893,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: 1px solid var(--border);
 }
 .backlink-section-label {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 18px;
   letter-spacing: 0.05em;
   color: var(--text);
@@ -897,7 +925,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   margin-bottom: 20px;
 }
 .expert-panel-title {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 22px;
   letter-spacing: 0.05em;
   color: var(--gold-dark);
@@ -1046,7 +1074,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .eeat-audit-body { padding: 12px 20px 24px; }
 .eeat-audit-pillar {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 16px;
   letter-spacing: 0.08em;
   color: var(--gold);
@@ -1068,7 +1096,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   padding: 4px 0;
   border-radius: 6px;
   border: 1.5px solid var(--border);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -1102,7 +1130,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: none;
   padding: 0;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .eeat-audit-note-area {
   display: none;
@@ -1115,7 +1143,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 7px 9px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
   color: var(--text);
   resize: none;
@@ -1137,7 +1165,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: none;
   color: var(--text-muted);
   font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   padding: 0;
   margin-bottom: 8px;
@@ -1161,7 +1189,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 11px;
   flex-shrink: 0;
   overflow: hidden;
@@ -1190,7 +1218,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 10px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: var(--text);
   resize: none;
@@ -1203,7 +1231,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: none;
   border-radius: 8px;
   padding: 8px 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1223,7 +1251,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border-radius: 6px;
   transition: background 0.15s;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .post-reply-btn:hover { background: var(--surface2); color: var(--text); }
 .see-more-btn {
@@ -1232,7 +1260,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   color: var(--gold);
   font-size: 12px;
   font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   padding: 2px 0;
   margin-bottom: 6px;
@@ -1252,7 +1280,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: 1px solid var(--gold);
   border-radius: 8px;
   padding: 10px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   color: var(--text);
   resize: none;
@@ -1265,7 +1293,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 10px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: var(--text);
 }
@@ -1285,7 +1313,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   border: 1px solid var(--gold);
   border-radius: 8px;
   padding: 10px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   color: #fff;
   resize: none;
@@ -1316,7 +1344,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .admin-banner-icon { font-size: 22px; flex-shrink: 0; }
 .admin-banner-title {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 20px;
   letter-spacing: 0.04em;
   line-height: 1.1;
@@ -1517,7 +1545,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 }
 .tracker-month-group { margin-bottom: 20px; }
 .tracker-month-title {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 18px;
   margin-bottom: 4px;
 }
@@ -1638,26 +1666,26 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 /* ==============================
    WAC PRO
    ============================== */
-.pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:0.08em;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;line-height:1.4;}
-.pro-locked-label{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:0.1em;padding:3px 10px;border-radius:20px;margin-bottom:10px;}
-.pro-locked-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:4px;}
+.pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Sora',sans-serif;font-size:11px;letter-spacing:0.08em;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;line-height:1.4;}
+.pro-locked-label{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Sora',sans-serif;font-size:12px;letter-spacing:0.1em;padding:3px 10px;border-radius:20px;margin-bottom:10px;}
+.pro-locked-title{font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:4px;}
 .pro-locked-desc{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:14px;}
-.btn-upgrade{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.06em;cursor:pointer;text-decoration:none;transition:opacity .15s;}
+.btn-upgrade{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;border:none;border-radius:var(--radius);font-family:'Sora',sans-serif;font-size:18px;letter-spacing:0.06em;cursor:pointer;text-decoration:none;transition:opacity .15s;}
 .btn-upgrade:hover{opacity:.85;}
 .pro-page-header{background:linear-gradient(135deg,#1a1500,#2d2000);border-radius:var(--radius);padding:20px;margin-bottom:20px;border:1px solid var(--gold);}
-.pro-page-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.06em;color:var(--gold);line-height:1;}
+.pro-page-title{font-family:'Sora',sans-serif;font-size:32px;letter-spacing:0.06em;color:var(--gold);line-height:1;}
 .pro-page-sub{font-size:13px;color:rgba(201,168,76,.7);margin-top:4px;}
 .pro-feature-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:var(--shadow);}
 .pro-feature-icon{font-size:28px;margin-bottom:10px;}
-.pro-feature-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:6px;}
+.pro-feature-title{font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:6px;}
 .pro-feature-desc{font-size:13px;color:var(--text-muted);line-height:1.6;}
 .pro-coming-soon{display:inline-block;background:var(--surface2);color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:20px;margin-top:8px;}
 .pro-admin-section{background:linear-gradient(135deg,#fffbf0,#fdf5e0);border:1.5px solid var(--gold);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
-.pro-admin-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.05em;margin-bottom:4px;color:var(--gold-dark);}
+.pro-admin-title{font-family:'Sora',sans-serif;font-size:18px;letter-spacing:0.05em;margin-bottom:4px;color:var(--gold-dark);}
 .pro-global-danger{background:#fff5f5;border:1.5px solid #e74c3c;border-radius:var(--radius);padding:14px;margin-top:12px;}
-.pro-global-danger-title{font-family:'Bebas Neue',sans-serif;font-size:16px;color:#e74c3c;margin-bottom:4px;}
+.pro-global-danger-title{font-family:'Sora',sans-serif;font-size:16px;color:#e74c3c;margin-bottom:4px;}
 .pro-notif-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#e74c3c;border-radius:50%;border:2px solid var(--surface);}
-.lb-pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:0.08em;padding:1px 6px;border-radius:20px;margin-left:4px;vertical-align:middle;}
+.lb-pro-badge{display:inline-flex;align-items:center;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#fff;font-family:'Sora',sans-serif;font-size:9px;letter-spacing:0.08em;padding:1px 6px;border-radius:20px;margin-left:4px;vertical-align:middle;}
 
 /* ==============================
    MEMBER PROFILE MODAL
@@ -1839,12 +1867,12 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   color: #fff;
 }
 .welcome-header .welcome-logo {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: 'Sora', sans-serif;
   font-size: 48px;
   letter-spacing: 0.08em;
 }
 .welcome-body { padding: 24px; }
-.welcome-body h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; margin-bottom: 16px; }
+.welcome-body h3 { font-family: 'Sora', sans-serif; font-size: 22px; margin-bottom: 16px; }
 .welcome-step {
   display: flex;
   gap: 12px;
@@ -1934,7 +1962,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
 /* How Points Work card */
 .points-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 16px; }
-.points-card h4 { font-family: 'Bebas Neue', sans-serif; font-size: 16px; margin-bottom: 8px; }
+.points-card h4 { font-family: 'Sora', sans-serif; font-size: 16px; margin-bottom: 8px; }
 .points-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; }
 .points-row .pts-val { font-weight: 700; color: var(--gold); }
 
@@ -1956,7 +1984,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .dash-animate{opacity:0;animation:dashFadeUp 0.42s ease forwards;}
 .dash-welcome{margin-bottom:20px;}
 .dash-welcome-sub{font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
-.dash-welcome-name{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:var(--text);letter-spacing:0.03em;}
+.dash-welcome-name{font-family:'Sora',sans-serif;font-size:52px;line-height:1;color:var(--text);letter-spacing:0.03em;}
 .dash-welcome-name span{color:var(--gold);}
 .dash-welcome-meta{font-size:13px;color:var(--text-muted);margin-top:5px;}
 .dash-status-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
@@ -1973,12 +2001,12 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .dash-stat-card:hover{border-color:var(--gold-light);transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.1);}
 .dash-stat-card.highlight{background:linear-gradient(135deg,#fffbf0,#fff8e6);border-color:var(--gold-light);}
 .dash-stat-icon{font-size:22px;margin-bottom:12px;display:block;}
-.dash-stat-value{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;letter-spacing:0.02em;color:var(--text);margin-bottom:4px;}
+.dash-stat-value{font-family:'Sora',sans-serif;font-size:52px;line-height:1;letter-spacing:0.02em;color:var(--text);margin-bottom:4px;}
 .dash-stat-card.highlight .dash-stat-value{color:var(--gold);}
 .dash-stat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);}
 .dash-stat-delta{position:absolute;top:16px;right:16px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(39,174,96,0.1);color:#27ae60;}
 .dash-quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-.dash-quick-btn{display:flex;align-items:center;gap:10px;padding:16px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--surface);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;box-shadow:var(--shadow);transition:all 0.15s;text-align:left;}
+.dash-quick-btn{display:flex;align-items:center;gap:10px;padding:16px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--surface);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;box-shadow:var(--shadow);transition:all 0.15s;text-align:left;}
 .dash-quick-btn:hover{border-color:var(--gold);color:var(--gold);background:#fffbf0;}
 .dash-quick-btn-icon{font-size:20px;flex-shrink:0;}
 .dash-quick-btn-label{line-height:1.3;}
@@ -1989,7 +2017,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .dash-allstar-banner::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));}
 .dash-allstar-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
 .dash-allstar-star{font-size:30px;flex-shrink:0;}
-.dash-allstar-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.04em;}
+.dash-allstar-title{font-family:'Sora',sans-serif;font-size:20px;letter-spacing:0.04em;}
 .dash-allstar-sub{font-size:12px;color:var(--text-muted);margin-top:1px;}
 .dash-prog-track{background:var(--border);border-radius:999px;height:10px;overflow:hidden;margin-bottom:8px;}
 .dash-prog-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));transition:width 1.4s cubic-bezier(0.22,1,0.36,1);position:relative;}
@@ -2002,22 +2030,22 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .dash-week-dot.current{background:var(--gold);border-color:var(--gold-dark);color:#fff;box-shadow:0 2px 8px rgba(201,168,76,0.4);}
 .dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px;box-shadow:var(--shadow);}
 .dash-card-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.dash-card-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;display:flex;align-items:center;gap:8px;}
+.dash-card-title{font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.04em;display:flex;align-items:center;gap:8px;}
 .dash-card-meta{font-size:12px;color:var(--text-muted);font-weight:500;}
 .dash-lb-row{display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:10px;transition:background 0.15s;cursor:default;}
 .dash-lb-row:hover{background:var(--surface2);}
 .dash-lb-row.you{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);margin:3px 0;}
-.dash-lb-rank{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text-muted);width:30px;text-align:center;flex-shrink:0;}
+.dash-lb-rank{font-family:'Sora',sans-serif;font-size:22px;color:var(--text-muted);width:30px;text-align:center;flex-shrink:0;}
 .dash-lb-rank.top3{color:var(--gold);}
 .dash-lb-info{flex:1;min-width:0;}
 .dash-lb-name{font-weight:700;font-size:14px;}
 .dash-lb-sub{font-size:11px;color:var(--text-muted);margin-top:1px;}
-.dash-lb-pts{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);flex-shrink:0;}
+.dash-lb-pts{font-family:'Sora',sans-serif;font-size:22px;color:var(--gold);flex-shrink:0;}
 .dash-you-badge{display:inline-block;background:var(--gold);color:#fff;font-size:10px;font-weight:700;letter-spacing:0.08em;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:middle;}
 .dash-lb-divider{height:1px;background:var(--border);margin:4px 0;}
-.dash-view-all-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:14px;padding:11px;border:1.5px solid var(--border);border-radius:var(--radius);background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all 0.15s;}
+.dash-view-all-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:14px;padding:11px;border:1.5px solid var(--border);border-radius:var(--radius);background:transparent;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all 0.15s;}
 .dash-view-all-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.04);}
-.dash-lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.04em;flex-shrink:0;}
+.dash-lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:14px;letter-spacing:0.04em;flex-shrink:0;}
 
 /* ── WEEKLY CHALLENGE BANNER ── */
 .weekly-challenge-banner{background:linear-gradient(135deg,#1a1a1a,#2a2000);border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s,box-shadow 0.2s;}.weekly-challenge-banner:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,0.18);border-color:var(--gold-light);}
@@ -2026,7 +2054,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .wc-icon{font-size:26px;flex-shrink:0;margin-top:2px;}
 .wc-body{flex:1;}
 .wc-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:3px;}
-.wc-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.04em;color:var(--gold);line-height:1.1;margin-bottom:4px;}
+.wc-title{font-family:'Sora',sans-serif;font-size:20px;letter-spacing:0.04em;color:var(--gold);line-height:1.1;margin-bottom:4px;}
 .wc-desc{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;}
 .wc-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold);color:#fff;font-size:11px;font-weight:700;letter-spacing:0.06em;padding:3px 10px;border-radius:999px;margin-top:8px;}
 
@@ -2112,15 +2140,15 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .zoom-replay-watch-btn:hover { background: #d4a017; }
 /* ===================== GET STARTED GUIDE (gs-) ===================== */
 #page-getstarted-wac{max-width:1100px;margin:0 auto;}
-.gs-back{background:none;border:none;color:var(--gold,#b8860b);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px;}
+.gs-back{background:none;border:none;color:var(--gold,#b8860b);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;margin-bottom:10px;display:inline-flex;align-items:center;gap:4px;}
 .gs-back:hover{text-decoration:underline;}
 .gs-topbar{background:var(--surface,#fff);border:1.5px solid var(--border,#e6e6e6);border-radius:var(--radius,14px);padding:14px 16px;margin-bottom:16px;box-shadow:var(--shadow,0 2px 10px rgba(0,0,0,0.05));}
 .gs-topbar-row1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
-.gs-name-input{flex:1;min-width:160px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:var(--text,#1a1a1a);background:var(--bg,#faf9f6);border:1.5px solid var(--border,#e6e6e6);border-radius:8px;padding:8px 12px;}
+.gs-name-input{flex:1;min-width:160px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;color:var(--text,#1a1a1a);background:var(--bg,#faf9f6);border:1.5px solid var(--border,#e6e6e6);border-radius:8px;padding:8px 12px;}
 .gs-name-input:focus{outline:none;border-color:var(--gold,#b8860b);}
 .gs-badge{flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#e8d5a0;background:linear-gradient(135deg,#1a1a1a,#2a2200);border:1.5px solid var(--gold,#b8860b);border-radius:999px;padding:4px 12px;}
 .gs-topbar-btns{display:flex;gap:8px;flex-shrink:0;}
-.gs-tbtn{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;padding:8px 12px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold,#b8860b);white-space:nowrap;transition:all .15s;}
+.gs-tbtn{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;padding:8px 12px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold,#b8860b);white-space:nowrap;transition:all .15s;}
 .gs-tbtn:hover{background:var(--gold,#b8860b);color:#fff;}
 .gs-tbtn.gold{background:var(--gold,#b8860b);color:#fff;}
 .gs-tbtn.gold:hover{background:var(--gold-dark,#946c09);}
@@ -2130,7 +2158,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .gs-prog-meta{font-size:11px;color:var(--text-muted,#777);font-weight:600;white-space:nowrap;}
 .gs-save{font-size:11px;color:var(--text-muted,#999);margin-top:6px;min-height:14px;}
 .gs-wrap{display:block;}
-.gs-rail-toggle{display:block;width:100%;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:10px;padding:10px;border:1.5px solid var(--border,#e6e6e6);background:var(--surface,#fff);color:var(--text,#1a1a1a);margin-bottom:12px;}
+.gs-rail-toggle{display:block;width:100%;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:10px;padding:10px;border:1.5px solid var(--border,#e6e6e6);background:var(--surface,#fff);color:var(--text,#1a1a1a);margin-bottom:12px;}
 .gs-rail{background:var(--surface,#fff);border:1.5px solid var(--border,#e6e6e6);border-radius:var(--radius,14px);padding:12px;margin-bottom:14px;display:none;}
 .gs-rail.open{display:block;}
 .gs-rail-sec{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted,#999);margin:12px 6px 6px;}
@@ -2153,17 +2181,17 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .gs-deeplinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
 .gs-field{margin-bottom:14px;}
 .gs-field-label{display:block;font-size:12px;font-weight:600;color:var(--text,#333);margin-bottom:5px;}
-.gs-input,.gs-textarea,.gs-select{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text,#1a1a1a);background:var(--bg,#faf9f6);border:1.5px solid var(--border,#e6e6e6);border-radius:8px;padding:9px 12px;box-sizing:border-box;}
+.gs-input,.gs-textarea,.gs-select{width:100%;font-family:'Inter',sans-serif;font-size:14px;color:var(--text,#1a1a1a);background:var(--bg,#faf9f6);border:1.5px solid var(--border,#e6e6e6);border-radius:8px;padding:9px 12px;box-sizing:border-box;}
 .gs-textarea{min-height:70px;resize:vertical;line-height:1.5;}
 .gs-input:focus,.gs-textarea:focus,.gs-select:focus{outline:none;border-color:var(--gold,#b8860b);}
 .gs-ai{background:linear-gradient(135deg,#1a1a1a,#221d0a);border:1.5px solid var(--gold,#b8860b);border-radius:12px;padding:14px;margin:16px 0;}
 .gs-ai-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
 .gs-ai-label{font-size:12px;font-weight:700;color:#e8d5a0;display:flex;align-items:center;gap:6px;}
-.gs-ai-copy{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;padding:6px 12px;border:1.5px solid var(--gold,#b8860b);background:var(--gold,#b8860b);color:#fff;}
+.gs-ai-copy{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:7px;padding:6px 12px;border:1.5px solid var(--gold,#b8860b);background:var(--gold,#b8860b);color:#fff;}
 .gs-ai-copy:hover{background:var(--gold-dark,#946c09);}
 .gs-ai-text{width:100%;min-height:130px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;line-height:1.5;color:#f0ead6;background:rgba(0,0,0,0.35);border:1px solid rgba(184,134,11,0.35);border-radius:8px;padding:10px;box-sizing:border-box;resize:vertical;}
 .gs-ai-hint{font-size:10px;color:rgba(232,213,160,0.7);margin-top:6px;line-height:1.4;}
-.gs-notes-toggle{font-size:12px;font-weight:600;color:var(--text-muted,#888);background:none;border:none;cursor:pointer;padding:4px 0;font-family:'DM Sans',sans-serif;}
+.gs-notes-toggle{font-size:12px;font-weight:600;color:var(--text-muted,#888);background:none;border:none;cursor:pointer;padding:4px 0;font-family:'Inter',sans-serif;}
 .gs-notes-area{display:none;margin-top:8px;}
 .gs-notes-area.open{display:block;}
 .gs-done-row{display:flex;align-items:center;gap:10px;margin:18px 0 4px;padding:12px 14px;background:var(--bg,#f7f6f2);border-radius:10px;}
@@ -2173,13 +2201,13 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .gs-done-toggle.on::after{transform:translateX(20px);}
 .gs-done-label{font-size:13px;font-weight:600;color:var(--text,#333);}
 .gs-nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border,#eee);}
-.gs-nav-btn{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border-radius:10px;padding:11px 20px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold,#b8860b);transition:all .15s;}
+.gs-nav-btn{font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border-radius:10px;padding:11px 20px;border:1.5px solid var(--gold,#b8860b);background:transparent;color:var(--gold,#b8860b);transition:all .15s;}
 .gs-nav-btn:hover{background:rgba(184,134,11,0.08);}
 .gs-nav-btn.primary{background:var(--gold,#b8860b);color:#fff;}
 .gs-nav-btn.primary:hover{background:var(--gold-dark,#946c09);}
 .gs-nav-btn:disabled{opacity:0.4;cursor:not-allowed;}
 .gs-fork{display:grid;grid-template-columns:1fr;gap:12px;margin:8px 0 4px;}
-.gs-fork-card{text-align:left;cursor:pointer;border:1.5px solid var(--border,#e6e6e6);border-radius:12px;padding:16px;background:var(--surface,#fff);transition:all .15s;font-family:'DM Sans',sans-serif;}
+.gs-fork-card{text-align:left;cursor:pointer;border:1.5px solid var(--border,#e6e6e6);border-radius:12px;padding:16px;background:var(--surface,#fff);transition:all .15s;font-family:'Inter',sans-serif;}
 .gs-fork-card:hover{border-color:var(--gold,#b8860b);box-shadow:0 4px 16px rgba(0,0,0,0.08);}
 .gs-fork-card.sel{border-color:var(--gold,#b8860b);background:linear-gradient(135deg,rgba(184,134,11,0.08),var(--surface,#fff));}
 .gs-fork-name{font-size:16px;font-weight:800;color:var(--text,#1a1a1a);margin-bottom:4px;}
@@ -2245,7 +2273,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <div style="display:flex;align-items:center;gap:10px;">
       <span class="topnav-user" id="topnav-user"></span>
       <span id="topnav-pro-badge" style="display:none;" class="pro-badge">PRO</span>
-      <button onclick="handleLogout()" onmouseover="this.style.background='var(--gold)';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';" style="padding:6px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--gold);background:transparent;color:var(--gold);transition:all .15s;white-space:nowrap;">Sign Out</button>
+      <button onclick="handleLogout()" onmouseover="this.style.background='var(--gold)';this.style.color='var(--black)';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';" style="padding:6px 14px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--gold);background:transparent;color:var(--gold);transition:all .15s;white-space:nowrap;">Sign Out</button>
       <button id="topnav-avatar-btn" onclick="navTo('profile')" title="My Profile" style="background:none;border:none;padding:0;cursor:pointer;flex-shrink:0;">
         <div id="topnav-avatar" class="topnav-avatar">?</div>
       </button>
@@ -2390,7 +2418,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       </div>
       <div id="announcements-list"></div>
       <div id="prev-anns-trigger" style="display:none;text-align:center;margin-bottom:8px;">
-        <button onclick="openArchivedAnnsModal()" style="background:none;border:none;color:var(--text-muted);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;padding:4px 8px;border-radius:6px;text-decoration:underline;text-underline-offset:3px;">📁 Previous Announcements</button>
+        <button onclick="openArchivedAnnsModal()" style="background:none;border:none;color:var(--text-muted);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;padding:4px 8px;border-radius:6px;text-decoration:underline;text-underline-offset:3px;">📁 Previous Announcements</button>
       </div>
       <!-- Member compose -->
       <div class="card">
@@ -2540,7 +2568,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
             <input type="checkbox" id="submit-challenge" style="margin-top:3px;accent-color:var(--gold);width:16px;height:16px;flex-shrink:0;" onchange="updatePtsPreview()" />
             <div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.04em;color:var(--gold);margin-bottom:2px;">⚡ Weekly Challenge <span style="font-size:12px;font-weight:700;background:var(--gold);color:#fff;padding:1px 8px;border-radius:999px;vertical-align:middle;">+5 pts</span></div>
+              <div style="font-family:'Sora',sans-serif;font-size:16px;letter-spacing:0.04em;color:var(--gold);margin-bottom:2px;">⚡ Weekly Challenge <span style="font-size:12px;font-weight:700;background:var(--gold);color:#fff;padding:1px 8px;border-radius:999px;vertical-align:middle;">+5 pts</span></div>
               <div id="submit-challenge-label" style="font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;">Loading this week's challenge...</div>
               <div id="submit-next-challenge" style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.4;"></div>
             </div>
@@ -2663,7 +2691,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <!-- ADMIN: Bug Reports Viewer -->
       <div id="admin-bug-reports" style="display:none;margin-bottom:28px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;">🐛 Bug Reports</div>
+          <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;">🐛 Bug Reports</div>
           <button class="btn btn-outline btn-sm" onclick="loadBugReports()">↻ Refresh</button>
         </div>
         <div id="bug-reports-body"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">No bug reports yet.</div></div>
@@ -2699,7 +2727,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Expert Webhook URL Config -->
       <div id="admin-expert-webhook" style="display:none;margin-bottom:24px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🎯 Expert Email Alert Webhook</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🎯 Expert Email Alert Webhook</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">Paste your Make.com webhook URL below. When a member submits an Expert Review Request, WAC will POST the request details to this URL so you can trigger an email to the Expert.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div class="form-group">
@@ -2722,7 +2750,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Reset Points Tool -->
       <div id="admin-reset-points" style="display:none;margin-top:28px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🔄 Reset Member Points</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🔄 Reset Member Points</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Zeroes out <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">points</code> and <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">totalPosts</code> for every member in the registry. Submission and engagement history in Firestore is preserved. Use at the end of the April trial before Round 1 begins.</div>
         <div class="pro-global-danger">
           <div class="pro-global-danger-title">⚠️ Destructive Action</div>
@@ -2734,7 +2762,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Delete Trial Submissions -->
       <div id="admin-delete-trial" style="display:none;margin-top:28px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🗑 Delete Trial Submissions</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🗑 Delete Trial Submissions</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Permanently deletes all submission documents flagged <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">isTrial: true</code> from Firestore for all members. Run this after resetting points to fully clear trial data.</div>
         <div class="pro-global-danger">
           <div class="pro-global-danger-title">⚠️ Destructive Action</div>
@@ -2746,7 +2774,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Coworking Sessions -->
       <div id="admin-cowork-tool" style="display:none;margin-top:28px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">💻 Coworking Sessions</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">💻 Coworking Sessions</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Create a session to surface the RSVP card on members' dashboards. Mark attendees after the session to award +5 pts each. RSVP (+2 pts) is member self-service.</div>
 
         <!-- Create Session -->
@@ -2770,7 +2798,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Community Points Log -->
       <div id="admin-community-pts-tool" style="display:none;margin-top:28px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">💬 Community Points Log</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">💬 Community Points Log</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">All community point events — Feed posts, PVR, RER, Backlink, Zoom RSVP, Coworking. Logged going forward; prior events are not backfilled.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
@@ -2799,7 +2827,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         </div>
 
         <!-- Backfill Tool -->
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.05em;margin:24px 0 4px;">🔧 Backfill Missing Points</div>
+        <div style="font-family:'Sora',sans-serif;font-size:20px;letter-spacing:0.05em;margin:24px 0 4px;">🔧 Backfill Missing Points</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Award community points retroactively for a member who missed an event before logging was in place. Writes a log entry and increments their registry total.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
@@ -2832,7 +2860,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: WAC Pro Management (hidden until _PRO_GLOBAL_ACTIVE = true) -->
       <div id="admin-pro-panel" style="display:none;margin-top:28px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">★ WAC Pro Management</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">★ WAC Pro Management</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Global Pro controls — inactive until Pro launch. Per-member Pro toggle and trial access are in the Member Directory.</div>
         <div class="pro-admin-section">
           <div class="pro-admin-title">Global Enable Pro</div>
@@ -2848,7 +2876,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Clear Feed Posts by Week (always visible to admin) -->
       <div id="admin-clear-feed-tool" style="display:none;margin-top:28px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🗑 Clear Feed Posts by Week</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">🗑 Clear Feed Posts by Week</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Remove all feed posts for a completed week after you've verified them. Only deletes the social wall cards — tracker submissions, engagement records, and points are NOT touched.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="margin-bottom:14px;">
@@ -2879,7 +2907,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 
       <!-- ADMIN: Submissions & Points Editor -->
       <div id="admin-submissions-tool" style="display:none;margin-top:28px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">📋 Submissions & Points Editor</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">📋 Submissions & Points Editor</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">View and edit all member submissions (including trial). Adjust points directly or delete a submission. Point changes update the member's registry total.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;">
@@ -2902,7 +2930,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <div id="admin-sub-list"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Select a filter or click Refresh to load submissions.</div></div>
         </div>
         <!-- Admin Edit Points by User -->
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;margin-top:28px;">🎯 Edit Member Points Directly</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;margin-top:28px;">🎯 Edit Member Points Directly</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Set a member's point total to any value. This updates the registry only — submission records are not changed.</div>
         <div class="card" style="border:1.5px solid var(--border);">
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
@@ -2998,9 +3026,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <!-- Add to Device card (always visible) -->
       <div class="card" id="add-to-device-card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
-          <img src="icons/icon-192.png" alt="WAC icon" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);" onerror="this.outerHTML='<div style=\'width:52px;height:52px;border-radius:12px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-shrink:0;\'><span style=\'font-family:Bebas Neue,sans-serif;font-size:20px;color:#c9a84c;letter-spacing:0.06em;\'>WAC</span></div>'" />
+          <img src="icons/icon-192.png" alt="WAC icon" style="width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);" onerror="this.outerHTML='<div style=\'width:52px;height:52px;border-radius:12px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-shrink:0;\'><span style=\'font-family:Sora,sans-serif;font-size:20px;color:#c9a84c;letter-spacing:0.06em;\'>WAC</span></div>'" />
           <div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.04em;">Add WAC to Your Device</div>
+            <div style="font-family:'Sora',sans-serif;font-size:20px;letter-spacing:0.04em;">Add WAC to Your Device</div>
             <div class="text-sm text-muted">Access WAC like a native app — no App Store needed.</div>
           </div>
         </div>
@@ -3086,7 +3114,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div id="profile-rer-status" style="display:none;margin-bottom:8px;"></div>
       <!-- Report a Bug -->
       <div style="text-align:center;margin-top:8px;padding-bottom:8px;">
-        <button onclick="openBugReport()" style="background:none;border:none;border-bottom:1px solid var(--border);padding:0 0 2px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text-muted);cursor:pointer;">🐛 Report a Bug / Issue</button>
+        <button onclick="openBugReport()" style="background:none;border:none;border-bottom:1px solid var(--border);padding:0 0 2px;font-family:'Inter',sans-serif;font-size:12px;color:var(--text-muted);cursor:pointer;">🐛 Report a Bug / Issue</button>
       </div>
     </div>
 
@@ -3117,7 +3145,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div id="bl-directory"><div class="backlink-empty">Loading directory...</div></div>
       <!-- ADMIN: Backlink Listings Management -->
       <div id="bl-admin-panel" style="display:none;margin-top:32px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">All Backlink Listings</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;margin-bottom:4px;">All Backlink Listings</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">All member listings. Delete any listing for abuse or spam.</div>
         <div id="bl-admin-body"><div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px;">Loading...</div></div>
       </div>
@@ -3188,46 +3216,46 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   <!-- BOTTOM NAV -->
   <nav class="bottomnav" id="bottomnav" style="display:none;">
     <button class="nav-item active" id="nav-dashboard" onclick="navTo('dashboard');">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/><path d="M10 20v-5h4v5"/></svg>
       Dashboard
     </button>
     <button class="nav-item" id="nav-feed" onclick="navTo('feed')" style="position:relative;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16"/><path d="M4 12h16"/><path d="M4 18.5h9"/><circle cx="19" cy="18.5" r="1.4" fill="currentColor" stroke="none"/></svg>
       Feed
       <span id="feed-notif-dot" class="nav-badge"></span>
     </button>
     <button class="nav-item" id="nav-resources" onclick="navTo('resources')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       Resources
     </button>
     <button class="nav-item" id="nav-submit" onclick="navTo('submit')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5"/><path d="M8 9l4-4 4 4"/><path d="M4.5 15v3.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V15"/></svg>
       Submit
     </button>
     <button class="nav-item" id="nav-ranks" onclick="navTo('ranks')" style="position:relative;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-6"/><path d="M12 20V8"/><path d="M19 20v-3"/><path d="M4 11l6-6 4 3 6-6"/></svg>
       Ranks
       <span id="ranks-notif-dot" class="nav-badge"></span>
     </button>
     <button class="nav-item" id="nav-tracker" onclick="navTo('tracker')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.5l2.3 2.3L16 9.5"/></svg>
       Tracker
     </button>
     <button class="nav-item" id="nav-reports" onclick="navTo('reports')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8 16v-4"/><path d="M12 16V8"/><path d="M16 16v-2.5"/></svg>
       Reports
     </button>
     <button class="nav-item" id="nav-members" onclick="navTo('members')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 21v-1.8a3.6 3.6 0 0 0-3.6-3.6H7.1a3.6 3.6 0 0 0-3.6 3.6V21"/><circle cx="9.8" cy="7.6" r="3.6"/><path d="M20.5 21v-1.8a3.6 3.6 0 0 0-2.4-3.4"/><path d="M14.6 4.3a3.6 3.6 0 0 1 0 6.9"/></svg>
       Members
     </button>
     <button class="nav-item" id="nav-backlinks" onclick="navTo('backlinks')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       Backlinks
     </button>
     <button class="nav-item" id="nav-pro" onclick="navTo('pro')" style="display:none;position:relative;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span style="background:linear-gradient(135deg,var(--gold),var(--gold-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:600;">PRO</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 4.9 5.3.6-4 3.7 1.1 5.3L12 14.9l-4.6 2.6 1.1-5.3-4-3.7 5.3-.6z"/></svg>
+      <span style="font-family:'Space Mono',monospace;background:linear-gradient(135deg,var(--gold),var(--gold-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700;">PRO</span>
       <span id="pro-notif-dot" class="pro-notif-dot" style="display:none;"></span>
     </button>
   </nav>
@@ -3303,7 +3331,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <div class="modal-overlay" id="archived-anns-overlay" onclick="closeArchivedAnnsModalDirect(event)">
   <div class="modal-sheet">
     <div class="modal-header">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.05em;">Previous Announcements</div>
+      <div style="font-family:'Sora',sans-serif;font-size:20px;letter-spacing:0.05em;">Previous Announcements</div>
       <button class="modal-close" onclick="closeArchivedAnnsModal()">✕</button>
     </div>
     <div id="archived-anns-content" style="padding-bottom:8px;"></div>
@@ -3338,7 +3366,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     </div>
     <div style="padding:12px 20px 4px;display:flex;align-items:center;justify-content:space-between;">
       <div id="eeat-audit-summary" style="font-size:12px;color:var(--text-muted);">Loading...</div>
-      <button onclick="resetEEATAudit()" style="font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;font-family:'DM Sans',sans-serif;">Reset All</button>
+      <button onclick="resetEEATAudit()" style="font-size:11px;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;font-family:'Inter',sans-serif;">Reset All</button>
     </div>
     <div class="eeat-audit-progress-bar">
       <div class="eeat-audit-progress-fill" id="eeat-audit-progress-fill" style="width:0%"></div>
@@ -3351,10 +3379,10 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <div class="rer-notif-overlay" id="rer-notif-overlay">
   <div class="rer-notif-modal">
     <div style="font-size:42px;margin-bottom:10px;">🎯</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.04em;margin-bottom:8px;">Expert Review Answered</div>
+    <div style="font-family:'Sora',sans-serif;font-size:26px;letter-spacing:0.04em;margin-bottom:8px;">Expert Review Answered</div>
     <div id="rer-notif-body" style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;"></div>
     <button class="btn btn-gold btn-block" onclick="dismissRERNotif()">View in Feed</button>
-    <button onclick="dismissRERNotifOnly()" style="margin-top:10px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text-muted);cursor:pointer;text-decoration:underline;">Dismiss</button>
+    <button onclick="dismissRERNotifOnly()" style="margin-top:10px;background:none;border:none;font-family:'Inter',sans-serif;font-size:12px;color:var(--text-muted);cursor:pointer;text-decoration:underline;">Dismiss</button>
   </div>
 </div>
 
@@ -4634,7 +4662,7 @@ function renderPVRCard(p) {
       <textarea class="pvr-edit-textarea" id="pvr-edit-prompt-${p.id}">${esc(p.pvr_prompt || "")}</textarea>
       <div class="pvr-edit-actions">
         <button class="btn btn-gold btn-sm" onclick="savePVREdit('${p.id}')">Save</button>
-        <button class="btn btn-sm" style="border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.6);border-radius:8px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;" onclick="closePVREdit('${p.id}')">Cancel</button>
+        <button class="btn btn-sm" style="border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.6);border-radius:8px;padding:7px 14px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;" onclick="closePVREdit('${p.id}')">Cancel</button>
       </div>
     </div>
     <div id="pvr-body-${p.id}">
@@ -5089,7 +5117,7 @@ function renderAnnouncements(anns) {
         ${adminActions}
       </div>
       ${hasMore
-        ? `<button id="${btnId}" onclick="toggleAnnBody('${bodyId}','${btnId}')" style="background:none;border:none;color:var(--gold);font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;padding:0;margin-top:2px;">See More ▸</button>`
+        ? `<button id="${btnId}" onclick="toggleAnnBody('${bodyId}','${btnId}')" style="background:none;border:none;color:var(--gold);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;padding:0;margin-top:2px;">See More ▸</button>`
         : `<div class="feed-time" style="margin-top:4px;">${timeAgo(a.timestamp)}${adminInlineActions}</div>`}
     </div>`;
   }).join("");
@@ -6967,9 +6995,9 @@ function showProNotification(type, title, message) {
   banner.innerHTML = `
     <div style="font-size:22px;flex-shrink:0;">⭐</div>
     <div style="flex:1;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold);letter-spacing:0.04em;margin-bottom:3px;">${esc(title)}</div>
+      <div style="font-family:'Sora',sans-serif;font-size:16px;color:var(--gold);letter-spacing:0.04em;margin-bottom:3px;">${esc(title)}</div>
       <div style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.5;">${esc(message)}</div>
-      <button onclick="navTo('pro');this.closest('#pro-notif-banner').remove();document.getElementById('pro-notif-dot').style.display='none';" style="margin-top:8px;background:var(--gold);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;cursor:pointer;">Open PRO ↗</button>
+      <button onclick="navTo('pro');this.closest('#pro-notif-banner').remove();document.getElementById('pro-notif-dot').style.display='none';" style="margin-top:8px;background:var(--gold);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-family:'Sora',sans-serif;font-size:14px;cursor:pointer;">Open PRO ↗</button>
     </div>
     <button onclick="this.closest('#pro-notif-banner').remove();document.getElementById('pro-notif-dot').style.display='none';" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:18px;padding:0;flex-shrink:0;">✕</button>`;
   document.body.appendChild(banner);
@@ -8217,7 +8245,7 @@ function renderEEATSlide() {
 
   wrap.innerHTML = `
     <div style="font-size:40px;margin-bottom:10px;">${slide.emoji}</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:14px;color:var(--text);">${esc(slide.title)}</div>
+    <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.04em;margin-bottom:14px;color:var(--text);">${esc(slide.title)}</div>
     <div style="font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text);">${linkify(slide.body)}</div>
     ${copyBtn}
     ${coreUpdateLink}
@@ -8690,7 +8718,7 @@ function renderRERCard(p, allPosts) {
   return `<div class="expert-response-card">
     <div class="expert-response-eyebrow">🎯 EXPERT REVIEW REQUEST</div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <div style="width:34px;height:34px;border-radius:50%;background:rgba(184,134,11,0.15);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;flex-shrink:0;overflow:hidden;border:1.5px solid rgba(184,134,11,0.4);">${avatarContent}</div>
+      <div style="width:34px;height:34px;border-radius:50%;background:rgba(184,134,11,0.15);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:12px;flex-shrink:0;overflow:hidden;border:1.5px solid rgba(184,134,11,0.4);">${avatarContent}</div>
       <div>
         <div style="font-weight:700;font-size:13px;color:var(--text);">${esc(p.author)}</div>
         <div style="font-size:11px;color:var(--text-muted);">${date} · requested an expert review</div>
@@ -8716,7 +8744,7 @@ function renderExpertResponseCard(p) {
   return `<div class="expert-response-card">
     <div class="expert-response-eyebrow">🎯 EXPERT REVIEW RESPONSE</div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-      <div style="width:34px;height:34px;border-radius:50%;background:rgba(184,134,11,0.2);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;flex-shrink:0;overflow:hidden;border:1.5px solid var(--gold);">${avatarContent}</div>
+      <div style="width:34px;height:34px;border-radius:50%;background:rgba(184,134,11,0.2);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:12px;flex-shrink:0;overflow:hidden;border:1.5px solid var(--gold);">${avatarContent}</div>
       <div>
         <div style="font-weight:700;font-size:13px;color:var(--text);">${esc(p.author)} <span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:rgba(184,134,11,0.12);color:var(--gold);">🎯 Expert</span></div>
         <div style="font-size:11px;color:var(--text-muted);">${date} · for <strong>${esc(p.requesterName)}</strong></div>
@@ -8727,7 +8755,7 @@ function renderExpertResponseCard(p) {
       <textarea class="pvr-edit-textarea" id="er-edit-body-${p.id}" style="min-height:100px;">${esc((p.body || "").trim())}</textarea>
       <div class="pvr-edit-actions">
         <button class="btn btn-gold btn-sm" onclick="saveExpertResponseEdit('${p.id}','${esc(p.reviewId || '')}')">Save</button>
-        <button class="btn btn-sm" style="border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.6);border-radius:8px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;" onclick="closeExpertResponseEdit('${p.id}')">Cancel</button>
+        <button class="btn btn-sm" style="border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.6);border-radius:8px;padding:7px 14px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;" onclick="closeExpertResponseEdit('${p.id}')">Cancel</button>
       </div>
     </div>
     <div id="er-body-${p.id}" style="font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--text);margin-bottom:4px;">
@@ -9064,7 +9092,7 @@ function openEditListing() {
   overlay.innerHTML = `
     <div style="background:var(--surface);border-radius:14px 14px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;max-height:90dvh;overflow-y:auto;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;">Add / Edit Listing</div>
+        <div style="font-family:'Sora',sans-serif;font-size:22px;letter-spacing:0.05em;">Add / Edit Listing</div>
         <button onclick="document.getElementById('bl-edit-overlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">&#x2715;</button>
       </div>
       <div class="form-group">
@@ -9825,7 +9853,7 @@ window.gsDuplicateBrief=gsDuplicateBrief; window.gsDeleteBrief=gsDeleteBrief;
 <div id="bug-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;padding:20px;">
   <div style="background:var(--surface);border-radius:12px;max-width:480px;margin:40px auto;padding:24px;border:1px solid var(--border);box-shadow:var(--shadow-lg);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.04em;">🐛 Report a Bug</div>
+      <div style="font-family:'Sora',sans-serif;font-size:26px;letter-spacing:0.04em;">🐛 Report a Bug</div>
       <button onclick="closeBugReport()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">✕</button>
     </div>
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Something not working right? Let Nate know and it'll get fixed.</p>
