@@ -3186,6 +3186,13 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="pro-page-sub">Your 90-Day Website Discipline System</div>
       </div>
 
+      <div id="pro-upsell-banner" style="display:none;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 20px;margin-bottom:20px;">
+        <div class="pro-locked-label">🔒 WAC PRO</div>
+        <div class="pro-locked-title">Unlock WAC Pro</div>
+        <div class="pro-locked-desc">Everything below is a preview. Upgrade to generate your plans, get copy assistance, and unlock full analytics.</div>
+        <a href="#" onclick="event.preventDefault(); showUpgradeInfo();" class="btn-upgrade">★ Upgrade to WAC Pro</a>
+      </div>
+
       <!-- Weekly Website Action Plan Generator -->
       <div class="pro-feature-card" id="pro-action-plan-card">
         <div class="pro-feature-icon">🗓</div>
@@ -3202,7 +3209,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="pro-feature-title">Website Copy Assist</div>
         <div class="pro-feature-desc">Got a page or section you want to improve? Drop in your idea and get 3 copy directions to choose from. You pick, you edit, you publish. It supports your voice — it doesn't replace it.</div>
         <div class="pro-feature-source-note">Grounded in Google's own People First Content Guide and WAC's copywriting resource library.</div>
-        <div style="margin-top:14px;">
+        <div id="copy-assist-upload" style="margin-top:14px;">
           <textarea id="copy-assist-brief" maxlength="500" rows="3" placeholder="What do you need copy for? e.g. 'Homepage hero section' or 'Instagram bio for a wedding photographer'" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;resize:vertical;"></textarea>
           <button class="btn btn-gold btn-sm" style="margin-top:8px;" onclick="generateWebsiteCopyNow()">Generate Copy</button>
         </div>
@@ -3236,7 +3243,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="pro-feature-icon">🔔</div>
         <div class="pro-feature-title">Stronger Nudges & Reminders</div>
         <div class="pro-feature-desc">A recurring weekly reminder on your own calendar, timed to your submission window — so you never miss a deadline. You signed up to be consistent. We'll help you follow through.</div>
-        <div style="margin-top:14px;">
+        <div id="nudges-cta" style="margin-top:14px;">
           <a href="https://calendar.app.google/fa81aGLE17JP8jb86" target="_blank" rel="noopener" class="btn btn-gold btn-sm" style="text-decoration:none;display:inline-block;">Add Weekly Reminder to Calendar</a>
         </div>
       </div>
@@ -3445,6 +3452,22 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <button id="eeat-prev-btn" class="btn btn-outline" style="flex:1;" onclick="eeatNav(-1)">← Prev</button>
         <button id="eeat-next-btn" class="btn btn-gold" style="flex:1;" onclick="eeatNav(1)">Next →</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pro-upgrade-modal-overlay" onclick="closeProUpgradeModalDirect(event)">
+  <div class="modal-sheet" style="max-width:400px;">
+    <div class="modal-header">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">WAC Pro Waitlist</div>
+      <button class="modal-close" onclick="closeProUpgradeModal()">✕</button>
+    </div>
+    <div style="padding:20px;">
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">Drop your name and email and we'll reach out as soon as WAC Pro is ready for you.</div>
+      <input type="text" id="pro-upgrade-name" placeholder="Name" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;font-family:inherit;font-size:14px;">
+      <input type="email" id="pro-upgrade-email" placeholder="Email" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:14px;font-family:inherit;font-size:14px;">
+      <button class="btn btn-gold btn-block" onclick="submitProUpgradeWaitlist()">Join the Waitlist</button>
+      <div id="pro-upgrade-status" style="font-size:13px;margin-top:10px;"></div>
     </div>
   </div>
 </div>
@@ -3988,7 +4011,7 @@ function bootApp() {
 
   // 4. Pro nav button
   const _proNavBtn = document.getElementById("nav-pro");
-  if (_proNavBtn) _proNavBtn.style.display = userHasPro() ? "flex" : "none";
+  if (_proNavBtn) _proNavBtn.style.display = currentUser ? "flex" : "none";
 
   // 5. Show/hide admin elements
   const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-delete-trial", "admin-submissions-tool", "admin-cowork-tool", "admin-community-pts-tool"];
@@ -6998,11 +7021,88 @@ function renderProPage() {
       trialBanner.style.display = "none";
     }
   }
+
+  const isLocked = !userHasPro();
+  const upsellBanner = document.getElementById("pro-upsell-banner");
+  if (upsellBanner) upsellBanner.style.display = isLocked ? "block" : "none";
+
+  // Copy Assist input + Nudges calendar CTA are static markup, not rendered
+  // by a JS function — lock them directly here.
+  const copyAssistUpload = document.getElementById("copy-assist-upload");
+  if (copyAssistUpload) {
+    copyAssistUpload.innerHTML = isLocked ? _proLockedToolHtml() : `
+      <textarea id="copy-assist-brief" maxlength="500" rows="3" placeholder="What do you need copy for? e.g. 'Homepage hero section' or 'Instagram bio for a wedding photographer'" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;resize:vertical;"></textarea>
+      <button class="btn btn-gold btn-sm" style="margin-top:8px;" onclick="generateWebsiteCopyNow()">Generate Copy</button>
+    `;
+  }
+  const nudgesCta = document.getElementById("nudges-cta");
+  if (nudgesCta) {
+    nudgesCta.innerHTML = isLocked ? _proLockedToolHtml() : `
+      <a href="https://calendar.app.google/fa81aGLE17JP8jb86" target="_blank" rel="noopener" class="btn btn-gold btn-sm" style="text-decoration:none;display:inline-block;">Add Weekly Reminder to Calendar</a>
+    `;
+  }
+
   renderActionPlanCard();
   renderCopyAssistArchive();
   renderStreakAnalytics();
   renderSeoAnalysisState();
 }
+
+function _proLockedToolHtml(msg) {
+  return `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--accent-bg,rgba(201,168,76,0.08));border-radius:8px;font-size:13px;color:var(--text-muted);">
+    <span>🔒</span><span>${msg || "Available to WAC Pro members."} <a href="#" onclick="event.preventDefault(); showUpgradeInfo();" style="color:var(--gold-dark);font-weight:600;text-decoration:none;">Upgrade to unlock</a></span>
+  </div>`;
+}
+
+function showUpgradeInfo() {
+  const overlay = document.getElementById("pro-upgrade-modal-overlay");
+  if (overlay) overlay.classList.add("open");
+}
+window.showUpgradeInfo = showUpgradeInfo;
+
+function closeProUpgradeModal() {
+  const overlay = document.getElementById("pro-upgrade-modal-overlay");
+  if (overlay) overlay.classList.remove("open");
+  const statusEl = document.getElementById("pro-upgrade-status");
+  if (statusEl) statusEl.textContent = "";
+}
+window.closeProUpgradeModal = closeProUpgradeModal;
+
+function closeProUpgradeModalDirect(e) {
+  if (e.target === document.getElementById("pro-upgrade-modal-overlay")) closeProUpgradeModal();
+}
+window.closeProUpgradeModalDirect = closeProUpgradeModalDirect;
+
+async function submitProUpgradeWaitlist() {
+  const nameEl = document.getElementById("pro-upgrade-name");
+  const emailEl = document.getElementById("pro-upgrade-email");
+  const statusEl = document.getElementById("pro-upgrade-status");
+  const name = (nameEl?.value || "").trim();
+  const email = (emailEl?.value || "").trim();
+
+  if (!name || !email) {
+    if (statusEl) { statusEl.textContent = "Please fill in both fields."; statusEl.style.color = "var(--danger)"; }
+    return;
+  }
+  if (statusEl) { statusEl.textContent = "Submitting…"; statusEl.style.color = "var(--text-muted)"; }
+
+  try {
+    const resp = await fetch("https://formspree.io/f/mqevpljw", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({ name, email, source: "WAC Platform — Pro Upgrade", memberEmail: currentUser?.email || "" }),
+    });
+    if (!resp.ok) throw new Error("Submit failed");
+    if (statusEl) { statusEl.textContent = "You're on the list! We'll be in touch."; statusEl.style.color = "#27ae60"; }
+    if (nameEl) nameEl.value = "";
+    if (emailEl) emailEl.value = "";
+    setTimeout(closeProUpgradeModal, 1800);
+  } catch (e) {
+    console.error("Pro upgrade waitlist submit failed:", e);
+    if (statusEl) { statusEl.textContent = "Something went wrong. Try again."; statusEl.style.color = "var(--danger)"; }
+  }
+}
+window.submitProUpgradeWaitlist = submitProUpgradeWaitlist;
 
 // ==============================
 // WAC PRO — Weekly Website Action Plan
@@ -7050,7 +7150,15 @@ function _weekMetaLabel(weekIdx) {
 // of past weeks — entirely from a direct read of the member's own memory
 // doc. No Cloud Function call happens just from viewing the page.
 async function renderActionPlanCard() {
-  if (!currentUser || !(userHasPro() || currentUser.isAdmin)) return;
+  if (!currentUser) return;
+  if (!userHasPro()) {
+    _renderActionPlanBody(_proLockedToolHtml("Generate a personalized weekly plan."));
+    const archiveEl0 = document.getElementById("pro-action-plan-archive");
+    if (archiveEl0) archiveEl0.innerHTML = "";
+    const badgeEl0 = document.getElementById("pro-action-plan-week-badge");
+    if (badgeEl0) badgeEl0.textContent = _weekMetaLabel(getWeekIndex());
+    return;
+  }
   const archiveEl = document.getElementById("pro-action-plan-archive");
   if (archiveEl) archiveEl.innerHTML = "";
   _renderActionPlanBody(`<div style="font-size:13px;color:var(--text-muted);">Loading…</div>`);
@@ -7221,9 +7329,10 @@ async function generateWebsiteCopyNow() {
 window.generateWebsiteCopyNow = generateWebsiteCopyNow;
 
 async function renderCopyAssistArchive() {
-  if (!currentUser || !(userHasPro() || currentUser.isAdmin)) return;
+  if (!currentUser) return;
   const archiveEl = document.getElementById("copy-assist-archive");
   if (!archiveEl) return;
+  if (!userHasPro()) { archiveEl.innerHTML = ""; return; }
 
   let entries = [];
   try {
@@ -7251,9 +7360,10 @@ window.renderCopyAssistArchive = renderCopyAssistArchive;
 // ==============================
 
 async function renderStreakAnalytics() {
-  if (!currentUser || !(userHasPro() || currentUser.isAdmin)) return;
+  if (!currentUser) return;
   const el = document.getElementById("streak-analytics-body");
   if (!el) return;
+  if (!userHasPro()) { el.innerHTML = _proLockedToolHtml("See your consistency score, streak, and cohort rank."); return; }
   el.innerHTML = `<div style="font-size:13px;color:var(--text-muted);">Loading…</div>`;
 
   try {
@@ -7332,9 +7442,14 @@ function _currentMonthStr() {
 }
 
 async function renderSeoAnalysisState() {
-  if (!currentUser || !(userHasPro() || currentUser.isAdmin)) return;
+  if (!currentUser) return;
   const uploadEl = document.getElementById("seo-analysis-upload");
   const archiveEl = document.getElementById("seo-analysis-archive");
+  if (!userHasPro()) {
+    if (uploadEl) uploadEl.innerHTML = _proLockedToolHtml("Upload a screenshot for reviewed, cited recommendations.");
+    if (archiveEl) archiveEl.innerHTML = "";
+    return;
+  }
 
   let data = { entries: [], lastUploadMonth: null };
   try {
