@@ -3459,15 +3459,14 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <div class="modal-overlay" id="pro-upgrade-modal-overlay" onclick="closeProUpgradeModalDirect(event)">
   <div class="modal-sheet" style="max-width:400px;">
     <div class="modal-header">
-      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">WAC Pro Waitlist</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">Upgrade to WAC Pro</div>
       <button class="modal-close" onclick="closeProUpgradeModal()">✕</button>
     </div>
     <div style="padding:20px;">
-      <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">Drop your name and email and we'll reach out as soon as WAC Pro is ready for you.</div>
-      <input type="text" id="pro-upgrade-name" placeholder="Name" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;font-family:inherit;font-size:14px;">
-      <input type="email" id="pro-upgrade-email" placeholder="Email" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:14px;font-family:inherit;font-size:14px;">
-      <button class="btn btn-gold btn-block" onclick="submitProUpgradeWaitlist()">Join the Waitlist</button>
-      <div id="pro-upgrade-status" style="font-size:13px;margin-top:10px;"></div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:28px;color:var(--text);margin-bottom:2px;">$75 <span style="font-size:13px;font-weight:500;color:var(--text-muted);">/ this round</span></div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">One-time charge for the rest of Round 2. Unlocks Weekly Action Plan, Copy Assist, Streak Analytics, and SEO Screenshot Review.</div>
+      <a href="https://buy.stripe.com/dRm3cv0Dh4IT3Pw0KBbo40e" target="_blank" rel="noopener" class="btn btn-gold btn-block" style="text-align:center;display:block;text-decoration:none;">★ Upgrade Now — $75</a>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.5;">You'll be redirected to Stripe to complete payment. Pro access is activated on your account within 24 hours of payment.</div>
     </div>
   </div>
 </div>
@@ -3551,8 +3550,8 @@ const WEEKLY_CHALLENGES = [
 ];
 
 // WAC Pro launch flags — flip both to true at Pro launch
-const _PRO_GLOBAL_ACTIVE = false; // shows WAC Pro Management panel in Reports
-const _PRO_NOTIFS_ACTIVE = false; // activates in-app notification sequence
+const _PRO_GLOBAL_ACTIVE = true; // shows WAC Pro Management panel in Reports
+const _PRO_NOTIFS_ACTIVE = true; // activates in-app notification sequence
 
 // ==============================
 // MEMBER SANITIZER
