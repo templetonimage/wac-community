@@ -1487,43 +1487,56 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   text-align: center; font-family: 'Space Mono', monospace; font-size: 12px;
   letter-spacing: 0.04em; color: var(--gold-dark);
   background: var(--accent-bg, rgba(201,168,76,.10)); border-radius: 8px;
-  padding: 9px 12px; margin-bottom: 18px;
+  padding: 7px 12px; margin-bottom: 14px;
 }
-.renewal-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.renewal-tile { text-align: center; padding: 20px 16px; }
+.renewal-pro-intro {
+  border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 14px 16px 12px; margin-bottom: 12px; background: var(--surface);
+}
+.renewal-pro-eyebrow {
+  font-family: 'Space Mono', monospace; font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold-dark); margin-bottom: 2px;
+}
+.renewal-pro-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 19px; color: var(--text); margin-bottom: 10px; }
+.renewal-pro-features { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 14px; margin-bottom: 12px; }
+.renewal-pro-feature { display: flex; align-items: flex-start; gap: 6px; font-size: 12.5px; color: var(--text); line-height: 1.35; }
+.renewal-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.renewal-tile { text-align: center; padding: 14px 14px; margin-bottom: 0; }
 .renewal-tile-label {
   font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
 }
-.renewal-tile-price { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 30px; color: var(--text); margin-bottom: 2px; }
-.renewal-tile-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-.renewal-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+.renewal-tile-price { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 26px; color: var(--text); margin-bottom: 2px; }
+.renewal-tile-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+.renewal-divider { display: flex; align-items: center; gap: 12px; margin: 14px 0; }
 .renewal-divider-line { flex: 1; height: 1px; background: var(--border); }
 .renewal-divider-text { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.05em; }
 .renewal-bundle-panel {
-  position: relative; border: 2px solid var(--gold); border-radius: 16px;
+  position: relative; border: 2px solid var(--gold); border-radius: 14px;
   background: linear-gradient(160deg, rgba(201,168,76,.12) 0%, var(--surface) 65%);
   box-shadow: 0 0 0 4px rgba(201,168,76,.08), var(--shadow-lg);
-  padding: 30px 20px 24px;
+  padding: 20px 16px 16px;
 }
 .renewal-bundle-badge {
-  position: absolute; top: -13px; left: 20px; background: var(--gold); color: var(--black);
-  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
-  text-transform: uppercase; padding: 5px 14px; border-radius: 8px; white-space: nowrap;
+  position: absolute; top: -12px; left: 16px; background: var(--gold); color: var(--black);
+  font-family: 'Space Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 4px 12px; border-radius: 8px; white-space: nowrap;
 }
-.renewal-bundle-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; color: var(--text); margin-bottom: 6px; }
-.renewal-bundle-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
-.renewal-bundle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.renewal-bundle-option { border: 1.5px solid var(--border); border-radius: 12px; padding: 18px 14px; text-align: center; background: var(--surface); }
+.renewal-bundle-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: var(--text); margin-bottom: 4px; }
+.renewal-bundle-sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4; }
+.renewal-bundle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.renewal-bundle-option { border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 10px; text-align: center; background: var(--surface); }
 .renewal-bundle-option-label {
   font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--gold-dark); margin-bottom: 6px;
+
 }
 .renewal-bundle-option-price { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 26px; color: var(--text); margin-bottom: 2px; }
 .renewal-bundle-option-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
 @media (max-width: 480px) {
   .renewal-tiles { grid-template-columns: 1fr; }
   .renewal-bundle-options { grid-template-columns: 1fr; }
+  .renewal-pro-features { grid-template-columns: 1fr; }
 }
 
 .format-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -3534,23 +3547,28 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     </div>
     <div>
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:var(--text);margin-bottom:4px;">Keep your momentum going</div>
-      <div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Renew for the next round, or bundle with AAC and save.</div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">Renew for the next round, or bundle with AAC and save.</div>
 
       <div class="renewal-countdown" id="renewal-countdown"></div>
 
-      <div class="renewal-tiles">
-        <div class="card renewal-tile">
-          <div class="renewal-tile-label">WAC Base</div>
-          <div class="renewal-tile-price">$55</div>
-          <div class="renewal-tile-sub">One-time · next round only</div>
-          <a href="https://buy.stripe.com/4gM7sLclZcbl1Hoctjbo40i" target="_blank" rel="noopener" class="btn btn-outline btn-block" style="text-align:center;display:block;text-decoration:none;">Renew Base</a>
+      <div class="renewal-pro-intro">
+        <div class="renewal-pro-eyebrow">Introducing</div>
+        <div class="renewal-pro-title">WAC Pro</div>
+        <div class="renewal-pro-features">
+          <div class="renewal-pro-feature"><span style="color:var(--gold-dark);">✓</span> Weekly Website Action Plan</div>
+          <div class="renewal-pro-feature"><span style="color:var(--gold-dark);">✓</span> Website Copy Assist</div>
+          <div class="renewal-pro-feature"><span style="color:var(--gold-dark);">✓</span> Advanced Streak Analytics</div>
+          <div class="renewal-pro-feature"><span style="color:var(--gold-dark);">✓</span> SEO Screenshot Review</div>
+          <div class="renewal-pro-feature"><span style="color:var(--gold-dark);">✓</span> Custom Claude Skill Creator <span style="color:var(--text-muted);font-size:11px;">(soon)</span></div>
         </div>
-        <div class="card renewal-tile">
-          <div class="renewal-tile-label">WAC Pro</div>
-          <div class="renewal-tile-price">$75</div>
-          <div class="renewal-tile-sub">One-time · next round only</div>
-          <a href="https://buy.stripe.com/dRm3cv0Dh4IT3Pw0KBbo40e" target="_blank" rel="noopener" class="btn btn-gold btn-block" style="text-align:center;display:block;text-decoration:none;">Renew Pro</a>
-        </div>
+        <a href="#" onclick="event.preventDefault(); closeRenewalModal(); navTo('pro');" class="btn btn-outline btn-block" style="text-align:center;display:block;text-decoration:none;">Learn More →</a>
+      </div>
+
+      <div class="card renewal-tile" style="margin-bottom:14px;">
+        <div class="renewal-tile-label">WAC Base</div>
+        <div class="renewal-tile-price">$55</div>
+        <div class="renewal-tile-sub">One-time · next round only</div>
+        <a href="https://buy.stripe.com/4gM7sLclZcbl1Hoctjbo40i" target="_blank" rel="noopener" class="btn btn-outline btn-block" style="text-align:center;display:block;text-decoration:none;">Renew Base</a>
       </div>
 
       <div class="renewal-divider">
@@ -3579,7 +3597,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         </div>
       </div>
 
-      <div style="font-size:12px;color:var(--text-muted);margin-top:16px;line-height:1.5;">You'll be redirected to Stripe to complete payment. Access is activated on your account within 24 hours of payment.</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:14px;line-height:1.5;">You'll be redirected to Stripe to complete payment. Access is activated on your account within 24 hours of payment.</div>
     </div>
   </div>
 </div>
