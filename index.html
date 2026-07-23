@@ -1480,6 +1480,52 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .round-ended-title { font-weight: 700; color: var(--danger); }
 .round-ended-sub { font-size: 13px; color: var(--text-muted); }
 
+/* ==============================
+   RENEWAL MODAL
+   ============================== */
+.renewal-countdown {
+  text-align: center; font-family: 'Space Mono', monospace; font-size: 12px;
+  letter-spacing: 0.04em; color: var(--gold-dark);
+  background: var(--accent-bg, rgba(201,168,76,.10)); border-radius: 8px;
+  padding: 9px 12px; margin-bottom: 18px;
+}
+.renewal-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.renewal-tile { text-align: center; padding: 20px 16px; }
+.renewal-tile-label {
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;
+}
+.renewal-tile-price { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 30px; color: var(--text); margin-bottom: 2px; }
+.renewal-tile-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+.renewal-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+.renewal-divider-line { flex: 1; height: 1px; background: var(--border); }
+.renewal-divider-text { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.05em; }
+.renewal-bundle-panel {
+  position: relative; border: 2px solid var(--gold); border-radius: 16px;
+  background: linear-gradient(160deg, rgba(201,168,76,.12) 0%, var(--surface) 65%);
+  box-shadow: 0 0 0 4px rgba(201,168,76,.08), var(--shadow-lg);
+  padding: 30px 20px 24px;
+}
+.renewal-bundle-badge {
+  position: absolute; top: -13px; left: 20px; background: var(--gold); color: var(--black);
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 5px 14px; border-radius: 8px; white-space: nowrap;
+}
+.renewal-bundle-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; color: var(--text); margin-bottom: 6px; }
+.renewal-bundle-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+.renewal-bundle-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.renewal-bundle-option { border: 1.5px solid var(--border); border-radius: 12px; padding: 18px 14px; text-align: center; background: var(--surface); }
+.renewal-bundle-option-label {
+  font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--gold-dark); margin-bottom: 6px;
+}
+.renewal-bundle-option-price { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 26px; color: var(--text); margin-bottom: 2px; }
+.renewal-bundle-option-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; }
+@media (max-width: 480px) {
+  .renewal-tiles { grid-template-columns: 1fr; }
+  .renewal-bundle-options { grid-template-columns: 1fr; }
+}
+
 .format-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
 .format-btn {
   padding: 8px 16px;
@@ -3475,6 +3521,65 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">One-time charge for the rest of Round 2. Unlocks Weekly Action Plan, Copy Assist, Streak Analytics, and SEO Screenshot Review.</div>
       <a href="https://buy.stripe.com/dRm3cv0Dh4IT3Pw0KBbo40e" target="_blank" rel="noopener" class="btn btn-gold btn-block" style="text-align:center;display:block;text-decoration:none;">★ Upgrade Now — $75</a>
       <div style="font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.5;">You'll be redirected to Stripe to complete payment. Pro access is activated on your account within 24 hours of payment.</div>
+    </div>
+  </div>
+</div>
+
+<!-- RENEWAL MODAL -->
+<div class="modal-overlay" id="renewal-modal-overlay" onclick="closeRenewalModalDirect(event)">
+  <div class="modal-sheet" style="max-width:560px;">
+    <div class="modal-header">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">Round Has Ended</div>
+      <button class="modal-close" onclick="closeRenewalModal()">✕</button>
+    </div>
+    <div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:var(--text);margin-bottom:4px;">Keep your momentum going</div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Renew for the next round, or bundle with AAC and save.</div>
+
+      <div class="renewal-countdown" id="renewal-countdown"></div>
+
+      <div class="renewal-tiles">
+        <div class="card renewal-tile">
+          <div class="renewal-tile-label">WAC Base</div>
+          <div class="renewal-tile-price">$55</div>
+          <div class="renewal-tile-sub">One-time · next round only</div>
+          <a href="https://buy.stripe.com/4gM7sLclZcbl1Hoctjbo40i" target="_blank" rel="noopener" class="btn btn-outline btn-block" style="text-align:center;display:block;text-decoration:none;">Renew Base</a>
+        </div>
+        <div class="card renewal-tile">
+          <div class="renewal-tile-label">WAC Pro</div>
+          <div class="renewal-tile-price">$75</div>
+          <div class="renewal-tile-sub">One-time · next round only</div>
+          <a href="https://buy.stripe.com/dRm3cv0Dh4IT3Pw0KBbo40e" target="_blank" rel="noopener" class="btn btn-gold btn-block" style="text-align:center;display:block;text-decoration:none;">Renew Pro</a>
+        </div>
+      </div>
+
+      <div class="renewal-divider">
+        <div class="renewal-divider-line"></div>
+        <div class="renewal-divider-text">— or —</div>
+        <div class="renewal-divider-line"></div>
+      </div>
+
+      <div class="renewal-bundle-panel">
+        <div class="renewal-bundle-badge">Best Value · Save $19</div>
+        <div class="renewal-bundle-title">Both challenges, one price</div>
+        <div class="renewal-bundle-sub">Bundle your WAC renewal with 3 months of AAC (Ad Accountability Challenge) and save $19 vs. buying separately.</div>
+        <div class="renewal-bundle-options">
+          <div class="renewal-bundle-option">
+            <div class="renewal-bundle-option-label">Base + AAC</div>
+            <div class="renewal-bundle-option-price">$117</div>
+            <div class="renewal-bundle-option-sub">WAC Base · 3mo AAC</div>
+            <a href="https://buy.stripe.com/4gM9AT3Pt5MXdq6ctjbo40g" target="_blank" rel="noopener" class="btn btn-gold btn-block" style="text-align:center;display:block;text-decoration:none;">Choose Bundle</a>
+          </div>
+          <div class="renewal-bundle-option">
+            <div class="renewal-bundle-option-label">Pro + AAC</div>
+            <div class="renewal-bundle-option-price">$137</div>
+            <div class="renewal-bundle-option-sub">WAC Pro · 3mo AAC</div>
+            <a href="https://buy.stripe.com/14AfZhbhV1wH4TA9h7bo40h" target="_blank" rel="noopener" class="btn btn-gold btn-block" style="text-align:center;display:block;text-decoration:none;">Choose Bundle</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;color:var(--text-muted);margin-top:16px;line-height:1.5;">You'll be redirected to Stripe to complete payment. Access is activated on your account within 24 hours of payment.</div>
     </div>
   </div>
 </div>
@@ -6923,7 +7028,68 @@ function checkRoundEnd() {
     btn.textContent = "Round Ended";
     btn.style.opacity = "0.5";
   });
+  maybeShowRenewalModal();
 }
+
+// ==============================
+// RENEWAL MODAL
+// ==============================
+function maybeShowRenewalModal() {
+  if (!currentUser) return;
+  const key = `wac_renewal_seen_${currentUser.uid}_${ROUND_END_TS}`;
+  if (localStorage.getItem(key)) return;
+  localStorage.setItem(key, "1");
+  openRenewalModal();
+}
+
+// July 31, 2026 11:59:59pm ET (EDT, UTC-4)
+const RENEWAL_COUNTDOWN_TS = Date.UTC(2026, 7, 1, 3, 59, 59, 999);
+let _renewalCountdownInterval = null;
+
+function _renewalCountdownTick() {
+  const el = document.getElementById("renewal-countdown");
+  if (!el) return;
+  const diff = RENEWAL_COUNTDOWN_TS - Date.now();
+  if (diff <= 0) {
+    el.style.display = "none";
+    if (_renewalCountdownInterval) { clearInterval(_renewalCountdownInterval); _renewalCountdownInterval = null; }
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  el.style.display = "block";
+  el.textContent = `⏳ Offer ends in ${d}d ${h}h ${m}m`;
+}
+
+function startRenewalCountdown() {
+  _renewalCountdownTick();
+  if (_renewalCountdownInterval) clearInterval(_renewalCountdownInterval);
+  _renewalCountdownInterval = setInterval(_renewalCountdownTick, 60000);
+}
+
+function stopRenewalCountdown() {
+  if (_renewalCountdownInterval) { clearInterval(_renewalCountdownInterval); _renewalCountdownInterval = null; }
+}
+
+function openRenewalModal() {
+  const overlay = document.getElementById("renewal-modal-overlay");
+  if (overlay) overlay.classList.add("open");
+  startRenewalCountdown();
+}
+window.openRenewalModal = openRenewalModal;
+
+function closeRenewalModal() {
+  const overlay = document.getElementById("renewal-modal-overlay");
+  if (overlay) overlay.classList.remove("open");
+  stopRenewalCountdown();
+}
+window.closeRenewalModal = closeRenewalModal;
+
+function closeRenewalModalDirect(e) {
+  if (e.target === document.getElementById("renewal-modal-overlay")) closeRenewalModal();
+}
+window.closeRenewalModalDirect = closeRenewalModalDirect;
 
 // ==============================
 // WELCOME MODAL
