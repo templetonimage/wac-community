@@ -2872,6 +2872,18 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div id="reset-points-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
       </div>
 
+      <!-- ADMIN: Archive Round -->
+      <div id="admin-archive-round" style="display:none;margin-top:28px;">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">📦 Archive Round</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Snapshots every member's final <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">points</code> and <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">totalPosts</code> into a permanent record, then zeroes both for the new round. <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">lifetimePoints</code> is never touched. Run this once the current Round is fully over, before the next Round's activity begins.</div>
+        <div class="pro-global-danger">
+          <div class="pro-global-danger-title">⚠️ Destructive Action</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">This cannot be undone. Every member's points/totalPosts reset to zero after being archived. Requires double confirmation.</div>
+          <button class="btn btn-sm" onclick="archiveRound()" style="background:var(--danger);color:#fff;border-color:var(--danger);">Archive Current Round &amp; Reset Points</button>
+        </div>
+        <div id="archive-round-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
+      </div>
+
       <!-- ADMIN: Delete Trial Submissions -->
       <div id="admin-delete-trial" style="display:none;margin-top:28px;">
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">🗑 Delete Trial Submissions</div>
@@ -3728,8 +3740,9 @@ function sanitizeMember(m) {
     ig:         m.ig         || "",
     website:    m.website    || "",
     photoURL:   m.photoURL   || "",
-    points:     typeof m.points === "number" ? m.points : 0,
-    totalPosts: typeof m.totalPosts === "number" ? m.totalPosts : 0,
+    points:        typeof m.points === "number" ? m.points : 0,
+    totalPosts:    typeof m.totalPosts === "number" ? m.totalPosts : 0,
+    lifetimePoints: typeof m.lifetimePoints === "number" ? m.lifetimePoints : 0,
     rounds:     Array.isArray(m.rounds) ? m.rounds : [],
     isAdmin:    m.isAdmin    || false,
     isExpert:   m.isExpert   || false,
@@ -4060,6 +4073,7 @@ async function resolveUser(user) {
     rounds: d.rounds || [],
     points: d.points || 0,
     totalPosts: d.totalPosts || 0,
+    lifetimePoints: d.lifetimePoints || 0,
     isFounder: d.isFounder || false,
     isExpert: d.isExpert || false,
     isVIP: d.isVIP || false,
@@ -4175,7 +4189,7 @@ function bootApp() {
   if (_proNavBtn) _proNavBtn.style.display = currentUser ? "flex" : "none";
 
   // 5. Show/hide admin elements
-  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-delete-trial", "admin-submissions-tool", "admin-cowork-tool", "admin-community-pts-tool"];
+  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-archive-round", "admin-delete-trial", "admin-submissions-tool", "admin-cowork-tool", "admin-community-pts-tool"];
   adminBoxes.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
@@ -4720,7 +4734,7 @@ async function submitPost() {
       propsCount: 0,
       timestamp: Date.now()
     });
-    await updateDoc(doc(db, "wac_registry", currentUser.uid), { points: increment(PTS_POST) });
+    await updateDoc(doc(db, "wac_registry", currentUser.uid), { points: increment(PTS_POST), lifetimePoints: increment(PTS_POST) });
     currentUser.points = (currentUser.points || 0) + PTS_POST;
     logCommunityPts(currentUser.uid, currentUser.name, "Feed Post", PTS_POST);
     document.getElementById("feed-compose").value = "";
@@ -5161,7 +5175,7 @@ async function submitPVR() {
       timestamp: Date.now()
     });
     const regRefPVR = doc(db, "wac_registry", currentUser.uid);
-    await updateDoc(regRefPVR, { points: increment(PTS_PVR) });
+    await updateDoc(regRefPVR, { points: increment(PTS_PVR), lifetimePoints: increment(PTS_PVR) });
     currentUser.points = (currentUser.points || 0) + PTS_PVR;
     logCommunityPts(currentUser.uid, currentUser.name, "Peer Review Request", PTS_PVR);
     document.getElementById("pvr-url").value = "";
@@ -5239,7 +5253,7 @@ async function submitPVRReply(postId, postAuthorUid) {
     });
     // Update points
     const regRef = doc(db, "wac_registry", currentUser.uid);
-    await updateDoc(regRef, { points: increment(PTS_ENGAGEMENT) });
+    await updateDoc(regRef, { points: increment(PTS_ENGAGEMENT), lifetimePoints: increment(PTS_ENGAGEMENT) });
     currentUser.points = (currentUser.points || 0) + PTS_ENGAGEMENT;
     lsSet("wac_session", currentUser);
     if (input) input.value = "";
@@ -5850,7 +5864,8 @@ async function submitUpdate() {
     const regRef = doc(db, "wac_registry", currentUser.uid);
     await updateDoc(regRef, {
       points: increment(pts),
-      totalPosts: increment(1)
+      totalPosts: increment(1),
+      lifetimePoints: increment(pts)
     });
 
     // Update local user
@@ -5924,7 +5939,7 @@ async function submitEngagement() {
     });
     // Update registry points
     const regRef = doc(db, "wac_registry", currentUser.uid);
-    await updateDoc(regRef, { points: increment(engPts) });
+    await updateDoc(regRef, { points: increment(engPts), lifetimePoints: increment(engPts) });
     currentUser.points = (currentUser.points || 0) + engPts;
     lsSet("wac_session", currentUser);
 
@@ -6050,7 +6065,8 @@ async function deleteSubmission(id, pts) {
     const regRef = doc(db, "wac_registry", currentUser.uid);
     await updateDoc(regRef, {
       points: increment(-pts),
-      totalPosts: increment(-1)
+      totalPosts: increment(-1),
+      lifetimePoints: increment(-pts)
     });
     currentUser.points    = Math.max(0, (currentUser.points    || 0) - pts);
     currentUser.totalPosts = Math.max(0, (currentUser.totalPosts || 0) - 1);
@@ -6737,7 +6753,7 @@ async function addRegistryMember(uid, name, email, website, ig, biz, type, round
     ig: ig || "",
     business: biz || "",
     type: type || "",
-    rounds, points: 0, totalPosts: 0,
+    rounds, points: 0, totalPosts: 0, lifetimePoints: 0,
     isFounder, isVIP, isAllStar: false,
     // WAC Pro fields — default inactive
     isPro: false, proSince: null, proExpiry: null, trialUntil: null,
@@ -8033,7 +8049,7 @@ async function rsvpCowork() {
     const existing = await getDoc(rsvpRef);
     if (existing.exists()) { showToast('Already RSVP\'d!'); await loadCoworkCard(); return; }
     await setDoc(rsvpRef, { uid: currentUser.uid, name: currentUser.name || '', rsvpAt: Date.now() });
-    await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_COWORK_RSVP) });
+    await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_COWORK_RSVP), lifetimePoints: increment(PTS_COWORK_RSVP) });
     currentUser.points = (currentUser.points || 0) + PTS_COWORK_RSVP;
     logCommunityPts(currentUser.uid, currentUser.name, 'Coworking RSVP', PTS_COWORK_RSVP);
     showToast(`RSVP confirmed! +${PTS_COWORK_RSVP} pts`);
@@ -8199,7 +8215,7 @@ async function adminAwardAttendance(sessionId) {
       const uid = cb.dataset.uid;
       if (!uid) continue;
       await setDoc(doc(db, 'wac_coworking_sessions', sessionId, 'attendees', uid), { uid, awardedAt: Date.now() });
-      await updateDoc(doc(db, 'wac_registry', uid), { points: increment(PTS_COWORK_ATTEND) });
+      await updateDoc(doc(db, 'wac_registry', uid), { points: increment(PTS_COWORK_ATTEND), lifetimePoints: increment(PTS_COWORK_ATTEND) });
       logCommunityPts(uid, cb.dataset.name || uid, 'Coworking Attendance', PTS_COWORK_ATTEND);
       count++;
     }
@@ -8264,7 +8280,7 @@ async function adminBackfillPts() {
   if (!confirm(`Award +${pts} pts to ${memberName} for "${action}"?\n\nThis will increment their total and log the event.`)) return;
   if (statusEl) { statusEl.style.color='var(--text-muted)'; statusEl.textContent='Awarding...'; }
   try {
-    await updateDoc(doc(db, 'wac_registry', uid), { points: increment(pts) });
+    await updateDoc(doc(db, 'wac_registry', uid), { points: increment(pts), lifetimePoints: increment(pts) });
     await logCommunityPts(uid, memberName, action + ' (backfill)', pts);
     if (statusEl) { statusEl.style.color='var(--gold-dark)'; statusEl.textContent=`Done — +${pts} pts awarded to ${memberName} for "${action}".`; }
     showToast(`Backfill complete: +${pts} pts to ${memberName}`);
@@ -8537,7 +8553,7 @@ window.adminOpenEditSubmission = function(docId, collName, authorUid, currentPts
       updates.pts = newPts;
       await updateDoc(doc(db, collName, docId), updates);
       if (ptsDiff !== 0) {
-        await updateDoc(doc(db, "wac_registry", authorUid), { points: increment(ptsDiff) });
+        await updateDoc(doc(db, "wac_registry", authorUid), { points: increment(ptsDiff), lifetimePoints: increment(ptsDiff) });
       }
       showToast("Submission updated.");
       await loadAdminSubmissions();
@@ -8555,7 +8571,8 @@ window.adminDeleteSubmission = async function(docId, collName, authorUid, pts) {
     await deleteDoc(doc(db, collName, docId));
     await updateDoc(doc(db, "wac_registry", authorUid), {
       points: increment(-pts),
-      totalPosts: increment(-1)
+      totalPosts: increment(-1),
+      lifetimePoints: increment(-pts)
     });
     showToast("Submission deleted. Points deducted.");
     await loadAdminSubmissions();
@@ -8577,7 +8594,11 @@ window.adminSetMemberPoints = async function() {
   if (!confirm(`Set ${name}'s points to ${newPts}?`)) return;
   const statusEl = document.getElementById("admin-pts-status");
   try {
-    await updateDoc(doc(db, "wac_registry", memberUid), { points: newPts });
+    const memberRef = doc(db, "wac_registry", memberUid);
+    const memberSnap = await getDoc(memberRef);
+    const oldPts = (memberSnap.exists() && typeof memberSnap.data().points === "number") ? memberSnap.data().points : 0;
+    const delta = newPts - oldPts;
+    await updateDoc(memberRef, { points: newPts, lifetimePoints: increment(delta) });
     statusEl.style.display = "block";
     statusEl.textContent = `Points updated: ${name} → ${newPts} pts`;
     showToast(`Points set to ${newPts}.`);
@@ -8640,6 +8661,49 @@ window.resetAllPoints = async function() {
   } catch (e) {
     statusEl.textContent = `Error: ${e.message}`;
     showToast("Recompute failed: " + e.message);
+  }
+};
+
+// ==============================
+// ADMIN — ARCHIVE ROUND
+// ==============================
+window.archiveRound = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const first = confirm(`Archive Round ${CURRENT_ROUND.replace("R","")}?\n\nThis snapshots every member's current points and totalPosts into a permanent record, then zeroes both fields. lifetimePoints is never touched. Run this only once the round is fully over.`);
+  if (!first) return;
+  const second = confirm("Are you sure? This cannot be undone.");
+  if (!second) return;
+
+  const statusEl = document.getElementById("archive-round-status");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Archiving round...";
+
+  try {
+    const regSnap = await getDocs(collection(db, "wac_registry"));
+    const archivedAt = Date.now();
+    let count = 0;
+
+    for (const d of regSnap.docs) {
+      const data = d.data();
+      // Step 1: snapshot this member's final totals for the round.
+      await setDoc(doc(db, "wac_round_archives", `${CURRENT_ROUND}_${d.id}`), {
+        uid: d.id,
+        name: data.name || "",
+        points: typeof data.points === "number" ? data.points : 0,
+        totalPosts: typeof data.totalPosts === "number" ? data.totalPosts : 0,
+        round: CURRENT_ROUND,
+        archivedAt,
+      });
+      // Step 2: zero points/totalPosts for the new round. lifetimePoints untouched.
+      await updateDoc(doc(db, "wac_registry", d.id), { points: 0, totalPosts: 0 });
+      count++;
+    }
+
+    statusEl.textContent = `Done — archived and reset ${count} member(s) for Round ${CURRENT_ROUND.replace("R","")}.`;
+    showToast(`Round archived — ${count} member(s) reset.`);
+  } catch (e) {
+    statusEl.textContent = `Error: ${e.message}`;
+    showToast("Archive failed: " + e.message);
   }
 };
 window.deleteAllTrialSubmissions = async function() {
@@ -9349,7 +9413,7 @@ async function submitRER() {
     });
 
     const regRefRER = doc(db, "wac_registry", currentUser.uid);
-    await updateDoc(regRefRER, { points: increment(PTS_RER) });
+    await updateDoc(regRefRER, { points: increment(PTS_RER), lifetimePoints: increment(PTS_RER) });
     currentUser.points = (currentUser.points || 0) + PTS_RER;
     logCommunityPts(currentUser.uid, currentUser.name, "Expert Review Request", PTS_RER);
     document.getElementById("rer-url").value = "";
@@ -10003,7 +10067,7 @@ async function saveListing() {
       isActive: true
     });
     if (isNew) {
-      await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_BACKLINK) });
+      await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(PTS_BACKLINK), lifetimePoints: increment(PTS_BACKLINK) });
       currentUser.points = (currentUser.points || 0) + PTS_BACKLINK;
       logCommunityPts(currentUser.uid, currentUser.name, 'Backlink Listing Added', PTS_BACKLINK);
       showToast(`Listing added! +${PTS_BACKLINK} pts`);
@@ -10024,7 +10088,7 @@ async function removeListing() {
   if (!confirm(`Remove your listing from the Backlink Directory?\n\nNote: Removing your listing will deduct ${PTS_BACKLINK} points from your score.`)) return;
   try {
     await deleteDoc(doc(db, 'wac_backlinks', currentUser.uid));
-    await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(-PTS_BACKLINK) });
+    await updateDoc(doc(db, 'wac_registry', currentUser.uid), { points: increment(-PTS_BACKLINK), lifetimePoints: increment(-PTS_BACKLINK) });
     currentUser.points = Math.max(0, (currentUser.points || 0) - PTS_BACKLINK);
     showToast(`Listing removed. -${PTS_BACKLINK} pts`);
     await renderMyListing();
