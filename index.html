@@ -3717,7 +3717,7 @@ function getTrialExpiryStr() {
   return new Date(currentUser.trialUntil).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
 }
 
-const ROUND_END_TS = Date.UTC(2026, 8, 1, 3, 59, 59, 999);
+const ROUND_END_TS = Date.UTC(2026, 7, 1, 3, 59, 59, 999); // July 31, 2026 11:59:59pm ET (was Aug 31 — fixed)
 
 const WEEK_SCHEDULE = [
   [Date.UTC(2026,4,1,4,0,0),   Date.UTC(2026,4,8,3,59,59,999)],   // W1  May 1–7
@@ -4201,6 +4201,10 @@ function bootApp() {
   setTimeout(showWelcomeModal, 600);
   setTimeout(initPushNotifications, 1000);
   setTimeout(checkRoundEnd, 300);
+  setTimeout(maybeShowRenewalModal, 300);
+  if (new URLSearchParams(window.location.search).get("testRenewal") === "1") {
+    setTimeout(openRenewalModal, 300);
+  }
   setTimeout(checkProNotifications, 2000);
   setTimeout(checkRERNotification, 2500);
 
@@ -7028,22 +7032,23 @@ function checkRoundEnd() {
     btn.textContent = "Round Ended";
     btn.style.opacity = "0.5";
   });
-  maybeShowRenewalModal();
 }
 
 // ==============================
 // RENEWAL MODAL
 // ==============================
+// July 31, 2026 11:59:59pm ET (EDT, UTC-4) — Round 1 renewal deadline / Round 2 opens Aug 1
+const RENEWAL_COUNTDOWN_TS = Date.UTC(2026, 7, 1, 3, 59, 59, 999);
+const RENEWAL_WINDOW_START_TS = RENEWAL_COUNTDOWN_TS - (7 * 24 * 60 * 60 * 1000); // opens 7 days out
+
 function maybeShowRenewalModal() {
   if (!currentUser) return;
-  const key = `wac_renewal_seen_${currentUser.uid}_${ROUND_END_TS}`;
-  if (localStorage.getItem(key)) return;
-  localStorage.setItem(key, "1");
+  if (Date.now() < RENEWAL_WINDOW_START_TS) return; // not yet inside the 7-day renewal window
+  const sessionKey = `wac_renewal_dismissed_session_${currentUser.uid}`;
+  if (sessionStorage.getItem(sessionKey)) return; // dismissed already this session
   openRenewalModal();
 }
 
-// July 31, 2026 11:59:59pm ET (EDT, UTC-4)
-const RENEWAL_COUNTDOWN_TS = Date.UTC(2026, 7, 1, 3, 59, 59, 999);
 let _renewalCountdownInterval = null;
 
 function _renewalCountdownTick() {
@@ -7083,6 +7088,7 @@ function closeRenewalModal() {
   const overlay = document.getElementById("renewal-modal-overlay");
   if (overlay) overlay.classList.remove("open");
   stopRenewalCountdown();
+  if (currentUser) sessionStorage.setItem(`wac_renewal_dismissed_session_${currentUser.uid}`, "1");
 }
 window.closeRenewalModal = closeRenewalModal;
 
