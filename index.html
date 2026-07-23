@@ -7086,9 +7086,8 @@ const RENEWAL_WINDOW_START_TS = Date.UTC(2026, 6, 23, 4, 0, 0); // July 23, 2026
 
 function maybeShowRenewalModal() {
   if (!currentUser) return;
-  if (Date.now() < RENEWAL_WINDOW_START_TS) return; // not yet inside the 7-day renewal window
-  const sessionKey = `wac_renewal_dismissed_session_${currentUser.uid}`;
-  if (sessionStorage.getItem(sessionKey)) return; // dismissed already this session
+  if (Date.now() < RENEWAL_WINDOW_START_TS) return; // not yet inside the renewal window
+  if (currentUser.renewedRound2) return; // future flag, set once webhook records a renewal/registration
   openRenewalModal();
 }
 
@@ -7143,7 +7142,6 @@ function closeRenewalModal() {
   const overlay = document.getElementById("renewal-modal-overlay");
   if (overlay) overlay.classList.remove("open");
   stopRenewalCountdown();
-  if (currentUser) sessionStorage.setItem(`wac_renewal_dismissed_session_${currentUser.uid}`, "1");
 }
 window.closeRenewalModal = closeRenewalModal;
 
