@@ -2333,7 +2333,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   <div class="auth-card-wrap">
     <div class="auth-logo">WAC</div>
     <div class="auth-subtitle">Website Accountability<br>Challenge</div>
-    <div class="auth-round-badge">Round 1 · May–July 2026</div>
+    <div class="auth-round-badge js-round-label">Round 1 · May–July 2026</div>
     <div class="auth-form-area">
       <div class="auth-form-group">
         <label class="auth-form-label">EMAIL ADDRESS</label>
@@ -2750,7 +2750,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="page-title">Leaderboard</div>
         <div class="page-subtitle">Real-time points standings.</div>
       </div>
-      <div class="text-sm text-muted mb-16">Round 1 · May–July 2026</div>
+      <div class="text-sm text-muted mb-16 js-round-label">Round 1 · May–July 2026</div>
       <div id="leaderboard-list"></div>
       <div class="points-card">
         <h4>How Points Work</h4>
@@ -2772,7 +2772,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <div class="page" id="page-tracker">
       <div class="page-header">
         <div class="page-title">⭐ All-Star Tracker</div>
-        <div class="page-subtitle">Your 12-week accountability record — May through July.</div>
+        <div class="page-subtitle" id="tracker-page-subtitle">Your 12-week accountability record — May through July.</div>
       </div>
       <!-- April Free Trial section (local only) -->
       <div class="card mb-16" style="display:none;">
@@ -2787,7 +2787,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       </div>
       <div class="card mt-16" style="background:linear-gradient(135deg,var(--accent-bg),var(--surface));">
         <div class="card-title">⭐ WAC All-Star</div>
-        <p class="text-sm text-muted">Complete all 12 weekly requirements across May, June, and July to earn All-Star status. That's 24 total updates over 90 days.</p>
+        <p class="text-sm text-muted" id="allstar-card-copy">Complete all 12 weekly requirements across May, June, and July to earn All-Star status. That's 24 total updates over 90 days.</p>
       </div>
     </div>
 
@@ -3721,7 +3721,7 @@ const FIREBASE_CONFIG = {
 // CONSTANTS
 // ==============================
 const ADMIN_EMAIL   = "nate@templetonimage.com";
-const CURRENT_ROUND = "R1";
+const CURRENT_ROUND = "R2";
 
 const PTS_ON_TIME   = 10;
 const PTS_LATE_24H  = 5;
@@ -3744,19 +3744,20 @@ const ZOOM_REPLAYS = [
 const MAX_ENG_PER_WEEK = 5;
 
 // Weekly Challenge Modifiers — one per week, keyed by weekIdx (0–11)
+// Round 2 set (Aug 1 – Oct 31, 2026) — new prompts, not reused from Round 1.
 const WEEKLY_CHALLENGES = [
-  { title: "Add a Testimonial (Trust Signal)",        desc: "Add at least one real client testimonial to your site — include the client's name and project for maximum trust impact. Named, verifiable reviews are a direct Trust signal Google looks for under E-E-A-T." },
-  { title: "Clarify Your Homepage (Expertise Signal)",desc: "Refresh your headline, subheadline, or hero image so a first-time visitor immediately understands who you serve and what makes you the expert. Clear positioning is an Expertise signal." },
-  { title: "Write a Blog Post (Experience Signal)",   desc: "Publish a new blog post sharing something from your real experience — a shoot recap, a lesson learned, a behind-the-scenes story. First-hand content is Google's definition of Experience under E-E-A-T." },
-  { title: "Add a New Page (Authority Signal)",       desc: "Create and publish a brand new page on your site — a service page, location page, or FAQ. More depth and coverage builds topical Authority in Google's eyes." },
-  { title: "Fix Your Mobile Layout (Trust Signal)",   desc: "Review your site on a phone and fix at least one mobile display issue. A broken mobile experience erodes visitor Trust and hurts your Google rankings." },
-  { title: "E-E-A-T Your About Page",                 desc: "Upgrade your About page to hit all four E-E-A-T pillars: years of experience, your specific niche, any training or awards, and a professional photo. This is the single highest-impact E-E-A-T page on your site." },
-  { title: "Add a Clear CTA (Trust Signal)",          desc: "Ensure every page has one clear, visible call-to-action above the fold. A site that makes next steps obvious signals professionalism and Trustworthiness to both visitors and Google. No need to upload proof of every page, just choose 1 page, like the home page or services page." },
-  { title: "Optimize Page Speed (Trust Signal)",      desc: "Run your site through PageSpeed Insights (pagespeed.web.dev) and fix at least one issue. Fast, technically sound sites are a core Trust signal — slow sites lose both visitors and rankings." },
-  { title: "Add Alt Text to Images (Experience Signal)", desc: "Add descriptive alt text to every image on at least one page. Good alt text proves you were present and intentional — and tells Google's bots exactly what your Experience-driven visuals show." },
-  { title: "Update Your Services Page (Expertise Signal)", desc: "Refresh your services or offerings page with current pricing, descriptions, or copy. A detailed, current services page demonstrates active Expertise and keeps your site feeling credible." },
-  { title: "Add Verified Social Proof (Authority Signal)", desc: "Add a review, press mention, award, or client logo to any page — with the client's name or source attached. Named, verifiable social proof is how Google measures your Authority in the real world." },
-  { title: "Final Push — Any E-E-A-T Win",            desc: "Complete any meaningful update that strengthens your site's Experience, Expertise, Authority, or Trust. Finish the round strong — every improvement you've made this 90 days is a Google trust signal compounding in your favor." },
+  { title: "Update Your Availability (Trust Signal)",  desc: "Make sure your booking calendar, contact form, or 'currently booking' messaging reflects your real availability. Stale scheduling info is one of the fastest ways to lose a visitor's trust." },
+  { title: "Add a Recent Project (Experience Signal)", desc: "Publish your most recent shoot, project, or client win — even a single image with a short caption counts. Fresh, dated proof of ongoing work is exactly what Experience signals to Google." },
+  { title: "Strengthen Your FAQ (Expertise Signal)",   desc: "Add or expand an FAQ section that answers the questions your clients actually ask before booking. Thorough, specific answers demonstrate Expertise better than generic copy ever will." },
+  { title: "Internal Linking Pass (Authority Signal)", desc: "Add at least 3 internal links between related pages on your site (services to portfolio, blog post to service page, etc). Strong internal linking helps Google understand your site's Authority and structure." },
+  { title: "Refresh Your Portfolio (Experience Signal)", desc: "Swap out one older portfolio piece for more recent, representative work. A portfolio that reflects your current skill level is a direct Experience signal for both visitors and Google." },
+  { title: "Add Location Specificity (Authority Signal)", desc: "Make sure your service area, city, or region is named clearly on at least one page — not just in your logo or header. Named geography builds local Authority in Google's eyes." },
+  { title: "Tighten Your Meta Descriptions (Trust Signal)", desc: "Rewrite the meta description on your homepage or top service page so it clearly states what you offer and who it's for. Clear, accurate previews build Trust before a visitor even clicks." },
+  { title: "Add a Process Page or Section (Expertise Signal)", desc: "Explain how you work — your process, timeline, or what a client can expect step by step. Showing your process (not just your results) is a strong Expertise signal." },
+  { title: "Fix a Broken Link (Trust Signal)",          desc: "Click through your own site and find (and fix) at least one broken link, dead button, or outdated page. Broken paths quietly erode visitor Trust and hurt crawlability." },
+  { title: "Add Fresh Social Proof (Authority Signal)", desc: "Add a new review, testimonial, or client shoutout with a name attached — even a screenshot of a DM or email counts if named. New, dated proof keeps your Authority signal current." },
+  { title: "Optimize One Image Set (Experience Signal)", desc: "Compress, rename with descriptive filenames, and add alt text to the images on your most-visited page. Well-optimized, well-described images are concrete proof of hands-on Experience." },
+  { title: "Final Push — Any E-E-A-T Win",              desc: "Complete any meaningful update that strengthens your site's Experience, Expertise, Authority, or Trust. Finish the round strong — every improvement you've made this 90 days is a Google trust signal compounding in your favor." },
 ];
 
 // WAC Pro launch flags — flip both to true at Pro launch
@@ -3815,39 +3816,60 @@ function getTrialExpiryStr() {
   return new Date(currentUser.trialUntil).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
 }
 
-const ROUND_END_TS = Date.UTC(2026, 7, 1, 3, 59, 59, 999); // July 31, 2026 11:59:59pm ET (was Aug 31 — fixed)
+const ROUND_END_TS = Date.UTC(2026, 10, 1, 3, 59, 59, 999); // Oct 31, 2026 11:59:59pm ET — Round 2 end
 
 const WEEK_SCHEDULE = [
-  [Date.UTC(2026,4,1,4,0,0),   Date.UTC(2026,4,8,3,59,59,999)],   // W1  May 1–7
-  [Date.UTC(2026,4,8,4,0,0),   Date.UTC(2026,4,15,3,59,59,999)],  // W2  May 8–14
-  [Date.UTC(2026,4,15,4,0,0),  Date.UTC(2026,4,22,3,59,59,999)],  // W3  May 15–21
-  [Date.UTC(2026,4,22,4,0,0),  Date.UTC(2026,5,1,3,59,59,999)],   // W4  May 22–31
-  [Date.UTC(2026,5,1,4,0,0),   Date.UTC(2026,5,8,3,59,59,999)],   // W5  Jun 1–7
-  [Date.UTC(2026,5,8,4,0,0),   Date.UTC(2026,5,15,3,59,59,999)],  // W6  Jun 8–14
-  [Date.UTC(2026,5,15,4,0,0),  Date.UTC(2026,5,22,3,59,59,999)],  // W7  Jun 15–21
-  [Date.UTC(2026,5,22,4,0,0),  Date.UTC(2026,6,1,3,59,59,999)],   // W8  Jun 22–30
-  [Date.UTC(2026,6,1,4,0,0),   Date.UTC(2026,6,8,3,59,59,999)],   // W9  Jul 1–7
-  [Date.UTC(2026,6,8,4,0,0),   Date.UTC(2026,6,15,3,59,59,999)],  // W10 Jul 8–14
-  [Date.UTC(2026,6,15,4,0,0),  Date.UTC(2026,6,22,3,59,59,999)],  // W11 Jul 15–21
-  [Date.UTC(2026,6,22,4,0,0),  Date.UTC(2026,8,1,3,59,59,999)],   // W12 Jul 22–31
+  [Date.UTC(2026,7,1,4,0,0),   Date.UTC(2026,7,8,3,59,59,999)],   // W1  Aug 1–7
+  [Date.UTC(2026,7,8,4,0,0),   Date.UTC(2026,7,15,3,59,59,999)],  // W2  Aug 8–14
+  [Date.UTC(2026,7,15,4,0,0),  Date.UTC(2026,7,22,3,59,59,999)],  // W3  Aug 15–21
+  [Date.UTC(2026,7,22,4,0,0),  Date.UTC(2026,8,1,3,59,59,999)],   // W4  Aug 22–31
+  [Date.UTC(2026,8,1,4,0,0),   Date.UTC(2026,8,8,3,59,59,999)],   // W5  Sep 1–7
+  [Date.UTC(2026,8,8,4,0,0),   Date.UTC(2026,8,15,3,59,59,999)],  // W6  Sep 8–14
+  [Date.UTC(2026,8,15,4,0,0),  Date.UTC(2026,8,22,3,59,59,999)],  // W7  Sep 15–21
+  [Date.UTC(2026,8,22,4,0,0),  Date.UTC(2026,9,1,3,59,59,999)],   // W8  Sep 22–30
+  [Date.UTC(2026,9,1,4,0,0),   Date.UTC(2026,9,8,3,59,59,999)],   // W9  Oct 1–7
+  [Date.UTC(2026,9,8,4,0,0),   Date.UTC(2026,9,15,3,59,59,999)],  // W10 Oct 8–14
+  [Date.UTC(2026,9,15,4,0,0),  Date.UTC(2026,9,22,3,59,59,999)],  // W11 Oct 15–21
+  [Date.UTC(2026,9,22,4,0,0),  Date.UTC(2026,10,1,3,59,59,999)],  // W12 Oct 22–31
 ];
 
 const WEEKS = [
-  {id:"w1",  label:"Week 1", dates:"May 1–7",    month:"May",  required:1},
-  {id:"w2",  label:"Week 2", dates:"May 8–14",   month:"May",  required:1},
-  {id:"w3",  label:"Week 3", dates:"May 15–21",  month:"May",  required:1},
-  {id:"w4",  label:"Week 4", dates:"May 22–31",  month:"May",  required:1},
-  {id:"w5",  label:"Week 1", dates:"Jun 1–7",    month:"June", required:2},
-  {id:"w6",  label:"Week 2", dates:"Jun 8–14",   month:"June", required:2},
-  {id:"w7",  label:"Week 3", dates:"Jun 15–21",  month:"June", required:2},
-  {id:"w8",  label:"Week 4", dates:"Jun 22–30",  month:"June", required:2},
-  {id:"w9",  label:"Week 1", dates:"Jul 1–7",    month:"July", required:3},
-  {id:"w10", label:"Week 2", dates:"Jul 8–14",   month:"July", required:3},
-  {id:"w11", label:"Week 3", dates:"Jul 15–21",  month:"July", required:3},
-  {id:"w12", label:"Week 4", dates:"Jul 22–31",  month:"July", required:3},
+  {id:"w1",  label:"Week 1", dates:"Aug 1–7",    month:"August",    required:1},
+  {id:"w2",  label:"Week 2", dates:"Aug 8–14",   month:"August",    required:1},
+  {id:"w3",  label:"Week 3", dates:"Aug 15–21",  month:"August",    required:1},
+  {id:"w4",  label:"Week 4", dates:"Aug 22–31",  month:"August",    required:1},
+  {id:"w5",  label:"Week 1", dates:"Sep 1–7",    month:"September", required:2},
+  {id:"w6",  label:"Week 2", dates:"Sep 8–14",   month:"September", required:2},
+  {id:"w7",  label:"Week 3", dates:"Sep 15–21",  month:"September", required:2},
+  {id:"w8",  label:"Week 4", dates:"Sep 22–30",  month:"September", required:2},
+  {id:"w9",  label:"Week 1", dates:"Oct 1–7",    month:"October",   required:3},
+  {id:"w10", label:"Week 2", dates:"Oct 8–14",   month:"October",   required:3},
+  {id:"w11", label:"Week 3", dates:"Oct 15–21",  month:"October",   required:3},
+  {id:"w12", label:"Week 4", dates:"Oct 22–31",  month:"October",   required:3},
 ];
-const MONTHS = ["May", "June", "July"];
-const MONTH_REQS = {"May":"1 update/week", "June":"2 updates/week", "July":"3 updates/week"};
+const MONTHS = ["August", "September", "October"];
+const MONTH_REQS = {"August":"1 update/week", "September":"2 updates/week", "October":"3 updates/week"};
+
+// Round-label text that appears in static HTML (auth screen, leaderboard,
+// tracker page, All-Star card) — computed from CURRENT_ROUND/MONTHS/WEEK_SCHEDULE
+// so it never needs a manual find-and-replace at the start of a new round.
+function _applyRoundLabels() {
+  const roundNum = CURRENT_ROUND.replace("R", "");
+  const roundYear = new Date(WEEK_SCHEDULE[0][0]).getUTCFullYear();
+  const roundLabel = `Round ${roundNum} · ${MONTHS[0].slice(0,3)}–${MONTHS[MONTHS.length-1].slice(0,3)} ${roundYear}`;
+  document.querySelectorAll(".js-round-label").forEach(el => el.textContent = roundLabel);
+
+  const trackerSub = document.getElementById("tracker-page-subtitle");
+  if (trackerSub) trackerSub.textContent = `Your 12-week accountability record — ${MONTHS[0]} through ${MONTHS[MONTHS.length-1]}.`;
+
+  const allStarCopy = document.getElementById("allstar-card-copy");
+  if (allStarCopy) allStarCopy.textContent = `Complete all 12 weekly requirements across ${MONTHS.join(", ").replace(/, ([^,]*)$/, ", and $1")} to earn All-Star status. That's 24 total updates over 90 days.`;
+}
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", _applyRoundLabels);
+} else {
+  _applyRoundLabels();
+}
 
 // Returns the array of completion checkboxes for a given week.
 // Reads from new shape `trackerData.tracked[w.id]` (array of booleans),
@@ -4549,7 +4571,7 @@ window.loadDashboard = async function() {
     if (roundEl) roundEl.textContent = 'Free Trial';
     if (weekEl) weekEl.textContent = `Week ${trialIdx + 1} of 4`;
   } else {
-    if (roundEl) roundEl.textContent = 'Round 1';
+    if (roundEl) roundEl.textContent = 'Round ' + CURRENT_ROUND.replace('R', '');
     if (weekEl) weekEl.textContent = weekIdx >= 0 ? 'Week ' + (weekIdx + 1) + ' of 12' : '—';
   }
 
@@ -6163,7 +6185,7 @@ async function buildTracker() {
       <span class="text-sm text-muted">${pct}%</span>
     </div>
     <div class="tracker-progress"><div class="tracker-progress-bar" style="width:${pct}%"></div></div>
-    ${isLocked ? `<div style="font-size:12px;color:var(--text-muted);margin-top:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;text-align:center;">🔒 Round 1 begins May 1, 2026</div>` : ""}
+    ${isLocked ? `<div style="font-size:12px;color:var(--text-muted);margin-top:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;text-align:center;">🔒 Round ${CURRENT_ROUND.replace("R","")} begins ${new Date(WEEK_SCHEDULE[0][0]).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}</div>` : ""}
     ${currentUser.isAdmin ? `<div style="font-size:11px;color:var(--text-muted);margin-top:6px;padding:4px 8px;background:var(--surface2);border-radius:4px;">Admin test tracker — use Reports → All-Star Progress to manage member trackers</div>` : ""}
   `;
 
@@ -6377,7 +6399,7 @@ async function renderAdminRegistry() {
           ${igUrl ? `<div style="font-size:11px;margin-bottom:6px;"><a href="${igUrl}" target="_blank" rel="noopener" style="color:var(--text-muted);">📸 ${esc(m.ig)}</a></div>` : ""}
           <div class="admin-member-controls">
             <button class="${(m.rounds||[]).includes('R1')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R1')">R1 ${(m.rounds||[]).includes("R1")?"✓":""}</button>
-            <button class="${(m.rounds||[]).includes('R2')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R2')">R2 ${(m.rounds||[]).includes("R2")?"✓":""}</button>
+            <button class="${(m.rounds||[]).includes('R2')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R2')" title="Marks this member active for Round 2 — also hides the renewal modal for them">R2 ${(m.rounds||[]).includes("R2")?"✓":""}</button>
             <button class="${(m.rounds||[]).includes('R3')?'active-flag':''}" onclick="toggleRegistryRound('${docId}','R3')">R3 ${(m.rounds||[]).includes("R3")?"✓":""}</button>
             <button class="${m.isFounder?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isFounder')">🏅 Founder</button>
             <button class="${m.isExpert?'active-flag':''}" onclick="toggleRegistryFlag('${docId}','isExpert')" style="${m.isExpert ? 'background:rgba(184,134,11,0.12);border-color:var(--gold);color:var(--gold-dark);font-weight:600;' : ''}">🎯 Expert</button>
@@ -7148,7 +7170,11 @@ const RENEWAL_WINDOW_START_TS = Date.UTC(2026, 6, 23, 4, 0, 0); // July 23, 2026
 function maybeShowRenewalModal() {
   if (!currentUser) return;
   if (Date.now() < RENEWAL_WINDOW_START_TS) return; // not yet inside the renewal window
-  if (currentUser.renewedRound2) return; // future flag, set once webhook records a renewal/registration
+  // Skip for anyone marked active for R2 — either by the admin Directory's R2
+  // toggle (rounds includes "R2") or by the Stripe webhook setting the legacy
+  // renewedRound2 flag once that automation is wired up.
+  if ((currentUser.rounds || []).includes("R2")) return;
+  if (currentUser.renewedRound2) return;
   openRenewalModal();
 }
 
