@@ -3459,7 +3459,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;opacity:0.85;">Website Accountability Challenge</div>
     </div>
     <div class="welcome-body">
-      <h3>Welcome to Round 1! 👋</h3>
+      <h3 id="welcome-modal-title">Welcome to Round 1! 👋</h3>
       <div class="welcome-step"><span class="welcome-step-icon">🌐</span><span>Submit your updates — paste your URL each week after you update your site</span></div>
       <div class="welcome-step"><span class="welcome-step-icon">✅</span><span>Check your Tracker — mark weeks complete as you go</span></div>
       <div class="welcome-step"><span class="welcome-step-icon">🤝</span><span>Engage with members — visit and comment on other members' sites for +2 pts each</span></div>
@@ -3468,6 +3468,26 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <div class="welcome-footer">
       <button class="btn btn-gold btn-block" onclick="closeWelcomeModal()">Let's Go! 🚀</button>
       <button class="welcome-dismiss" onclick="closeWelcomeModal()">Don't show this again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ROUND WELCOME-BACK MODAL — shown once per round to returning members active in the new round -->
+<div class="modal-overlay" id="round-welcome-overlay" onclick="closeRoundWelcomeModalDirect(event)">
+  <div class="modal-sheet" style="max-width:480px;">
+    <div class="modal-header">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">New Round</div>
+      <button class="modal-close" onclick="closeRoundWelcomeModal()">✕</button>
+    </div>
+    <div>
+      <div id="round-welcome-title" style="font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:var(--text);margin-bottom:4px;">Welcome to Round 2!</div>
+      <div id="round-welcome-sub" style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">Round 2 · Aug–Oct 2026 is live — here's what's new.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">🔄</span><span style="font-size:13px;line-height:1.5;">Your weekly Tracker and points reset for a clean slate — your <strong>Lifetime Points</strong> keep growing across every round, nothing is lost.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">⚡</span><span style="font-size:13px;line-height:1.5;">A fresh set of Weekly Challenge Modifiers is live — check your dashboard each week for a new E-E-A-T focus.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">📈</span><span style="font-size:13px;line-height:1.5;">Requirements ramp up like last round: 1 update/week this month, 2/week next month, 3/week in the final month.</span></div>
+      </div>
+      <button class="btn btn-gold btn-block" onclick="closeRoundWelcomeModal()">Let's Go! 🚀</button>
     </div>
   </div>
 </div>
@@ -4323,6 +4343,7 @@ function bootApp() {
   setTimeout(initPushNotifications, 1000);
   setTimeout(checkRoundEnd, 300);
   setTimeout(maybeShowRenewalModal, 300);
+  setTimeout(maybeShowRoundWelcomeModal, 350);
   if (new URLSearchParams(window.location.search).get("testRenewal") === "1") {
     setTimeout(openRenewalModal, 300);
   }
@@ -7243,6 +7264,8 @@ window.closeRenewalModalDirect = closeRenewalModalDirect;
 function showWelcomeModal() {
   const key = `wac_welcomed_${currentUser.uid}`;
   if (localStorage.getItem(key)) return;
+  const titleEl = document.getElementById("welcome-modal-title");
+  if (titleEl) titleEl.textContent = `Welcome to Round ${CURRENT_ROUND.replace("R","")}! 👋`;
   document.getElementById("welcome-overlay").classList.add("open");
 }
 
@@ -7250,6 +7273,36 @@ function closeWelcomeModal() {
   const key = `wac_welcomed_${currentUser.uid}`;
   localStorage.setItem(key, "1");
   document.getElementById("welcome-overlay").classList.remove("open");
+}
+
+// Shown once per round to returning members who are active in the current
+// round (rounds includes CURRENT_ROUND). Separate from showWelcomeModal above,
+// which is a one-time-ever modal for brand-new members. Dismiss is stored per
+// round per uid in localStorage, so it naturally re-shows for the next round
+// without any code changes.
+function maybeShowRoundWelcomeModal() {
+  if (!currentUser) return;
+  if (!(currentUser.rounds || []).includes(CURRENT_ROUND)) return; // only members active this round
+  const key = `wac_round_welcome_${CURRENT_ROUND}_${currentUser.uid}`;
+  if (localStorage.getItem(key)) return;
+
+  const roundNum = CURRENT_ROUND.replace("R", "");
+  const roundLabel = `${MONTHS[0].slice(0,3)}–${MONTHS[MONTHS.length-1].slice(0,3)} ${new Date(WEEK_SCHEDULE[0][0]).getUTCFullYear()}`;
+  const titleEl = document.getElementById("round-welcome-title");
+  const subEl = document.getElementById("round-welcome-sub");
+  if (titleEl) titleEl.textContent = `Welcome to Round ${roundNum}!`;
+  if (subEl) subEl.textContent = `Round ${roundNum} · ${roundLabel} is live — here's what's new.`;
+
+  document.getElementById("round-welcome-overlay").classList.add("open");
+}
+
+function closeRoundWelcomeModal() {
+  if (currentUser) localStorage.setItem(`wac_round_welcome_${CURRENT_ROUND}_${currentUser.uid}`, "1");
+  document.getElementById("round-welcome-overlay").classList.remove("open");
+}
+
+function closeRoundWelcomeModalDirect(e) {
+  if (e.target === document.getElementById("round-welcome-overlay")) closeRoundWelcomeModal();
 }
 
 // ==============================
@@ -8472,6 +8525,8 @@ window.initProfilePhotoPreview = initProfilePhotoPreview;
 window.updateTopnavAvatar = updateTopnavAvatar;
 window.initAddToDevice = initAddToDevice;
 window.closeWelcomeModal = closeWelcomeModal;
+window.closeRoundWelcomeModal = closeRoundWelcomeModal;
+window.closeRoundWelcomeModalDirect = closeRoundWelcomeModalDirect;
 window.requestPushPermission = requestPushPermission;
 window.installPWA = installPWA;
 window.exportCSV = exportCSV;
