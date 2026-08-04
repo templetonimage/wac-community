@@ -8763,6 +8763,9 @@ function renderBackfillReport(report, collections) {
 
 // Cache of last sweep results, used by fixAllSweepMismatches.
 let _sweepResults = [];
+// uid -> { submissions:[], engagements:[], communityPts:[] } — raw contributions
+// from the last sweep, used to render the per-member drill-down on demand.
+let _sweepContrib = {};
 
 // Compares registry.points against the sum of pts across submissions + engagements
 // + wac_community_pts (filtered to CURRENT_ROUND) for every member. Read-only.
@@ -8787,10 +8790,36 @@ window.runPointsSweep = async function() {
     ]);
 
     const totals = {};
+    const contrib = {}; // uid -> { submissions:[], engagements:[], communityPts:[] }
+    const touch = (uid) => { if (!contrib[uid]) contrib[uid] = { submissions: [], engagements: [], communityPts: [] }; return contrib[uid]; };
     const add = (uid, pts) => { if (!uid) return; totals[uid] = (totals[uid] || 0) + (pts || 0); };
-    subSnap.docs.forEach(d => add(d.data().authorUid, d.data().pts));
-    engSnap.docs.forEach(d => add(d.data().authorUid, d.data().pts));
-    cpSnap.docs.forEach(d => add(d.data().uid, d.data().pts));
+    const fmtDate = (ts) => { try { return new Date(ts).toLocaleDateString(); } catch { return ""; } };
+
+    subSnap.docs.forEach(d => {
+      const data = d.data();
+      add(data.authorUid, data.pts);
+      if (data.authorUid) touch(data.authorUid).submissions.push({
+        label: `${data.format || "Static"} · ${data.url || "(no url)"}${data.challengeCompleted ? " · +challenge" : ""}`,
+        pts: data.pts || 0, date: fmtDate(data.timestamp)
+      });
+    });
+    engSnap.docs.forEach(d => {
+      const data = d.data();
+      add(data.authorUid, data.pts);
+      if (data.authorUid) touch(data.authorUid).engagements.push({
+        label: `${data.type || ""} · ${data.targetUrl || "(no url)"}`,
+        pts: data.pts || 0, date: fmtDate(data.timestamp)
+      });
+    });
+    cpSnap.docs.forEach(d => {
+      const data = d.data();
+      add(data.uid, data.pts);
+      if (data.uid) touch(data.uid).communityPts.push({
+        label: data.action || "Community points",
+        pts: data.pts || 0, date: fmtDate(data.ts)
+      });
+    });
+    _sweepContrib = contrib;
 
     const results = regSnap.docs.map(d => {
       const data = d.data();
@@ -8821,12 +8850,13 @@ window.runPointsSweep = async function() {
     document.getElementById("sweep-table-body").innerHTML = results.map(r => {
       const deltaColor = r.delta === 0 ? "var(--text-muted)" : r.delta > 0 ? "#c0392b" : "#e67e22";
       const deltaStr = r.delta === 0 ? "—" : (r.delta > 0 ? "+" : "") + r.delta;
-      return `<tr style="border-bottom:1px solid var(--border);">
-        <td style="padding:7px 8px;">${esc(r.name)}</td>
+      return `<tr id="sweep-row-${r.id}" style="border-bottom:1px solid var(--border);cursor:pointer;" onclick="toggleSweepDetail('${r.id}')">
+        <td style="padding:7px 8px;">${esc(r.name)} <span style="color:var(--text-muted);font-size:10px;">▾</span></td>
         <td style="text-align:right;padding:7px 8px;">${r.registryPts}</td>
         <td style="text-align:right;padding:7px 8px;">${r.computed}</td>
         <td style="text-align:right;padding:7px 8px;font-weight:700;color:${deltaColor};">${deltaStr}</td>
-      </tr>`;
+      </tr>
+      <tr id="sweep-detail-${r.id}" style="display:none;"><td colspan="4" style="padding:0;"></td></tr>`;
     }).join("");
 
     fixBtn.style.display = mismatches.length ? "block" : "none";
@@ -8837,6 +8867,55 @@ window.runPointsSweep = async function() {
   } finally {
     runBtn.disabled = false;
   }
+};
+
+// Expands/collapses the per-member breakdown row under a sweep table row —
+// shows what's actually contributing to "Computed" (submissions, engagements,
+// community points log), so an admin can see WHY a delta exists before fixing it.
+window.toggleSweepDetail = function(uid) {
+  const row = document.getElementById(`sweep-detail-${uid}`);
+  if (!row) return;
+  if (row.style.display === "table-row") { row.style.display = "none"; return; }
+
+  const c = _sweepContrib[uid] || { submissions: [], engagements: [], communityPts: [] };
+  const sumOf = (arr) => arr.reduce((s, x) => s + (x.pts || 0), 0);
+  const renderGroup = (title, items) => {
+    if (!items.length) return `<div style="color:var(--text-muted);font-size:11.5px;margin-bottom:6px;">${title}: none</div>`;
+    const rows = items
+      .sort((a, b) => (a.date || "").localeCompare(b.date || ""))
+      .map(i => `<div style="display:flex;justify-content:space-between;gap:8px;font-size:11.5px;padding:2px 0;">
+        <span style="color:var(--text-muted);">${esc(i.label)} · ${esc(i.date)}</span>
+        <span style="flex-shrink:0;font-weight:600;">+${i.pts}</span>
+      </div>`).join("");
+    return `<div style="margin-bottom:10px;">
+      <div style="font-weight:700;font-size:12px;margin-bottom:3px;">${title} — ${items.length} item(s), ${sumOf(items)} pts</div>
+      ${rows}
+    </div>`;
+  };
+
+  const r = _sweepResults.find(x => x.id === uid);
+  row.querySelector("td").innerHTML = `
+    <div style="padding:12px 14px;background:var(--surface2);border-top:1px dashed var(--border);border-bottom:1px dashed var(--border);">
+      ${renderGroup("Submissions", c.submissions)}
+      ${renderGroup("Engagements", c.engagements)}
+      ${renderGroup("Community Points Log", c.communityPts)}
+      <div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">
+        Registry: <strong>${r ? r.registryPts : "?"}</strong> · Computed (sum above): <strong>${r ? r.computed : "?"}</strong> —
+        if these three groups don't add up to Computed, or Computed doesn't match Registry, the difference is either an
+        admin manual point edit that bypassed the ledger, or a deleted doc that left the registry total stale.
+      </div>
+      <button class="btn btn-sm btn-outline" style="margin-top:8px;padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();jumpToMemberSubmissions('${uid}')">View in Submissions Tool ↓</button>
+    </div>`;
+  row.style.display = "table-row";
+};
+
+// Filters the existing Admin Submissions & Points Editor to this member and
+// scrolls to it, so raw submission/engagement docs can be inspected directly.
+window.jumpToMemberSubmissions = function(uid) {
+  const sel = document.getElementById("admin-sub-member-filter");
+  if (sel) { sel.value = uid; loadAdminSubmissions(); }
+  const tool = document.getElementById("admin-submissions-tool");
+  if (tool) tool.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
 // Sets registry.points to the computed total for every flagged mismatch and
