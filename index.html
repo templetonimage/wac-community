@@ -8716,25 +8716,50 @@ window.backfillRoundTags = async function() {
   statusEl.style.display = "block";
   statusEl.textContent = "Backfilling round tags...";
 
-  try {
-    const collections = ["submissions", "engagements", "posts", "wac_community_pts", "expert_reviews"];
-    let tagged = 0, skipped = 0;
-    for (const collName of collections) {
-      const snap = await getDocs(collection(db, collName));
-      for (const d of snap.docs) {
-        if (d.data().round) { skipped++; continue; }
-        await updateDoc(doc(db, collName, d.id), { round: CURRENT_ROUND });
-        tagged++;
-      }
-      statusEl.textContent = `Backfilling... ${collName} done.`;
+  const collections = ["submissions", "engagements", "posts", "wac_community_pts", "expert_reviews"];
+  const report = {}; // collName -> { tagged, skipped, failed, firstError }
+
+  for (const collName of collections) {
+    report[collName] = { tagged: 0, skipped: 0, failed: 0, firstError: "" };
+    let snap;
+    try {
+      snap = await getDocs(collection(db, collName));
+    } catch (e) {
+      report[collName].firstError = `read blocked: ${e.message}`;
+      statusEl.innerHTML = renderBackfillReport(report, collections);
+      continue;
     }
-    statusEl.textContent = `Done — tagged ${tagged} doc(s) with round:"${CURRENT_ROUND}" (${skipped} already tagged).`;
-    showToast(`Backfill complete: ${tagged} doc(s) tagged.`);
-  } catch (e) {
-    statusEl.textContent = `Error: ${e.message}`;
-    showToast("Backfill failed: " + e.message);
+    for (const d of snap.docs) {
+      if (d.data().round) { report[collName].skipped++; continue; }
+      try {
+        await updateDoc(doc(db, collName, d.id), { round: CURRENT_ROUND });
+        report[collName].tagged++;
+      } catch (e) {
+        report[collName].failed++;
+        if (!report[collName].firstError) report[collName].firstError = e.message;
+      }
+      statusEl.innerHTML = renderBackfillReport(report, collections);
+    }
   }
+
+  const totalFailed = Object.values(report).reduce((s, r) => s + r.failed, 0);
+  statusEl.innerHTML = renderBackfillReport(report, collections);
+  showToast(totalFailed
+    ? `Backfill finished with ${totalFailed} permission failure(s) — see details above.`
+    : "Backfill complete.");
 };
+
+function renderBackfillReport(report, collections) {
+  return collections.map(c => {
+    const r = report[c];
+    if (!r) return `<div>${c}: pending…</div>`;
+    const parts = [`${r.tagged} tagged`, `${r.skipped} already tagged`];
+    if (r.failed) parts.push(`<strong style="color:#c0392b;">${r.failed} BLOCKED</strong>`);
+    let line = `<div><strong>${c}</strong>: ${parts.join(", ")}</div>`;
+    if (r.firstError) line += `<div style="color:#c0392b;font-size:11.5px;padding-left:8px;">↳ ${esc(r.firstError)}</div>`;
+    return line;
+  }).join("");
+}
 
 // Cache of last sweep results, used by fixAllSweepMismatches.
 let _sweepResults = [];
