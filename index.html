@@ -2872,6 +2872,42 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div id="reset-points-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
       </div>
 
+      <!-- ADMIN: Points Audit (Round Sweep) -->
+      <div id="admin-points-audit" style="display:none;margin-top:28px;">
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">🔍 Points Audit</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Step 1: tag existing Round 1 activity with <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">round: "R1"</code> (one-time, safe to re-run — skips docs already tagged). Step 2: compares each member's registry <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">points</code> against the sum of their Round 1 submissions + engagements + community points. Run this before archiving.</div>
+        <button class="btn btn-outline btn-sm" onclick="backfillRoundTags()">1. Backfill Round Tags</button>
+        <div id="round-tag-backfill-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-sm" id="sweep-run-btn" onclick="runPointsSweep()" style="background:var(--gold);color:#000;border-color:var(--gold);">2. Run Points Sweep</button>
+        </div>
+        <div id="sweep-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);"></div>
+        <div id="sweep-results" style="display:none;margin-top:14px;">
+          <div id="sweep-summary" style="font-size:13px;margin-bottom:10px;"></div>
+          <div style="max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead><tr>
+                <th style="text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);">Member</th>
+                <th style="text-align:right;padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);">Registry</th>
+                <th style="text-align:right;padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);">Computed</th>
+                <th style="text-align:right;padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);">Delta</th>
+              </tr></thead>
+              <tbody id="sweep-table-body"></tbody>
+            </table>
+          </div>
+          <button class="btn btn-sm" id="sweep-fix-all-btn" onclick="fixAllSweepMismatches()" style="display:none;margin-top:12px;background:var(--danger);color:#fff;border-color:var(--danger);">Fix All Mismatches</button>
+        </div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+          <button class="btn btn-sm" id="dupcheck-run-btn" onclick="runDuplicateOverCapCheck()" style="background:var(--gold);color:#000;border-color:var(--gold);">3. Check Duplicates / Over-Caps</button>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Flags weeks/months where a member exceeded the submission, engagement, PVR, or RER cap, or claimed the weekly challenge bonus more than once. Submissions/engagements can be deleted inline; PVR/RER over-caps are flagged for manual review since their points live in the Community Points Log, not on the flagged doc.</div>
+        </div>
+        <div id="dupcheck-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);"></div>
+        <div id="dupcheck-results" style="display:none;margin-top:14px;">
+          <div id="dupcheck-summary" style="font-size:13px;margin-bottom:10px;"></div>
+          <div id="dupcheck-list"></div>
+        </div>
+      </div>
+
       <!-- ADMIN: Archive Round -->
       <div id="admin-archive-round" style="display:none;margin-top:28px;">
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">📦 Archive Round</div>
@@ -4189,7 +4225,7 @@ function bootApp() {
   if (_proNavBtn) _proNavBtn.style.display = currentUser ? "flex" : "none";
 
   // 5. Show/hide admin elements
-  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-archive-round", "admin-delete-trial", "admin-submissions-tool", "admin-cowork-tool", "admin-community-pts-tool"];
+  const adminBoxes = ["admin-announce-box", "admin-resource-box", "admin-create-box", "admin-registry", "firebase-setup-card", "admin-export-csv-btn", "admin-bug-reports", "admin-reset-points", "admin-points-audit", "admin-archive-round", "admin-delete-trial", "admin-submissions-tool", "admin-cowork-tool", "admin-community-pts-tool"];
   adminBoxes.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
@@ -8661,6 +8697,325 @@ window.resetAllPoints = async function() {
   } catch (e) {
     statusEl.textContent = `Error: ${e.message}`;
     showToast("Recompute failed: " + e.message);
+  }
+};
+
+// ==============================
+// ADMIN — POINTS AUDIT (ROUND SWEEP)
+// ==============================
+
+// One-time migration: tags existing submissions/engagements/posts/wac_community_pts
+// docs with round:"R1" if they don't already have a round field. Idempotent — safe
+// to re-run, skips anything already tagged. Required before runPointsSweep can
+// filter Round 1 activity by round.
+window.backfillRoundTags = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  if (!confirm(`Tag all untagged activity docs with round:"${CURRENT_ROUND}"?\n\nOnly touches docs missing a round field. Safe to re-run.`)) return;
+
+  const statusEl = document.getElementById("round-tag-backfill-status");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Backfilling round tags...";
+
+  try {
+    const collections = ["submissions", "engagements", "posts", "wac_community_pts", "expert_reviews"];
+    let tagged = 0, skipped = 0;
+    for (const collName of collections) {
+      const snap = await getDocs(collection(db, collName));
+      for (const d of snap.docs) {
+        if (d.data().round) { skipped++; continue; }
+        await updateDoc(doc(db, collName, d.id), { round: CURRENT_ROUND });
+        tagged++;
+      }
+      statusEl.textContent = `Backfilling... ${collName} done.`;
+    }
+    statusEl.textContent = `Done — tagged ${tagged} doc(s) with round:"${CURRENT_ROUND}" (${skipped} already tagged).`;
+    showToast(`Backfill complete: ${tagged} doc(s) tagged.`);
+  } catch (e) {
+    statusEl.textContent = `Error: ${e.message}`;
+    showToast("Backfill failed: " + e.message);
+  }
+};
+
+// Cache of last sweep results, used by fixAllSweepMismatches.
+let _sweepResults = [];
+
+// Compares registry.points against the sum of pts across submissions + engagements
+// + wac_community_pts (filtered to CURRENT_ROUND) for every member. Read-only.
+window.runPointsSweep = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const statusEl  = document.getElementById("sweep-status");
+  const resultsEl = document.getElementById("sweep-results");
+  const runBtn    = document.getElementById("sweep-run-btn");
+  const fixBtn    = document.getElementById("sweep-fix-all-btn");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Reading Firestore...";
+  resultsEl.style.display = "none";
+  runBtn.disabled = true;
+  _sweepResults = [];
+
+  try {
+    const [regSnap, subSnap, engSnap, cpSnap] = await Promise.all([
+      getDocs(collection(db, "wac_registry")),
+      getDocs(query(collection(db, "submissions"), where("round", "==", CURRENT_ROUND))),
+      getDocs(query(collection(db, "engagements"), where("round", "==", CURRENT_ROUND))),
+      getDocs(query(collection(db, "wac_community_pts"), where("round", "==", CURRENT_ROUND)))
+    ]);
+
+    const totals = {};
+    const add = (uid, pts) => { if (!uid) return; totals[uid] = (totals[uid] || 0) + (pts || 0); };
+    subSnap.docs.forEach(d => add(d.data().authorUid, d.data().pts));
+    engSnap.docs.forEach(d => add(d.data().authorUid, d.data().pts));
+    cpSnap.docs.forEach(d => add(d.data().uid, d.data().pts));
+
+    const results = regSnap.docs.map(d => {
+      const data = d.data();
+      const registryPts = typeof data.points === "number" ? data.points : 0;
+      const computed = totals[d.id] || 0;
+      const delta = computed - registryPts;
+      return { id: d.id, name: data.name || "(unnamed)", registryPts, computed, delta };
+    });
+
+    results.sort((a, b) => {
+      if (a.delta === 0 && b.delta !== 0) return 1;
+      if (a.delta !== 0 && b.delta === 0) return -1;
+      if (a.delta !== 0 && b.delta !== 0) return Math.abs(b.delta) - Math.abs(a.delta);
+      return a.name.localeCompare(b.name);
+    });
+
+    _sweepResults = results;
+    const mismatches = results.filter(r => r.delta !== 0);
+    const ok = results.filter(r => r.delta === 0);
+
+    document.getElementById("sweep-summary").innerHTML =
+      `<span style="color:var(--text-muted);">${results.length} members checked</span> &nbsp;·&nbsp; ` +
+      (mismatches.length
+        ? `<span style="color:#c0392b;font-weight:700;">${mismatches.length} mismatch${mismatches.length > 1 ? "es" : ""}</span>`
+        : `<span style="color:#27ae60;font-weight:700;">0 mismatches</span>`) +
+      ` &nbsp;·&nbsp; <span style="color:#27ae60;">${ok.length} OK</span>`;
+
+    document.getElementById("sweep-table-body").innerHTML = results.map(r => {
+      const deltaColor = r.delta === 0 ? "var(--text-muted)" : r.delta > 0 ? "#c0392b" : "#e67e22";
+      const deltaStr = r.delta === 0 ? "—" : (r.delta > 0 ? "+" : "") + r.delta;
+      return `<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:7px 8px;">${esc(r.name)}</td>
+        <td style="text-align:right;padding:7px 8px;">${r.registryPts}</td>
+        <td style="text-align:right;padding:7px 8px;">${r.computed}</td>
+        <td style="text-align:right;padding:7px 8px;font-weight:700;color:${deltaColor};">${deltaStr}</td>
+      </tr>`;
+    }).join("");
+
+    fixBtn.style.display = mismatches.length ? "block" : "none";
+    statusEl.style.display = "none";
+    resultsEl.style.display = "block";
+  } catch (e) {
+    statusEl.textContent = "Error: " + e.message;
+  } finally {
+    runBtn.disabled = false;
+  }
+};
+
+// Sets registry.points to the computed total for every flagged mismatch and
+// adjusts lifetimePoints by the same delta so lifetime totals stay accurate.
+window.fixAllSweepMismatches = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const mismatches = _sweepResults.filter(r => r.delta !== 0);
+  if (!mismatches.length) { showToast("No mismatches to fix."); return; }
+  if (!confirm(`Fix ${mismatches.length} mismatch${mismatches.length > 1 ? "es" : ""}?\n\nThis sets each member's points to the computed total and adjusts lifetimePoints by the same delta. Continue?`)) return;
+
+  const fixBtn   = document.getElementById("sweep-fix-all-btn");
+  const statusEl = document.getElementById("sweep-status");
+  fixBtn.disabled = true;
+  statusEl.style.display = "block";
+
+  try {
+    let done = 0, failed = 0;
+    for (const m of mismatches) {
+      try {
+        await updateDoc(doc(db, "wac_registry", m.id), {
+          points: m.computed,
+          lifetimePoints: increment(m.delta)
+        });
+        done++;
+      } catch (e) { failed++; }
+      statusEl.textContent = `Fixing... ${done + failed}/${mismatches.length}`;
+    }
+    statusEl.innerHTML = `Done — ${done} fixed` + (failed ? `, ${failed} failed — check Firestore.` : ".") + ` Re-running sweep...`;
+    fixBtn.style.display = "none";
+    await runPointsSweep();
+  } catch (e) {
+    statusEl.textContent = "Error: " + e.message;
+    fixBtn.disabled = false;
+  }
+};
+
+// Cache of last duplicate/over-cap scan, used by auditDeleteViolationDoc to
+// remove a row from the DOM after a successful delete without a full re-scan.
+let _dupCheckViolations = [];
+
+// Scans Round 1 activity for weeks/months where a member exceeded a submission
+// cap, or claimed a bonus more than once:
+//  - submissions per (uid, weekIdx) > WEEKS[weekIdx].required
+//  - challengeCompleted:true on more than 1 submission in the same week
+//  - engagements per (uid, weekIdx) > MAX_ENG_PER_WEEK
+//  - PVR posts per (uid, weekIdx) > 1
+//  - Expert Review Requests per (uid, monthKey) > 1
+// Read-only — reports violations, does not modify anything.
+window.runDuplicateOverCapCheck = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const statusEl  = document.getElementById("dupcheck-status");
+  const resultsEl = document.getElementById("dupcheck-results");
+  const runBtn    = document.getElementById("dupcheck-run-btn");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Scanning Round 1 activity...";
+  resultsEl.style.display = "none";
+  runBtn.disabled = true;
+  _dupCheckViolations = [];
+
+  try {
+    const [subSnap, engSnap, postSnap, revSnap] = await Promise.all([
+      getDocs(query(collection(db, "submissions"), where("round", "==", CURRENT_ROUND))),
+      getDocs(query(collection(db, "engagements"), where("round", "==", CURRENT_ROUND))),
+      getDocs(query(collection(db, "posts"), where("round", "==", CURRENT_ROUND))),
+      getDocs(collection(db, "expert_reviews"))
+    ]);
+
+    const violations = [];
+    const fmtDate = (ts) => { try { return new Date(ts).toLocaleDateString(); } catch { return ""; } };
+
+    // --- Submissions: over-cap + duplicate challenge bonus, per (uid, weekIdx) ---
+    const subGroups = {};
+    subSnap.docs.forEach(d => {
+      const data = d.data();
+      if (data.isTrial) return; // trial weeks use a different cadence, not Round 1 caps
+      const key = `${data.authorUid}|${data.weekIdx}`;
+      (subGroups[key] = subGroups[key] || []).push({ id: d.id, ...data });
+    });
+    Object.values(subGroups).forEach(docs => {
+      const { authorUid: uid, weekIdx } = docs[0];
+      const week = WEEKS[weekIdx];
+      const cap = week ? week.required : 1;
+      const weekLabel = week ? `${week.label} (${week.dates})` : `Week ${weekIdx}`;
+      if (docs.length > cap) {
+        violations.push({
+          uid, name: docs[0].author || uid, category: "Over-cap submissions",
+          detail: `${weekLabel}: ${docs.length} submitted, ${cap} allowed`,
+          docs: docs.map(d => ({ id: d.id, collName: "submissions", pts: d.pts || 0,
+            label: `${d.format || "Static"} · ${d.url || "(no url)"} · ${fmtDate(d.timestamp)} · +${d.pts || 0} pts` }))
+        });
+      }
+      const challengeDocs = docs.filter(d => d.challengeCompleted === true);
+      if (challengeDocs.length > 1) {
+        violations.push({
+          uid, name: docs[0].author || uid, category: "Duplicate challenge bonus",
+          detail: `${weekLabel}: challenge bonus claimed on ${challengeDocs.length} submissions, only 1 should count`,
+          docs: challengeDocs.map(d => ({ id: d.id, collName: "submissions", pts: d.pts || 0,
+            label: `${d.url || "(no url)"} · ${fmtDate(d.timestamp)} · +${d.pts || 0} pts (incl. challenge bonus)` }))
+        });
+      }
+    });
+
+    // --- Engagements: over-cap per (uid, weekIdx) ---
+    const engGroups = {};
+    engSnap.docs.forEach(d => {
+      const data = d.data();
+      const key = `${data.authorUid}|${data.weekIdx}`;
+      (engGroups[key] = engGroups[key] || []).push({ id: d.id, ...data });
+    });
+    Object.values(engGroups).forEach(docs => {
+      const { authorUid: uid, weekIdx } = docs[0];
+      if (docs.length > MAX_ENG_PER_WEEK) {
+        violations.push({
+          uid, name: docs[0].author || uid, category: "Over-cap engagements",
+          detail: `Week ${weekIdx + 1}: ${docs.length} logged, ${MAX_ENG_PER_WEEK} allowed`,
+          docs: docs.map(d => ({ id: d.id, collName: "engagements", pts: d.pts || 0,
+            label: `${d.type || ""} · ${d.targetUrl || "(no url)"} · ${fmtDate(d.timestamp)} · +${d.pts || 0} pts` }))
+        });
+      }
+    });
+
+    // --- PVR: over-cap per (uid, weekIdx), from posts where type=="pvr" ---
+    const pvrGroups = {};
+    postSnap.docs.forEach(d => {
+      const data = d.data();
+      if (data.type !== "pvr") return;
+      const key = `${data.authorUid}|${data.weekIdx}`;
+      (pvrGroups[key] = pvrGroups[key] || []).push({ id: d.id, ...data });
+    });
+    Object.values(pvrGroups).forEach(docs => {
+      const { authorUid: uid, weekIdx } = docs[0];
+      if (docs.length > 1) {
+        violations.push({
+          uid, name: docs[0].author || uid, category: "Over-cap Peer Review Requests",
+          detail: `Week ${weekIdx + 1}: ${docs.length} PVR posts, 1 allowed`,
+          docs: docs.map(d => ({ id: d.id, collName: "posts", pts: 0, noDelete: true,
+            label: `${d.pvr_url || "(no url)"} · ${fmtDate(d.timestamp)} — points came from Community Points Log, review manually` }))
+        });
+      }
+    });
+
+    // --- RER: over-cap per (uid, monthKey), from expert_reviews ---
+    const rerGroups = {};
+    revSnap.docs.forEach(d => {
+      const data = d.data();
+      const key = `${data.requesterUid}|${data.monthKey}`;
+      (rerGroups[key] = rerGroups[key] || []).push({ id: d.id, ...data });
+    });
+    Object.values(rerGroups).forEach(docs => {
+      const { requesterUid: uid, monthKey } = docs[0];
+      if (docs.length > 1) {
+        violations.push({
+          uid, name: docs[0].requesterName || uid, category: "Over-cap Expert Review Requests",
+          detail: `${monthKey}: ${docs.length} requests, 1 allowed`,
+          docs: docs.map(d => ({ id: d.id, collName: "expert_reviews", pts: 0, noDelete: true,
+            label: `${d.pageUrl || "(no url)"} · ${fmtDate(d.createdAt)} — points came from Community Points Log, review manually` }))
+        });
+      }
+    });
+
+    _dupCheckViolations = violations;
+
+    document.getElementById("dupcheck-summary").innerHTML = violations.length
+      ? `<span style="color:#c0392b;font-weight:700;">${violations.length} violation${violations.length > 1 ? "s" : ""} found</span>`
+      : `<span style="color:#27ae60;font-weight:700;">0 violations found</span>`;
+
+    document.getElementById("dupcheck-list").innerHTML = violations.map(v => `
+      <div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:var(--surface2);">
+        <div style="font-weight:700;font-size:13px;margin-bottom:2px;">${esc(v.name)} — ${esc(v.category)}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">${esc(v.detail)}</div>
+        ${v.docs.map(d => `
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;padding:4px 0;border-top:1px dashed var(--border);">
+            <span style="color:var(--text-muted);">${esc(d.label)}</span>
+            ${d.noDelete
+              ? `<span style="color:var(--text-muted);font-style:italic;flex-shrink:0;">manual review</span>`
+              : `<button class="btn btn-sm" style="flex-shrink:0;padding:3px 10px;font-size:11px;background:var(--danger);color:#fff;border-color:var(--danger);" onclick="auditDeleteViolationDoc('${d.collName}','${d.id}','${v.uid}',${d.pts})">Delete</button>`}
+          </div>`).join("")}
+      </div>`).join("");
+
+    statusEl.style.display = "none";
+    resultsEl.style.display = "block";
+  } catch (e) {
+    statusEl.textContent = "Error: " + e.message;
+  } finally {
+    runBtn.disabled = false;
+  }
+};
+
+// Deletes a flagged submission or engagement doc and deducts its points
+// (+ totalPosts for submissions) from the member's registry record.
+window.auditDeleteViolationDoc = async function(collName, docId, uid, pts) {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const label = collName === "submissions" ? "submission" : "engagement";
+  if (!confirm(`Delete this ${label}? The member's points will be reduced by ${pts}.`)) return;
+  try {
+    await deleteDoc(doc(db, collName, docId));
+    const updates = { points: increment(-pts), lifetimePoints: increment(-pts) };
+    if (collName === "submissions") updates.totalPosts = increment(-1);
+    await updateDoc(doc(db, "wac_registry", uid), updates);
+    showToast(`Deleted. ${pts} pt(s) deducted.`);
+    _dupCheckViolations.forEach(v => { v.docs = v.docs.filter(d => d.id !== docId); });
+    await runDuplicateOverCapCheck();
+  } catch (e) {
+    showToast("Delete failed: " + e.message);
   }
 };
 
