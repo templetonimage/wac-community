@@ -4342,11 +4342,7 @@ function bootApp() {
   setTimeout(showWelcomeModal, 600);
   setTimeout(initPushNotifications, 1000);
   setTimeout(checkRoundEnd, 300);
-  setTimeout(maybeShowRenewalModal, 300);
   setTimeout(maybeShowRoundWelcomeModal, 350);
-  if (new URLSearchParams(window.location.search).get("testRenewal") === "1") {
-    setTimeout(openRenewalModal, 300);
-  }
   setTimeout(checkProNotifications, 2000);
   setTimeout(checkRERNotification, 2500);
 
