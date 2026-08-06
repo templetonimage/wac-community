@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wac-v1';
+const CACHE_NAME = 'wac-v2';
 const ASSETS = [
   './',
   './index.html',
