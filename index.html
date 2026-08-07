@@ -8126,8 +8126,9 @@ async function loadCoworkCard() {
   try {
     const snap = await getDocs(query(collection(db, 'wac_coworking_sessions'), where('active', '==', true)));
     if (snap.empty) { card.style.display = 'none'; return; }
-    // Use most recently created active session
-    const sessions = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    // Use most recently created active session that isn't admin-hidden
+    const sessions = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(s => !s.hidden).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    if (!sessions.length) { card.style.display = 'none'; return; }
     const session = sessions[0];
     if (labelEl) labelEl.textContent = session.label || 'Coworking Session';
     // Check if already RSVP'd
@@ -8213,9 +8214,10 @@ async function loadAdminCoworkSessions() {
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
           <div>
             <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${esc(s.label)}</div>
-            <div style="font-size:11px;color:var(--text-muted);">Created ${new Date(s.createdAt||0).toLocaleDateString()} &bull; <span style="color:${s.active ? 'var(--gold-dark)' : 'var(--text-muted)'};">${s.active ? 'Active' : 'Closed'}</span></div>
+            <div style="font-size:11px;color:var(--text-muted);">Created ${new Date(s.createdAt||0).toLocaleDateString()} &bull; <span style="color:${s.active ? 'var(--gold-dark)' : 'var(--text-muted)'};">${s.active ? 'Active' : 'Closed'}</span>${s.hidden ? ' &bull; <span style="color:#c0392b;">Hidden from Dashboard</span>' : ''}</div>
           </div>
-          <div style="display:flex;gap:8px;flex-shrink:0;">
+          <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" onclick="adminToggleHideCoworkSession('${s.id}', ${!!s.hidden})">${s.hidden ? 'Show on Dashboard' : 'Hide from Dashboard'}</button>
             <button class="btn btn-outline btn-sm" onclick="adminToggleCoworkSession('${s.id}', ${s.active})">${s.active ? 'Close' : 'Reopen'}</button>
             <button class="btn btn-outline btn-sm" onclick="adminShowRenameSession('${s.id}')">Edit</button>
             <button class="btn btn-outline btn-sm" onclick="adminDeleteCoworkSession('${s.id}')">Delete</button>
@@ -8246,6 +8248,15 @@ async function adminToggleCoworkSession(sessionId, currentActive) {
     await updateDoc(doc(db, 'wac_coworking_sessions', sessionId), { active: !currentActive });
     await loadAdminCoworkSessions();
     await loadCoworkCard();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function adminToggleHideCoworkSession(sessionId, currentHidden) {
+  try {
+    await updateDoc(doc(db, 'wac_coworking_sessions', sessionId), { hidden: !currentHidden });
+    await loadAdminCoworkSessions();
+    await loadCoworkCard();
+    showToast(currentHidden ? 'Card is visible on dashboards again.' : 'Card hidden from all dashboards.');
   } catch(e) { showToast('Error: ' + e.message); }
 }
 
@@ -8456,6 +8467,7 @@ window.rsvpCowork = rsvpCowork;
 window.adminCreateCoworkSession = adminCreateCoworkSession;
 window.loadAdminCoworkSessions = loadAdminCoworkSessions;
 window.adminToggleCoworkSession = adminToggleCoworkSession;
+window.adminToggleHideCoworkSession = adminToggleHideCoworkSession;
 window.adminDeleteCoworkSession = adminDeleteCoworkSession;
 window.adminShowRenameSession = adminShowRenameSession;
 window.adminRenameSession = adminRenameSession;
