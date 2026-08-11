@@ -2937,6 +2937,14 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">💻 Coworking Sessions</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Create a session to surface the RSVP card on members' dashboards. Mark attendees after the session to award +5 pts each. RSVP (+2 pts) is member self-service.</div>
 
+        <div class="card" id="cowork-visibility-card" style="border:1.5px solid var(--border);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div>
+            <div style="font-weight:700;font-size:13px;">Card visibility on Dashboard</div>
+            <div id="cowork-visibility-status" style="font-size:12px;color:var(--text-muted);margin-top:2px;">Loading...</div>
+          </div>
+          <button class="btn btn-sm" id="cowork-visibility-btn" onclick="adminToggleCoworkVisibility()">...</button>
+        </div>
+
         <!-- Create Session -->
         <div class="card" style="border:1.5px solid var(--border);margin-bottom:16px;">
           <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Create Session</div>
@@ -4292,7 +4300,7 @@ function bootApp() {
     if (_expertWebhook) _expertWebhook.style.display = "block";
     // Coworking tool visible to admin
     const _coworkTool = document.getElementById("admin-cowork-tool");
-    if (_coworkTool) { _coworkTool.style.display = "block"; loadAdminCoworkSessions(); }
+    if (_coworkTool) { _coworkTool.style.display = "block"; loadAdminCoworkSessions(); loadAdminCoworkVisibility(); }
     // Community points log
     const _commPtsTool = document.getElementById("admin-community-pts-tool");
     if (_commPtsTool) { _commPtsTool.style.display = "block"; populateCommPtsMemberFilter(); }
@@ -8124,11 +8132,14 @@ async function loadCoworkCard() {
   const btn = document.getElementById('cowork-rsvp-btn');
   if (!card || !db) return;
   try {
+    // Master visibility switch (admin-controlled) — singleton doc in the same collection
+    const visSnap = await getDoc(doc(db, 'wac_coworking_sessions', '_visibility'));
+    if (visSnap.exists() && visSnap.data().visible === false) { card.style.display = 'none'; return; }
+
     const snap = await getDocs(query(collection(db, 'wac_coworking_sessions'), where('active', '==', true)));
     if (snap.empty) { card.style.display = 'none'; return; }
-    // Use most recently created active session that isn't admin-hidden
-    const sessions = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(s => !s.hidden).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
-    if (!sessions.length) { card.style.display = 'none'; return; }
+    // Use most recently created active session
+    const sessions = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
     const session = sessions[0];
     if (labelEl) labelEl.textContent = session.label || 'Coworking Session';
     // Check if already RSVP'd
@@ -8176,6 +8187,31 @@ async function rsvpCowork() {
 
 // ---- Admin: Session Management ----
 
+async function loadAdminCoworkVisibility() {
+  const statusEl = document.getElementById('cowork-visibility-status');
+  const btn = document.getElementById('cowork-visibility-btn');
+  if (!statusEl || !btn) return;
+  try {
+    const snap = await getDoc(doc(db, 'wac_coworking_sessions', '_visibility'));
+    const visible = !snap.exists() || snap.data().visible !== false;
+    statusEl.textContent = visible ? 'Visible — showing whenever a session is Active.' : 'Hidden — card is off for all members regardless of session status.';
+    btn.textContent = visible ? 'Hide Card' : 'Show Card';
+    btn.className = visible ? 'btn btn-sm' : 'btn btn-gold btn-sm';
+    btn.style.cssText = visible ? 'background:var(--danger);color:#fff;border-color:var(--danger);' : '';
+  } catch(e) { statusEl.textContent = 'Error loading visibility.'; console.error('loadAdminCoworkVisibility:', e); }
+}
+
+async function adminToggleCoworkVisibility() {
+  try {
+    const snap = await getDoc(doc(db, 'wac_coworking_sessions', '_visibility'));
+    const visible = !snap.exists() || snap.data().visible !== false;
+    await setDoc(doc(db, 'wac_coworking_sessions', '_visibility'), { visible: !visible });
+    showToast(visible ? 'Card hidden from Dashboard.' : 'Card visible on Dashboard.');
+    await loadAdminCoworkVisibility();
+    await loadCoworkCard();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
 async function adminCreateCoworkSession() {
   const labelInput = document.getElementById('cowork-new-label');
   const calUrlInput = document.getElementById('cowork-new-calurl');
@@ -8207,17 +8243,16 @@ async function loadAdminCoworkSessions() {
   listEl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">Loading...</div>';
   try {
     const snap = await getDocs(collection(db, 'wac_coworking_sessions'));
-    if (snap.empty) { listEl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">No sessions yet.</div>'; return; }
-    const sessions = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    const sessions = snap.docs.filter(d => d.id !== '_visibility').map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    if (!sessions.length) { listEl.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">No sessions yet.</div>'; return; }
     listEl.innerHTML = sessions.map(s => `
       <div style="border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;background:var(--surface);">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
           <div>
             <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${esc(s.label)}</div>
-            <div style="font-size:11px;color:var(--text-muted);">Created ${new Date(s.createdAt||0).toLocaleDateString()} &bull; <span style="color:${s.active ? 'var(--gold-dark)' : 'var(--text-muted)'};">${s.active ? 'Active' : 'Closed'}</span>${s.hidden ? ' &bull; <span style="color:#c0392b;">Hidden from Dashboard</span>' : ''}</div>
+            <div style="font-size:11px;color:var(--text-muted);">Created ${new Date(s.createdAt||0).toLocaleDateString()} &bull; <span style="color:${s.active ? 'var(--gold-dark)' : 'var(--text-muted)'};">${s.active ? 'Active' : 'Closed'}</span></div>
           </div>
-          <div style="display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap;">
-            <button class="btn btn-outline btn-sm" onclick="adminToggleHideCoworkSession('${s.id}', ${!!s.hidden})">${s.hidden ? 'Show on Dashboard' : 'Hide from Dashboard'}</button>
+          <div style="display:flex;gap:8px;flex-shrink:0;">
             <button class="btn btn-outline btn-sm" onclick="adminToggleCoworkSession('${s.id}', ${s.active})">${s.active ? 'Close' : 'Reopen'}</button>
             <button class="btn btn-outline btn-sm" onclick="adminShowRenameSession('${s.id}')">Edit</button>
             <button class="btn btn-outline btn-sm" onclick="adminDeleteCoworkSession('${s.id}')">Delete</button>
@@ -8248,15 +8283,6 @@ async function adminToggleCoworkSession(sessionId, currentActive) {
     await updateDoc(doc(db, 'wac_coworking_sessions', sessionId), { active: !currentActive });
     await loadAdminCoworkSessions();
     await loadCoworkCard();
-  } catch(e) { showToast('Error: ' + e.message); }
-}
-
-async function adminToggleHideCoworkSession(sessionId, currentHidden) {
-  try {
-    await updateDoc(doc(db, 'wac_coworking_sessions', sessionId), { hidden: !currentHidden });
-    await loadAdminCoworkSessions();
-    await loadCoworkCard();
-    showToast(currentHidden ? 'Card is visible on dashboards again.' : 'Card hidden from all dashboards.');
   } catch(e) { showToast('Error: ' + e.message); }
 }
 
@@ -8467,7 +8493,8 @@ window.rsvpCowork = rsvpCowork;
 window.adminCreateCoworkSession = adminCreateCoworkSession;
 window.loadAdminCoworkSessions = loadAdminCoworkSessions;
 window.adminToggleCoworkSession = adminToggleCoworkSession;
-window.adminToggleHideCoworkSession = adminToggleHideCoworkSession;
+window.adminToggleCoworkVisibility = adminToggleCoworkVisibility;
+window.loadAdminCoworkVisibility = loadAdminCoworkVisibility;
 window.adminDeleteCoworkSession = adminDeleteCoworkSession;
 window.adminShowRenameSession = adminShowRenameSession;
 window.adminRenameSession = adminRenameSession;
