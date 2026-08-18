@@ -2877,6 +2877,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">🔍 Points Audit</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Step 1: tag existing Round 1 activity with <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">round: "R1"</code> (one-time, safe to re-run — skips docs already tagged). Step 2: compares each member's registry <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">points</code> against the sum of their Round 1 submissions + engagements + community points. Run this before archiving.</div>
         <button class="btn btn-outline btn-sm" onclick="backfillRoundTags()">1. Backfill Round Tags</button>
+        <button class="btn btn-outline btn-sm" onclick="fixCommunityPtsRoundTags()" style="margin-left:8px;">Fix Community Pts Tags (one-time)</button>
         <div id="round-tag-backfill-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface2);border-radius:6px;"></div>
         <div style="margin-top:16px;">
           <button class="btn btn-sm" id="sweep-run-btn" onclick="runPointsSweep()" style="background:var(--gold);color:#000;border-color:var(--gold);">2. Run Points Sweep</button>
@@ -2911,7 +2912,13 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <!-- ADMIN: Archive Round -->
       <div id="admin-archive-round" style="display:none;margin-top:28px;">
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">📦 Archive Round</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Snapshots every member's final <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">points</code> and <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">totalPosts</code> into a permanent record, then zeroes both for the new round. <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">lifetimePoints</code> is never touched. Run this once the current Round is fully over, before the next Round's activity begins.</div>
+        <div style="font-size:12px;color:var(--gold-dark);margin-bottom:10px;line-height:1.6;">⚠️ Round 1 was never archived before Round 2 launched — run the one-time catch-up below first (once), not the normal archive button, which would mislabel the archive as R2.</div>
+        <div class="pro-global-danger" style="margin-bottom:16px;">
+          <div class="pro-global-danger-title">One-Time Catch-Up (run this now)</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">Archives true R1 totals correctly labeled "R1", then resets registry.points to each member's actual R2-only total — preserving any R2 points already earned. Run Backfill Round Tags + Fix Community Pts Tags first.</div>
+          <button class="btn btn-sm" onclick="catchUpArchiveR1AndFixR2Points()" style="background:var(--danger);color:#fff;border-color:var(--danger);">Catch Up: Archive R1 &amp; Fix R2 Points</button>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Snapshots every member's final <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">points</code> and <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">totalPosts</code> into a permanent record, then zeroes both for the new round. <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">lifetimePoints</code> is never touched. Use this at future round boundaries, right after the round is fully over.</div>
         <div class="pro-global-danger">
           <div class="pro-global-danger-title">⚠️ Destructive Action</div>
           <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">This cannot be undone. Every member's points/totalPosts reset to zero after being archived. Requires double confirmation.</div>
@@ -4620,8 +4627,8 @@ window.loadDashboard = async function() {
     const [regSnap, subSnap, engSnap, trackerSnap, lbSnap] = await Promise.race([
       Promise.all([
         getDoc(dc(db, 'wac_registry', registryId)),
-        getDocs(q(col(db, 'submissions'), where('authorUid', '==', uid))),
-        getDocs(q(col(db, 'engagements'), where('authorUid', '==', uid))),
+        getDocs(q(col(db, 'submissions'), where('authorUid', '==', uid), where('round', '==', CURRENT_ROUND))),
+        getDocs(q(col(db, 'engagements'), where('authorUid', '==', uid), where('round', '==', CURRENT_ROUND))),
         getDoc(dc(db, 'trackers', uid)),
         (async () => {
           try { return await getDocs(q(col(db, 'wac_registry'), ob('points', 'desc'), lim(12))); }
@@ -4632,12 +4639,20 @@ window.loadDashboard = async function() {
     ]);
 
     const regData = regSnap.exists() ? regSnap.data() : {};
-    const totalPts = regData.points || 0;
     const subs = subSnap.docs.map(d => ({...d.data(), id:d.id}));
     const engs = engSnap.docs.map(d => ({...d.data(), id:d.id}));
     const postPts = subs.reduce((a, s) => a + (s.pts || 0), 0);
     const engPts = engs.reduce((a, e) => a + (e.pts || 0), 0);
-    const communityPts = Math.max(0, totalPts - postPts - engPts);
+    // Community points aren't tied to a round-scoped query here, so pull from
+    // a dedicated round-filtered read rather than deriving from the raw
+    // registry.points field (which still carries forward prior-round totals
+    // until archiveRound() has been run for the round boundary).
+    let communityPts = 0;
+    try {
+      const cpSnap = await getDocs(q(col(db, 'wac_community_pts'), where('uid', '==', uid), where('round', '==', CURRENT_ROUND)));
+      communityPts = cpSnap.docs.reduce((a, d) => a + (d.data().pts || 0), 0);
+    } catch (e) { communityPts = 0; }
+    const totalPts = postPts + engPts + communityPts;
 
     // Tracker-based post count
     const trackerData = trackerSnap.exists() ? trackerSnap.data() : {};
@@ -5881,6 +5896,10 @@ async function submitUpdate() {
   if (url && !/^https?:\/\//i.test(url)) url = "https://" + url;
   if (isRoundOver()) { showToast("Round has ended."); return; }
 
+  const _btn = document.getElementById("submit-update-btn");
+  const _btnOriginalText = _btn ? _btn.textContent : "";
+  if (_btn) { _btn.disabled = true; _btn.textContent = "Submitting..."; _btn.style.opacity = "0.7"; }
+
   const isTrial = trialIdx !== -1;
   const weekIdx = getWeekIndex();
   const now = Date.now();
@@ -5891,7 +5910,7 @@ async function submitUpdate() {
     const deadline = getWeekDeadline(weekIdx);
     isLate = now > deadline;
     const lateWindow = deadline + (24 * 60 * 60 * 1000);
-    if (isLate && now > lateWindow) { showToast("Submission window has closed for this week."); return; }
+    if (isLate && now > lateWindow) { showToast("Submission window has closed for this week."); _resetSubmitBtn(_btn, _btnOriginalText); return; }
   }
 
   // Check weekly limit (trial: 1 per trial week; round: normal required count)
@@ -5903,7 +5922,7 @@ async function submitUpdate() {
         where("authorUid", "==", currentUser.uid),
         where("trialWeekIdx", "==", trialIdx));
       const tsnap = await getDocs(tq);
-      if (tsnap.size >= 1) { showToast("You've already submitted for this trial week."); return; }
+      if (tsnap.size >= 1) { showToast("You've already submitted for this trial week."); _resetSubmitBtn(_btn, _btnOriginalText); return; }
       // Trial weeks are 1-per-week, so challenge dedup isn't needed here.
     } else {
       const required = WEEKS[weekIdx].required;
@@ -5912,7 +5931,7 @@ async function submitUpdate() {
         where("weekIdx", "==", weekIdx),
         where("round", "==", CURRENT_ROUND));
       const snap = await getDocs(q);
-      if (snap.size >= required) { showToast(`You've already submitted ${required} update(s) this week.`); return; }
+      if (snap.size >= required) { showToast(`You've already submitted ${required} update(s) this week.`); _resetSubmitBtn(_btn, _btnOriginalText); return; }
       challengeAlreadyClaimed = snap.docs.some(d => d.data().challengeCompleted === true);
     }
 
@@ -5970,10 +5989,20 @@ async function submitUpdate() {
     loadMySubmissions();
     updatePtsPreview();
     refreshChallengeAvailability();
+    if (typeof loadDashboard === "function") loadDashboard();
   } catch (e) {
     console.error("submitUpdate error:", e);
     showToast("Failed to submit update.");
+  } finally {
+    _resetSubmitBtn(_btn, _btnOriginalText);
   }
+}
+
+function _resetSubmitBtn(btn, originalText) {
+  if (!btn) return;
+  btn.disabled = false;
+  btn.textContent = originalText;
+  btn.style.opacity = "";
 }
 
 // ==============================
@@ -8120,7 +8149,7 @@ window.switchComposeTab = switchComposeTab;
 async function logCommunityPts(uid, name, action, pts) {
   try {
     await addDoc(collection(db, 'wac_community_pts'), {
-      uid, name, action, pts, ts: Date.now()
+      uid, name, action, pts, round: CURRENT_ROUND, ts: Date.now()
     });
   } catch(e) { console.warn('logCommunityPts failed:', e.message); }
 }
@@ -8854,7 +8883,7 @@ window.backfillRoundTags = async function() {
     for (const d of snap.docs) {
       const data = d.data();
       if (data.round) { report[collName].skipped++; continue; }
-      const ts = typeof data.timestamp === "number" ? data.timestamp : 0;
+      const ts = typeof data.timestamp === "number" ? data.timestamp : (typeof data.ts === "number" ? data.ts : 0);
       const roundTag = ts >= ROUND2_START ? CURRENT_ROUND : "R1";
       try {
         await updateDoc(doc(db, collName, d.id), { round: roundTag });
@@ -8885,6 +8914,40 @@ function renderBackfillReport(report, collections) {
     return line;
   }).join("");
 }
+
+// One-time correction: an earlier version of backfillRoundTags read the wrong
+// timestamp field on wac_community_pts docs (they use `ts`, not `timestamp`),
+// so every untagged doc defaulted to ts=0 and was mistagged "R1" regardless of
+// when it actually happened. This re-examines only docs currently tagged "R1"
+// in wac_community_pts and re-tags anything on/after the Round 2 start as R2.
+// Safe to re-run; a no-op once everything is corrected.
+window.fixCommunityPtsRoundTags = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  if (!confirm("Re-check wac_community_pts docs tagged R1 and fix any that actually belong to R2 (based on their `ts` field)?")) return;
+
+  const statusEl = document.getElementById("round-tag-backfill-status");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Checking wac_community_pts tags...";
+
+  const ROUND2_START = WEEK_SCHEDULE[0][0];
+  try {
+    const snap = await getDocs(query(collection(db, "wac_community_pts"), where("round", "==", "R1")));
+    let fixed = 0, checked = 0;
+    for (const d of snap.docs) {
+      checked++;
+      const ts = typeof d.data().ts === "number" ? d.data().ts : 0;
+      if (ts >= ROUND2_START) {
+        await updateDoc(doc(db, "wac_community_pts", d.id), { round: CURRENT_ROUND });
+        fixed++;
+      }
+    }
+    statusEl.textContent = `Checked ${checked} R1-tagged docs, corrected ${fixed} to ${CURRENT_ROUND}.`;
+    showToast(`Corrected ${fixed} mistagged community points doc(s).`);
+  } catch (e) {
+    statusEl.textContent = `Error: ${e.message}`;
+    showToast("Correction failed: " + e.message);
+  }
+};
 
 // Cache of last sweep results, used by fixAllSweepMismatches.
 let _sweepResults = [];
@@ -9290,6 +9353,109 @@ window.archiveRound = async function() {
     showToast("Archive failed: " + e.message);
   }
 };
+// ONE-TIME CATCH-UP: Round 1 was never archived before CURRENT_ROUND was
+// flipped to R2 at launch. registry.points has been carrying the full R1
+// total forward ever since, and any R2 points already earned (before the
+// round-scoping fix shipped) are sitting on top of that same field. This:
+//   1. Archives each member's true R1 total (round-tagged submissions +
+//      engagements + wac_community_pts) to wac_round_archives as "R1" —
+//      NOT via archiveRound(), which would mislabel it CURRENT_ROUND ("R2").
+//   2. Sets registry.points to their actual R2-only sum (not zero), so any
+//      legitimately earned R2 points survive. totalPosts is set to their R2
+//      submission count. lifetimePoints is never touched.
+// Requires the round field to already exist on activity docs — run
+// Backfill Round Tags (and Fix Community Pts Tags) first.
+window.catchUpArchiveR1AndFixR2Points = async function() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  if (!confirm("One-time catch-up: archive true R1 totals, then reset registry.points to each member's actual R2-only total (preserving any R2 points already earned)?\n\nThis writes to wac_round_archives and updates wac_registry.")) return;
+  if (!confirm("Are you sure? This cannot be undone.")) return;
+
+  const statusEl = document.getElementById("archive-round-status");
+  statusEl.style.display = "block";
+  statusEl.textContent = "Running catch-up...";
+
+  try {
+    const [regSnap, r2SubsSnap, r2EngsSnap, r2CpSnap, r1SubsSnap, r1EngsSnap, r1CpSnap] = await Promise.all([
+      getDocs(collection(db, "wac_registry")),
+      getDocs(query(collection(db, "submissions"), where("round", "==", CURRENT_ROUND))),
+      getDocs(query(collection(db, "engagements"), where("round", "==", CURRENT_ROUND))),
+      getDocs(query(collection(db, "wac_community_pts"), where("round", "==", CURRENT_ROUND))),
+      getDocs(query(collection(db, "submissions"), where("round", "==", "R1"))),
+      getDocs(query(collection(db, "engagements"), where("round", "==", "R1"))),
+      getDocs(query(collection(db, "wac_community_pts"), where("round", "==", "R1"))),
+    ]);
+
+    const sumByUid = (snap, uidField) => {
+      const map = {};
+      snap.docs.forEach(d => {
+        const data = d.data();
+        const uid = data[uidField];
+        if (!uid) return;
+        map[uid] = (map[uid] || 0) + (data.pts || 0);
+      });
+      return map;
+    };
+    const countByUid = (snap, uidField) => {
+      const map = {};
+      snap.docs.forEach(d => {
+        const uid = d.data()[uidField];
+        if (!uid) return;
+        map[uid] = (map[uid] || 0) + 1;
+      });
+      return map;
+    };
+
+    const r2SubPts = sumByUid(r2SubsSnap, "authorUid");
+    const r2EngPts = sumByUid(r2EngsSnap, "authorUid");
+    const r2CpPts = sumByUid(r2CpSnap, "uid");
+    const r2SubCount = countByUid(r2SubsSnap, "authorUid");
+
+    const r1SubPts = sumByUid(r1SubsSnap, "authorUid");
+    const r1EngPts = sumByUid(r1EngsSnap, "authorUid");
+    const r1CpPts = sumByUid(r1CpSnap, "uid");
+    const r1SubCount = countByUid(r1SubsSnap, "authorUid");
+
+    const archivedAt = Date.now();
+    let archived = 0, updated = 0, failed = 0, firstError = "";
+
+    for (const d of regSnap.docs) {
+      const uid = d.id;
+      const data = d.data();
+      const r1Total = (r1SubPts[uid] || 0) + (r1EngPts[uid] || 0) + (r1CpPts[uid] || 0);
+      const r2Total = (r2SubPts[uid] || 0) + (r2EngPts[uid] || 0) + (r2CpPts[uid] || 0);
+
+      try {
+        // Only archive members who actually had R1 activity or a nonzero
+        // legacy points balance — skip brand-new R2-only members.
+        if (r1Total > 0 || (typeof data.points === "number" && data.points > 0 && r2Total === 0)) {
+          await setDoc(doc(db, "wac_round_archives", `R1_${uid}`), {
+            uid, name: data.name || "",
+            points: r1Total > 0 ? r1Total : (data.points || 0),
+            totalPosts: r1SubCount[uid] || 0,
+            round: "R1",
+            archivedAt,
+          });
+          archived++;
+        }
+        await updateDoc(doc(db, "wac_registry", uid), {
+          points: r2Total,
+          totalPosts: r2SubCount[uid] || 0,
+        });
+        updated++;
+      } catch (e) {
+        failed++;
+        if (!firstError) firstError = e.message;
+      }
+    }
+
+    statusEl.textContent = `Done — archived ${archived} R1 total(s), reset ${updated} member(s) to their real R2 points.` + (failed ? ` ${failed} failed (${firstError}).` : "");
+    showToast(failed ? `Catch-up finished with ${failed} failure(s).` : "Catch-up complete — points now reflect Round 2 only.");
+  } catch (e) {
+    statusEl.textContent = `Error: ${e.message}`;
+    showToast("Catch-up failed: " + e.message);
+  }
+};
+
 window.deleteAllTrialSubmissions = async function() {
   if (!currentUser || !currentUser.isAdmin) return;
   const first = confirm("Delete ALL trial submissions for all members?\n\nThis permanently removes every Firestore document in 'submissions' where isTrial is true.");
