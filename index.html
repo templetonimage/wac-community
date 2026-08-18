@@ -5909,7 +5909,8 @@ async function submitUpdate() {
       const required = WEEKS[weekIdx].required;
       const q = query(collection(db, "submissions"),
         where("authorUid", "==", currentUser.uid),
-        where("weekIdx", "==", weekIdx));
+        where("weekIdx", "==", weekIdx),
+        where("round", "==", CURRENT_ROUND));
       const snap = await getDocs(q);
       if (snap.size >= required) { showToast(`You've already submitted ${required} update(s) this week.`); return; }
       challengeAlreadyClaimed = snap.docs.some(d => d.data().challengeCompleted === true);
@@ -5930,6 +5931,7 @@ async function submitUpdate() {
     await addDoc(collection(db, "submissions"), {
       author: currentUser.name,
       authorUid: currentUser.uid,
+      round: CURRENT_ROUND,
       weekIdx,
       weekLabel,
       ...(isTrial ? { isTrial: true, trialWeekIdx: trialIdx } : {}),
@@ -5988,7 +5990,8 @@ async function getWeeklyEngCount() {
   try {
     const q = query(collection(db, "engagements"),
       where("authorUid", "==", currentUser.uid),
-      where("weekIdx", "==", weekIdx));
+      where("weekIdx", "==", weekIdx),
+      where("round", "==", CURRENT_ROUND));
     const snap = await getDocs(q);
     return snap.size;
   } catch { return 0; }
@@ -6012,6 +6015,7 @@ async function submitEngagement() {
     await addDoc(collection(db, "engagements"), {
       author: currentUser.name,
       authorUid: currentUser.uid,
+      round: CURRENT_ROUND,
       weekIdx,
       targetUrl: url,
       note,
@@ -8826,7 +8830,8 @@ window.resetAllPoints = async function() {
 // filter Round 1 activity by round.
 window.backfillRoundTags = async function() {
   if (!currentUser || !currentUser.isAdmin) return;
-  if (!confirm(`Tag all untagged activity docs with round:"${CURRENT_ROUND}"?\n\nOnly touches docs missing a round field. Safe to re-run.`)) return;
+  const splitDateStr = new Date(WEEK_SCHEDULE[0][0]).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
+  if (!confirm(`Tag untagged activity docs by timestamp: before ${splitDateStr} → R1, on/after → ${CURRENT_ROUND}?\n\nOnly touches docs missing a round field. Safe to re-run.`)) return;
 
   const statusEl = document.getElementById("round-tag-backfill-status");
   statusEl.style.display = "block";
@@ -8834,6 +8839,7 @@ window.backfillRoundTags = async function() {
 
   const collections = ["submissions", "engagements", "posts", "wac_community_pts", "expert_reviews"];
   const report = {}; // collName -> { tagged, skipped, failed, firstError }
+  const ROUND2_START = WEEK_SCHEDULE[0][0]; // Aug 1, 2026 04:00 UTC — anything before this is prior-round activity
 
   for (const collName of collections) {
     report[collName] = { tagged: 0, skipped: 0, failed: 0, firstError: "" };
@@ -8846,9 +8852,12 @@ window.backfillRoundTags = async function() {
       continue;
     }
     for (const d of snap.docs) {
-      if (d.data().round) { report[collName].skipped++; continue; }
+      const data = d.data();
+      if (data.round) { report[collName].skipped++; continue; }
+      const ts = typeof data.timestamp === "number" ? data.timestamp : 0;
+      const roundTag = ts >= ROUND2_START ? CURRENT_ROUND : "R1";
       try {
-        await updateDoc(doc(db, collName, d.id), { round: CURRENT_ROUND });
+        await updateDoc(doc(db, collName, d.id), { round: roundTag });
         report[collName].tagged++;
       } catch (e) {
         report[collName].failed++;
