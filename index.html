@@ -3756,6 +3756,10 @@ const FIREBASE_CONFIG = {
 // CONSTANTS
 // ==============================
 const ADMIN_EMAIL   = "nate@templetonimage.com";
+// Bump this any time a server-side change (round switch, points recompute,
+// registry field fix) needs every cached localStorage session invalidated
+// on next load, forcing a fresh Firestore read instead of stale local data.
+const SESSION_CACHE_VERSION = 2;
 const CURRENT_ROUND = "R2";
 
 const PTS_ON_TIME   = 10;
@@ -4204,6 +4208,11 @@ onAuthStateChanged(auth, async (user) => {
   if (saved && saved.isAdmin && saved.name !== "Nate Templeton") {
     localStorage.removeItem("wac_session");
   }
+  // Cache version bump: force a fresh Firestore read whenever server-side
+  // data (round switch, points recompute) invalidates local session caches.
+  if (saved && saved._cacheVersion !== SESSION_CACHE_VERSION) {
+    localStorage.removeItem("wac_session");
+  }
 
   // Try session restore
   const validSaved = lsGet("wac_session");
@@ -4219,6 +4228,7 @@ onAuthStateChanged(auth, async (user) => {
         return;
       }
       currentUser = resolved;
+      currentUser._cacheVersion = SESSION_CACHE_VERSION;
       lsSet("wac_session", currentUser);
     } catch (e) {
       console.error("Auth resolve error:", e);
