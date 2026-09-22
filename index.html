@@ -2402,6 +2402,17 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <button class="btn btn-outline btn-sm" style="flex-shrink:0;" onclick="navTo('pro')">Learn More</button>
         </div>
       </div>
+      <!-- AMBASSADOR PROOF CARD (restarted members who haven't submitted proof yet) -->
+      <div id="dash-ambassador-card" class="dash-animate" style="display:none;animation-delay:0.2s;background:linear-gradient(135deg,rgba(184,134,11,0.1),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:22px;flex-shrink:0;">📣</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:13px;color:var(--text);">Add your Ambassador post</div>
+            <div style="font-size:11.5px;color:var(--text-muted);margin-top:1px;">+25 pts and a badge. Proof closes Sep 30.</div>
+          </div>
+          <button class="btn btn-gold btn-sm" style="flex-shrink:0;" onclick="openProofUpload()">Add Proof</button>
+        </div>
+      </div>
       <!-- COWORKING RSVP CARD (shown when active session exists) -->
       <div id="cowork-card" class="dash-animate" style="display:none;animation-delay:0.18s;background:linear-gradient(135deg,rgba(184,134,11,0.07),var(--surface));border:1.5px solid var(--gold);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;">
         <div style="display:flex;align-items:center;gap:14px;">
@@ -3716,6 +3727,38 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   </div>
 </div>
 
+<!-- RESTART MODAL -->
+<div class="modal-overlay" id="restart-modal-overlay" onclick="closeRestartModalDirect(event)">
+  <div class="modal-sheet" style="max-width:480px;">
+    <div class="modal-header">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">Welcome Back</div>
+      <button class="modal-close" onclick="closeRestartModal()">✕</button>
+    </div>
+    <div style="padding:0 20px 20px;">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:var(--text);margin-bottom:4px;">Let's restart WAC</div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">Your access is complimentary through December 31. One click and you're back in.</div>
+      <button class="btn btn-gold btn-block" style="margin-bottom:10px;" onclick="restartAccount(false)">Restart (+10 pts)</button>
+      <button class="btn btn-outline btn-block" onclick="restartAccount(true)">Restart + Add Ambassador Proof</button>
+      <div id="restart-proof-note" style="display:none;font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.5;">Post about WAC linking joinwac.com, tag @jointheacc, then upload a screenshot for +25 pts and the Ambassador badge. Proof closes Sep 30.</div>
+    </div>
+  </div>
+</div>
+
+<!-- AMBASSADOR PROOF UPLOAD -->
+<div class="modal-overlay" id="ambassador-proof-overlay">
+  <div class="modal-sheet" style="max-width:480px;">
+    <div class="modal-header">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">Ambassador Proof</div>
+      <button class="modal-close" onclick="closeProofUpload()">✕</button>
+    </div>
+    <div style="padding:0 20px 20px;">
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">Make a Feed post about WAC linking joinwac.com (or share the graphic), tag @jointheacc, then upload a screenshot of the live post. Keep it live through Oct 1, then delete or archive it if you like.</div>
+      <input type="file" id="ambassador-proof-file" accept="image/*" style="margin-bottom:14px;" />
+      <button class="btn btn-gold btn-block" id="ambassador-proof-submit-btn" onclick="submitAmbassadorProof()">Submit Proof</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -3759,7 +3802,7 @@ const ADMIN_EMAIL   = "nate@templetonimage.com";
 // Bump this any time a server-side change (round switch, points recompute,
 // registry field fix) needs every cached localStorage session invalidated
 // on next load, forcing a fresh Firestore read instead of stale local data.
-const SESSION_CACHE_VERSION = 2;
+const SESSION_CACHE_VERSION = 3;
 const CURRENT_ROUND = "R2";
 
 const PTS_ON_TIME   = 10;
@@ -4179,6 +4222,10 @@ async function resolveUser(user) {
     proSince: d.proSince || null,
     proExpiry: d.proExpiry || null,
     trialUntil: d.trialUntil || null,
+    restartedAt: d.restartedAt || null,
+    restartAccessThroughUTC: d.restartAccessThroughUTC || null,
+    ambassadorBadge: d.ambassadorBadge || false,
+    ambassadorProofSubmittedAt: d.ambassadorProofSubmittedAt || null,
   };
 }
 
@@ -4368,6 +4415,7 @@ function bootApp() {
   setTimeout(initPushNotifications, 1000);
   setTimeout(checkRoundEnd, 300);
   setTimeout(maybeShowRoundWelcomeModal, 350);
+  setTimeout(maybeShowRestartModal, 400);
   setTimeout(checkProNotifications, 2000);
   setTimeout(checkRERNotification, 2500);
 
@@ -4585,6 +4633,7 @@ window.loadDashboard = async function() {
   if (!currentUser) return;
 
   renderRenewalDashCards();
+  renderRestartProofCard();
 
   // Reset animations so they replay on every visit
   document.querySelectorAll('#page-dashboard .dash-animate').forEach(el => {
@@ -5265,7 +5314,7 @@ async function submitPVR() {
   if (!url) { showToast("Enter the page URL."); return; }
   if (!/^https?:\/\//i.test(url)) url = "https://" + url;
   if (!prompt) { showToast("Describe the feedback you're looking for."); return; }
-  if (isRoundOver()) { showToast("Round has ended."); return; }
+  if (isRoundOver() && !hasActiveAccess()) { showToast("Round has ended."); return; }
   const weekIdx = getWeekIndex();
   const count = await getWeeklyPVRCount();
   if (count >= 1) { showToast("One Peer Review Request per week."); return; }
@@ -5327,7 +5376,7 @@ async function submitPVRReply(postId, postAuthorUid) {
   const text = input ? input.value.trim() : "";
   if (!text) { showToast("Write your feedback first."); return; }
   if (postAuthorUid === currentUser.uid) { showToast("You can't reply to your own request."); return; }
-  if (isRoundOver()) { showToast("Round has ended."); return; }
+  if (isRoundOver() && !hasActiveAccess()) { showToast("Round has ended."); return; }
 
   // Check weekly engagement cap
   const engCount = await getWeeklyEngCount();
@@ -5904,7 +5953,7 @@ async function submitUpdate() {
   }
 
   if (url && !/^https?:\/\//i.test(url)) url = "https://" + url;
-  if (isRoundOver()) { showToast("Round has ended."); return; }
+  if (isRoundOver() && !hasActiveAccess()) { showToast("Round has ended."); return; }
 
   const _btn = document.getElementById("submit-update-btn");
   const _btnOriginalText = _btn ? _btn.textContent : "";
@@ -6042,7 +6091,7 @@ async function submitEngagement() {
   if (!_selectedEngType) { showToast("Select engagement type."); return; }
   const isTrial = getTrialWeekIndex() !== -1;
   if (!isTrial && !_engScreenshotData) { showToast("A screenshot is required."); return; }
-  if (isRoundOver()) { showToast("Round has ended."); return; }
+  if (isRoundOver() && !hasActiveAccess()) { showToast("Round has ended."); return; }
 
   const count = await getWeeklyEngCount();
   if (count >= MAX_ENG_PER_WEEK) { showToast(`Max ${MAX_ENG_PER_WEEK} engagements per week.`); return; }
@@ -6386,6 +6435,7 @@ async function loadLeaderboard() {
       if (m.isFounder) badges.push("🏅");
       if (m.isExpert) badges.push("🎯");
       if (m.isVIP) badges.push("⚡");
+      if (m.ambassadorBadge) badges.push("📣");
       const milestone = getMilestoneBadges(m.totalPosts || 0);
       const initials = getInitials(m.name);
       const lbAvatarContent = m.photoURL
@@ -6431,15 +6481,30 @@ async function loadDirectory() {
   await renderMemberGrid();
 }
 
+let _adminRestartFilterOn = false;
+function toggleAdminRestartFilter() {
+  _adminRestartFilterOn = !_adminRestartFilterOn;
+  renderAdminRegistry();
+}
+window.toggleAdminRestartFilter = toggleAdminRestartFilter;
+
 async function renderAdminRegistry() {
   try {
     const snap = await getDocs(collection(db, "wac_registry"));
-    const all = [];
+    let all = [];
     snap.forEach(d => all.push(sanitizeMember({ id: d.id, ...d.data() })));
     all.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 
+    const restartedCount = all.filter(m => m.restartedAt).length;
+    const proofCount = all.filter(m => m.ambassadorProofSubmittedAt).length;
+    if (_adminRestartFilterOn) all = all.filter(m => m.restartedAt);
+
     const el = document.getElementById("admin-registry");
-    el.innerHTML = `<div class="card"><div class="card-title">Full Registry — ${all.length} member${all.length !== 1 ? "s" : ""} · Round ${CURRENT_ROUND.replace("R","")} active</div>` +
+    el.innerHTML = `<div class="card"><div class="card-title">Full Registry — ${all.length} member${all.length !== 1 ? "s" : ""} · Round ${CURRENT_ROUND.replace("R","")} active</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span>🔁 ${restartedCount} restarted · 📣 ${proofCount} proof submitted</span>
+        <button onclick="toggleAdminRestartFilter()" style="${_adminRestartFilterOn ? "background:rgba(184,134,11,0.12);border-color:var(--gold);color:var(--gold-dark);font-weight:600;" : ""}">${_adminRestartFilterOn ? "✓ Showing restarted only" : "Show restarted only"}</button>
+      </div>` +
       all.map(m => {
         const docId = m.id || m.uid || "";
         const rounds = (m.rounds || []).join(", ");
@@ -6455,6 +6520,8 @@ async function renderAdminRegistry() {
             ${m.isExpert ? `<span style="font-size:10px;background:rgba(184,134,11,0.12);color:var(--gold-dark);padding:1px 6px;border-radius:4px;font-weight:700;">🎯 Expert</span>` : ""}
             ${m.isVIP ? `<span style="font-size:10px;background:#e8f4fd;color:#2980b9;padding:1px 6px;border-radius:4px;font-weight:700;">⚡ VIP</span>` : ""}
             ${m.isAllStar ? `<span style="font-size:10px;background:#fffbf0;color:var(--gold-dark);padding:1px 6px;border-radius:4px;font-weight:700;">⭐ All-Star</span>` : ""}
+            ${m.restartedAt ? `<span style="font-size:10px;background:#fffbf0;color:var(--gold-dark);padding:1px 6px;border-radius:4px;font-weight:700;">🔁 Restarted</span>` : ""}
+            ${m.ambassadorBadge ? `<span style="font-size:10px;background:#fffbf0;color:var(--gold-dark);padding:1px 6px;border-radius:4px;font-weight:700;">📣 Ambassador</span>` : ""}
             ${proBadgeHtml}${trialHtml}
           </div>
           <div class="text-sm text-muted" style="margin-bottom:6px;">
@@ -6477,6 +6544,7 @@ async function renderAdminRegistry() {
             <button onclick="editRegistryName('${docId}','${esc(m.name)}')">✏️ Name</button>
             <button onclick="toggleProAccess('${docId}',${!!m.isPro})" style="${m.isPro ? "background:#fffbf0;border-color:var(--gold);color:var(--gold-dark);font-weight:600;" : ""}">${m.isPro ? "★ Remove Pro" : "★ Grant Pro"}</button>
             <button onclick="setTrialAccess('${docId}','${esc(m.name)}')">⏱ Trial Access</button>
+            ${m.ambassadorBadge ? `<button onclick="revokeAmbassadorProof('${docId}','${esc(m.name)}')" style="color:var(--danger);">🚫 Revoke Ambassador</button>` : ""}
             <button onclick="removeRegistryMember('${docId}','${esc(m.name)}')" style="color:var(--danger);">✕ Remove</button>
           </div>
         </div>`;
@@ -6541,6 +6609,7 @@ async function openMemberProfile(member) {
   if (member.isAllStar) badges.push("⭐ All-Star");
   if (member.isFounder) badges.push("🏅 Founder");
   if (member.isVIP) badges.push("⚡ VIP");
+  if (member.ambassadorBadge) badges.push("📣 Ambassador");
   const milestone = getMilestoneBadges(member.totalPosts || 0);
 
   // Load tracker data
@@ -6768,6 +6837,25 @@ async function toggleRegistryFlag(docId, flag) {
   } catch { showToast("Failed to update."); }
 }
 
+async function revokeAmbassadorProof(docId, name) {
+  if (!confirm(`Revoke ${name}'s Ambassador badge and remove the 25 pts?`)) return;
+  try {
+    const ref = doc(db, "wac_registry", docId);
+    const snap = await getDoc(ref);
+    if (!snap.exists() || !snap.data().ambassadorBadge) { showToast("Nothing to revoke."); loadDirectory(); return; }
+    await updateDoc(ref, {
+      ambassadorBadge: false,
+      ambassadorProofUrl: "",
+      ambassadorProofSubmittedAt: null,
+      points: increment(-25),
+      lifetimePoints: increment(-25)
+    });
+    showToast(`Revoked Ambassador badge for ${name}.`);
+    loadDirectory();
+  } catch { showToast("Failed to revoke."); }
+}
+window.revokeAmbassadorProof = revokeAmbassadorProof;
+
 async function removeRegistryMember(docId, name) {
   if (!confirm(`Remove ${name} from registry?`)) return;
   try {
@@ -6929,6 +7017,7 @@ function renderProfileHero() {
   if (currentUser.isAllStar) badges.push("⭐ All-Star");
   if (currentUser.isFounder) badges.push("🏅 Founder");
   if (currentUser.isVIP) badges.push("⚡ VIP");
+  if (currentUser.ambassadorBadge) badges.push("📣 Ambassador");
   if (currentUser.isAdmin) badges.push("👑 Admin");
   if (userHasPro() && !currentUser.isAdmin) badges.push("★ Pro");
   const milestone = getMilestoneBadges(currentUser.totalPosts || 0);
@@ -7218,6 +7307,7 @@ function isRoundOver() { return Date.now() > ROUND_END_TS; }
 
 function checkRoundEnd() {
   if (!isRoundOver()) return;
+  if (currentUser && hasActiveAccess()) return; // restarted member — round-end gate doesn't apply
   const banner = document.getElementById("round-ended-banner");
   if (banner) banner.style.display = "flex";
   document.querySelectorAll('#page-submit .btn-post, #eng-submit-btn').forEach(btn => {
@@ -7226,6 +7316,176 @@ function checkRoundEnd() {
     btn.style.opacity = "0.5";
   });
 }
+
+// ==============================
+// RESTART (Oct 1 comeback — TAC Co. restart pack)
+// ==============================
+// Window: opens Sep 23, restart stays open through Oct 1. Proof (Ambassador
+// bonus) closes Sep 30 11:59pm ET, a day before restart itself closes.
+const RESTART_OPEN_UTC = Date.UTC(2026, 8, 23, 4, 0, 0);   // Sep 23, 2026 12:00am ET
+const PROOF_CLOSE_UTC = Date.UTC(2026, 9, 1, 3, 59, 0);    // Sep 30, 2026 11:59pm ET
+const RESTART_CLOSE_UTC = Date.UTC(2026, 9, 2, 3, 59, 0);  // Oct 1, 2026 11:59pm ET
+// Complimentary access granted on restart, independent of ROUND_END_TS.
+const RESTART_COMP_ACCESS_THROUGH_UTC = Date.UTC(2026, 11, 31, 4, 59, 59, 999); // Dec 31, 2026 11:59:59pm ET
+
+function isRestartWindowOpen() {
+  return Date.now() >= RESTART_OPEN_UTC && Date.now() < RESTART_CLOSE_UTC;
+}
+
+function isProofWindowOpen() {
+  return Date.now() >= RESTART_OPEN_UTC && Date.now() < PROOF_CLOSE_UTC;
+}
+
+// Complimentary access from a restart overrides the normal round-end gate.
+function hasActiveAccess() {
+  if (!isRoundOver()) return true;
+  if (currentUser && currentUser.restartAccessThroughUTC && Date.now() < currentUser.restartAccessThroughUTC) return true;
+  return false;
+}
+
+function maybeShowRestartModal() {
+  if (!currentUser || currentUser.isAdmin) return;
+  const bypass = new URLSearchParams(location.search).get("testRestart") === "1";
+  if (!bypass && !isRestartWindowOpen()) return;
+  // Lapsed/paused = not enrolled in the current round.
+  if ((currentUser.rounds || []).includes(CURRENT_ROUND)) return;
+  if (currentUser.restartedAt) return;
+  openRestartModal();
+}
+
+async function restartAccount(withProof) {
+  if (!currentUser || currentUser.restartedAt) {
+    if (withProof) openProofUpload(); else closeRestartModal();
+    return;
+  }
+  try {
+    // Re-check the live doc immediately before writing — refresh/double-click safe.
+    const regRef = doc(db, "wac_registry", currentUser.uid);
+    const snap = await getDoc(regRef);
+    if (snap.exists() && snap.data().restartedAt) {
+      currentUser.restartedAt = snap.data().restartedAt;
+      currentUser.restartAccessThroughUTC = snap.data().restartAccessThroughUTC || null;
+      lsSet("wac_session", currentUser);
+      if (withProof) openProofUpload(); else closeRestartModal();
+      return;
+    }
+    const now = Date.now();
+    await updateDoc(regRef, {
+      restartedAt: now,
+      restartAccessThroughUTC: RESTART_COMP_ACCESS_THROUGH_UTC,
+      rounds: arrayUnion(CURRENT_ROUND),
+      points: increment(10),
+      lifetimePoints: increment(10)
+    });
+    await addDoc(collection(db, "wac_community_pts"), {
+      uid: currentUser.uid,
+      name: currentUser.name,
+      type: "restart",
+      pts: 10,
+      round: CURRENT_ROUND,
+      timestamp: now
+    });
+    currentUser.restartedAt = now;
+    currentUser.restartAccessThroughUTC = RESTART_COMP_ACCESS_THROUGH_UTC;
+    currentUser.rounds = [...(currentUser.rounds || []), CURRENT_ROUND];
+    currentUser.points = (currentUser.points || 0) + 10;
+    lsSet("wac_session", currentUser);
+    showToast("Welcome back! +10 pts. Access is on us through Dec 31.");
+    closeRestartModal();
+    if (withProof) setTimeout(openProofUpload, 300);
+  } catch (e) {
+    showToast("Couldn't restart: " + (e.code || e.message));
+  }
+}
+window.restartAccount = restartAccount;
+
+function openRestartModal() {
+  const overlay = document.getElementById("restart-modal-overlay");
+  if (overlay) overlay.classList.add("open");
+  const proofRow = document.getElementById("restart-proof-note");
+  if (proofRow) proofRow.style.display = isProofWindowOpen() ? "block" : "none";
+}
+window.openRestartModal = openRestartModal;
+
+function closeRestartModal() {
+  const overlay = document.getElementById("restart-modal-overlay");
+  if (overlay) overlay.classList.remove("open");
+}
+window.closeRestartModal = closeRestartModal;
+
+function closeRestartModalDirect(e) {
+  if (e.target === document.getElementById("restart-modal-overlay")) closeRestartModal();
+}
+window.closeRestartModalDirect = closeRestartModalDirect;
+
+// Dashboard card for members who restarted but haven't submitted proof yet.
+function renderRestartProofCard() {
+  const card = document.getElementById("dash-ambassador-card");
+  if (!card) return;
+  const show = !!(currentUser && currentUser.restartedAt && !currentUser.ambassadorProofSubmittedAt && isProofWindowOpen());
+  card.style.display = show ? "block" : "none";
+}
+
+async function submitAmbassadorProof() {
+  if (!currentUser || currentUser.ambassadorProofSubmittedAt) return;
+  if (!isProofWindowOpen()) { showToast("Proof uploads have closed."); return; }
+  const fileInput = document.getElementById("ambassador-proof-file");
+  const file = fileInput && fileInput.files[0];
+  if (!file) { showToast("Choose a screenshot first."); return; }
+  const btn = document.getElementById("ambassador-proof-submit-btn");
+  if (btn) { btn.disabled = true; btn.textContent = "Uploading..."; }
+  try {
+    const regRef = doc(db, "wac_registry", currentUser.uid);
+    const snap = await getDoc(regRef);
+    if (snap.exists() && snap.data().ambassadorProofSubmittedAt) {
+      showToast("Already submitted.");
+      closeProofUpload();
+      return;
+    }
+    const proofUrl = await compressImage(file);
+    const now = Date.now();
+    await updateDoc(regRef, {
+      ambassadorProofUrl: proofUrl,
+      ambassadorProofSubmittedAt: now,
+      ambassadorBadge: true,
+      points: increment(25),
+      lifetimePoints: increment(25)
+    });
+    await addDoc(collection(db, "wac_community_pts"), {
+      uid: currentUser.uid,
+      name: currentUser.name,
+      type: "restart_ambassador",
+      pts: 25,
+      round: CURRENT_ROUND,
+      timestamp: now
+    });
+    currentUser.ambassadorProofUrl = proofUrl;
+    currentUser.ambassadorProofSubmittedAt = now;
+    currentUser.ambassadorBadge = true;
+    currentUser.points = (currentUser.points || 0) + 25;
+    lsSet("wac_session", currentUser);
+    showToast("Proof received! +25 pts and your Ambassador badge.");
+    closeProofUpload();
+    renderRestartProofCard();
+  } catch (e) {
+    showToast("Couldn't submit proof: " + (e.code || e.message));
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "Submit Proof"; }
+  }
+}
+window.submitAmbassadorProof = submitAmbassadorProof;
+
+function openProofUpload() {
+  const overlay = document.getElementById("ambassador-proof-overlay");
+  if (overlay) overlay.classList.add("open");
+}
+window.openProofUpload = openProofUpload;
+
+function closeProofUpload() {
+  const overlay = document.getElementById("ambassador-proof-overlay");
+  if (overlay) overlay.classList.remove("open");
+}
+window.closeProofUpload = closeProofUpload;
 
 // ==============================
 // RENEWAL MODAL
