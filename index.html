@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
 <title>WAC — Website Accountability Challenge</title>
 <link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/x-icon" href="favicon.ico" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <meta name="theme-color" content="#c9a84c" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -2661,8 +2665,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div id="round-ended-banner" class="round-ended-banner" style="display:none;">
         <div class="round-ended-icon">🏁</div>
         <div>
-          <div class="round-ended-title">Round 1 Has Ended</div>
-          <div class="round-ended-sub">Submissions are closed. Thanks for an amazing 90 days!</div>
+          <div class="round-ended-title">Round Has Ended</div>
+          <div class="round-ended-sub">Submissions are closed. Thanks for an amazing round!</div>
         </div>
       </div>
       <div class="card">
@@ -2783,7 +2787,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     <div class="page" id="page-tracker">
       <div class="page-header">
         <div class="page-title">⭐ All-Star Tracker</div>
-        <div class="page-subtitle" id="tracker-page-subtitle">Your 12-week accountability record — May through July.</div>
+        <div class="page-subtitle" id="tracker-page-subtitle">Your accountability record for the round.</div>
       </div>
       <!-- April Free Trial section (local only) -->
       <div class="card mb-16" style="display:none;">
@@ -2798,7 +2802,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       </div>
       <div class="card mt-16" style="background:linear-gradient(135deg,var(--accent-bg),var(--surface));">
         <div class="card-title">⭐ WAC All-Star</div>
-        <p class="text-sm text-muted" id="allstar-card-copy">Complete all 12 weekly requirements across May, June, and July to earn All-Star status. That's 24 total updates over 90 days.</p>
+        <p class="text-sm text-muted" id="allstar-card-copy">Complete all 21 weekly requirements across August through December to earn All-Star status. That's 25 total updates over the round.</p>
       </div>
     </div>
 
@@ -3489,7 +3493,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div class="welcome-step"><span class="welcome-step-icon">🌐</span><span>Submit your updates — paste your URL each week after you update your site</span></div>
       <div class="welcome-step"><span class="welcome-step-icon">✅</span><span>Check your Tracker — mark weeks complete as you go</span></div>
       <div class="welcome-step"><span class="welcome-step-icon">🤝</span><span>Engage with members — visit and comment on other members' sites for +2 pts each</span></div>
-      <div class="welcome-step"><span class="welcome-step-icon">⭐</span><span>Earn All-Star status — complete every weekly requirement across all 12 weeks</span></div>
+      <div class="welcome-step"><span class="welcome-step-icon">⭐</span><span>Earn All-Star status — complete every weekly requirement, all round long</span></div>
     </div>
     <div class="welcome-footer">
       <button class="btn btn-gold btn-block" onclick="closeWelcomeModal()">Let's Go! 🚀</button>
@@ -3649,7 +3653,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <button class="modal-close" onclick="closeProUpgradeModal()">✕</button>
     </div>
     <div style="padding:20px;">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:28px;color:var(--text);margin-bottom:2px;">$75 <span style="font-size:13px;font-weight:500;color:var(--text-muted);">/ Round 2 · Aug–Oct 2026</span></div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:28px;color:var(--text);margin-bottom:2px;">$75 <span style="font-size:13px;font-weight:500;color:var(--text-muted);">/ Round 2 · Aug–Dec 2026</span></div>
       <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">One time charge for 90 day access with exclusive Pro tools equivalent to $25/mo. Unlocks Weekly Action Plan, Copy Assist, Streak Analytics, and SEO Screenshot Review.</div>
       <a href="https://buy.stripe.com/dRm3cv0Dh4IT3Pw0KBbo40e" target="_blank" rel="noopener" class="btn btn-gold btn-block" style="text-align:center;display:block;text-decoration:none;">★ Upgrade Now — $75</a>
       <div style="font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.5;">You'll be redirected to Stripe to complete payment. Pro access is activated on your account within 24 hours of payment.</div>
@@ -3686,7 +3690,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div class="card renewal-tile" style="margin-bottom:14px;">
         <div class="renewal-tile-label">WAC Base</div>
         <div class="renewal-tile-price">$55</div>
-        <div class="renewal-tile-sub">One-time fee for 90 days · ~$18/mo<br>Round 2 only · Aug–Oct 2026</div>
+        <div class="renewal-tile-sub">One-time fee · ~$18/mo<br>Round 2 only · Aug–Dec 2026</div>
         <a href="https://buy.stripe.com/4gM7sLclZcbl1Hoctjbo40i" target="_blank" rel="noopener" class="btn btn-outline btn-block" style="text-align:center;display:block;text-decoration:none;">Renew Base</a>
       </div>
 
@@ -3706,7 +3710,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <div class="renewal-bundle-option-price">$117</div>
             <div class="renewal-bundle-option-monthly">≈ $39/mo</div>
             <div class="renewal-bundle-option-sub">WAC Base · 3mo AAC</div>
-            <div class="renewal-bundle-option-sub">Aug–Oct 2026</div>
+            <div class="renewal-bundle-option-sub">Aug–Dec 2026</div>
             <div class="renewal-bundle-save">Save $19</div>
             <a href="https://buy.stripe.com/4gM9AT3Pt5MXdq6ctjbo40g" target="_blank" rel="noopener" class="btn btn-gold btn-block" style="text-align:center;display:block;text-decoration:none;">Choose Bundle</a>
           </div>
@@ -3715,7 +3719,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
             <div class="renewal-bundle-option-price">$137</div>
             <div class="renewal-bundle-option-monthly">≈ $45/mo</div>
             <div class="renewal-bundle-option-sub">WAC Pro · 3mo AAC</div>
-            <div class="renewal-bundle-option-sub">Aug–Oct 2026</div>
+            <div class="renewal-bundle-option-sub">Aug–Dec 2026</div>
             <div class="renewal-bundle-save">Save $19</div>
             <a href="https://buy.stripe.com/14AfZhbhV1wH4TA9h7bo40h" target="_blank" rel="noopener" class="btn btn-gold btn-block" style="text-align:center;display:block;text-decoration:none;">Choose Bundle</a>
           </div>
@@ -3839,7 +3843,16 @@ const WEEKLY_CHALLENGES = [
   { title: "Fix a Broken Link (Trust Signal)",          desc: "Click through your own site and find (and fix) at least one broken link, dead button, or outdated page. Broken paths quietly erode visitor Trust and hurt crawlability." },
   { title: "Add Fresh Social Proof (Authority Signal)", desc: "Add a new review, testimonial, or client shoutout with a name attached — even a screenshot of a DM or email counts if named. New, dated proof keeps your Authority signal current." },
   { title: "Optimize One Image Set (Experience Signal)", desc: "Compress, rename with descriptive filenames, and add alt text to the images on your most-visited page. Well-optimized, well-described images are concrete proof of hands-on Experience." },
-  { title: "Final Push — Any E-E-A-T Win",              desc: "Complete any meaningful update that strengthens your site's Experience, Expertise, Authority, or Trust. Finish the round strong — every improvement you've made this 90 days is a Google trust signal compounding in your favor." },
+  { title: "Momentum Check — Any E-E-A-T Win",          desc: "Complete any meaningful update that strengthens your site's Experience, Expertise, Authority, or Trust. Every improvement you've made so far is a Google trust signal compounding in your favor — keep it going." },
+  { title: "Update Your About Page (Trust Signal)",     desc: "Refresh your About/bio section with something current — a recent milestone, an updated headshot, or an honest line about what's changed this year. A stale bio reads as an inactive business; a current one builds Trust immediately." },
+  { title: "Publish a Case Study (Experience Signal)",  desc: "Turn one recent project into a short before/after or problem-solution writeup, even 3–4 sentences with a photo. Concrete, dated proof of results is the clearest Experience signal you can give both visitors and Google." },
+  { title: "Add a 'Who This Is For' Section (Expertise Signal)", desc: "Write a short section naming exactly who you serve best and what problem you solve for them. Specificity reads as Expertise; vague positioning reads as generic." },
+  { title: "Earn or Confirm a Backlink (Authority Signal)", desc: "Get listed in one local directory, vendor page, or partner site, or confirm an existing listing still links correctly. External sites linking to yours is one of the strongest Authority signals Google weighs." },
+  { title: "Check Your NAP Consistency (Trust Signal)", desc: "Confirm your Name, Address (or service area), and Phone number match exactly across your site, Google Business Profile, and any directories you're listed in. Inconsistent business info is a quiet Trust red flag for both visitors and search engines." },
+  { title: "Post a Timely Update (Experience Signal)",  desc: "Share something happening right now — current availability, a seasonal offer, year-end booking info, or recent work in progress. Timely, dated content is a direct Experience signal that your business is active today, not dormant." },
+  { title: "Add a Credentials or Press Mention (Expertise Signal)", desc: "Add any certification, feature, award, or press mention you haven't listed yet — even a small local write-up counts. Third-party recognition is one of the fastest ways to demonstrate Expertise." },
+  { title: "Get Tagged or Mentioned by Someone Else (Authority Signal)", desc: "Ask a recent client, collaborator, or vendor to tag you or link to your site from their own page or profile. Authority Google can verify from an outside source carries more weight than anything you say about yourself." },
+  { title: "Year-End Site Audit (Any E-E-A-T Win)",     desc: "Walk your site start to finish and fix the first thing that feels outdated, broken, or unclear — copy, a photo, a price, a dead link. Close out the year with one clean, deliberate improvement." },
 ];
 
 // WAC Pro launch flags — flip both to true at Pro launch
@@ -3898,7 +3911,7 @@ function getTrialExpiryStr() {
   return new Date(currentUser.trialUntil).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
 }
 
-const ROUND_END_TS = Date.UTC(2026, 10, 1, 3, 59, 59, 999); // Oct 31, 2026 11:59:59pm ET — Round 2 end
+const ROUND_END_TS = Date.UTC(2027, 0, 1, 4, 59, 59, 999); // Dec 31, 2026 11:59:59pm ET (EST, UTC-5) — Round 2 end, extended from Oct 31 as part of the Oct 1 restart pack
 
 const WEEK_SCHEDULE = [
   [Date.UTC(2026,7,1,4,0,0),   Date.UTC(2026,7,8,3,59,59,999)],   // W1  Aug 1–7
@@ -3913,6 +3926,17 @@ const WEEK_SCHEDULE = [
   [Date.UTC(2026,9,8,4,0,0),   Date.UTC(2026,9,15,3,59,59,999)],  // W10 Oct 8–14
   [Date.UTC(2026,9,15,4,0,0),  Date.UTC(2026,9,22,3,59,59,999)],  // W11 Oct 15–21
   [Date.UTC(2026,9,22,4,0,0),  Date.UTC(2026,10,1,3,59,59,999)],  // W12 Oct 22–31
+  // Nov 1, 2026 is itself still EDT (UTC-4) until the 2am DST changeover that
+  // morning; every boundary from Nov 1 end-of-day onward is EST (UTC-5).
+  [Date.UTC(2026,10,1,4,0,0),  Date.UTC(2026,10,8,4,59,59,999)],  // W13 Nov 1–7
+  [Date.UTC(2026,10,8,5,0,0),  Date.UTC(2026,10,15,4,59,59,999)], // W14 Nov 8–14
+  [Date.UTC(2026,10,15,5,0,0), Date.UTC(2026,10,22,4,59,59,999)], // W15 Nov 15–21
+  [Date.UTC(2026,10,22,5,0,0), Date.UTC(2026,11,1,4,59,59,999)],  // W16 Nov 22–30
+  [Date.UTC(2026,11,1,5,0,0),  Date.UTC(2026,11,8,4,59,59,999)],  // W17 Dec 1–7
+  [Date.UTC(2026,11,8,5,0,0),  Date.UTC(2026,11,15,4,59,59,999)], // W18 Dec 8–14
+  [Date.UTC(2026,11,15,5,0,0), Date.UTC(2026,11,22,4,59,59,999)], // W19 Dec 15–21
+  [Date.UTC(2026,11,22,5,0,0), Date.UTC(2026,11,29,4,59,59,999)], // W20 Dec 22–28
+  [Date.UTC(2026,11,29,5,0,0), Date.UTC(2027,0,1,4,59,59,999)],   // W21 Dec 29–31
 ];
 
 const WEEKS = [
@@ -3924,13 +3948,24 @@ const WEEKS = [
   {id:"w6",  label:"Week 2", dates:"Sep 8–14",   month:"September", required:2},
   {id:"w7",  label:"Week 3", dates:"Sep 15–21",  month:"September", required:2},
   {id:"w8",  label:"Week 4", dates:"Sep 22–30",  month:"September", required:2},
-  {id:"w9",  label:"Week 1", dates:"Oct 1–7",    month:"October",   required:3},
-  {id:"w10", label:"Week 2", dates:"Oct 8–14",   month:"October",   required:3},
-  {id:"w11", label:"Week 3", dates:"Oct 15–21",  month:"October",   required:3},
-  {id:"w12", label:"Week 4", dates:"Oct 22–31",  month:"October",   required:3},
+  {id:"w9",  label:"Week 1", dates:"Oct 1–7",    month:"October",   required:1},
+  {id:"w10", label:"Week 2", dates:"Oct 8–14",   month:"October",   required:1},
+  {id:"w11", label:"Week 3", dates:"Oct 15–21",  month:"October",   required:1},
+  {id:"w12", label:"Week 4", dates:"Oct 22–31",  month:"October",   required:1},
+  {id:"w13", label:"Week 1", dates:"Nov 1–7",    month:"November",  required:1},
+  {id:"w14", label:"Week 2", dates:"Nov 8–14",   month:"November",  required:1},
+  {id:"w15", label:"Week 3", dates:"Nov 15–21",  month:"November",  required:1},
+  {id:"w16", label:"Week 4", dates:"Nov 22–30",  month:"November",  required:1},
+  {id:"w17", label:"Week 1", dates:"Dec 1–7",    month:"December",  required:1},
+  {id:"w18", label:"Week 2", dates:"Dec 8–14",   month:"December",  required:1},
+  {id:"w19", label:"Week 3", dates:"Dec 15–21",  month:"December",  required:1},
+  {id:"w20", label:"Week 4", dates:"Dec 22–28",  month:"December",  required:1},
+  {id:"w21", label:"Week 5", dates:"Dec 29–31",  month:"December",  required:1},
 ];
-const MONTHS = ["August", "September", "October"];
-const MONTH_REQS = {"August":"1 update/week", "September":"2 updates/week", "October":"3 updates/week"};
+const MONTHS = ["August", "September", "October", "November", "December"];
+// October dropped from the original 1/2/3 ramp to a flat 1/week, effective Oct 1, 2026.
+// Round extended through Dec 31, 2026 as part of the Oct 1 restart pack — Nov/Dec added at the same flat 1/week rate.
+const MONTH_REQS = {"August":"1 update/week", "September":"2 updates/week", "October":"1 update/week", "November":"1 update/week", "December":"1 update/week"};
 
 // Round-label text that appears in static HTML (auth screen, leaderboard,
 // tracker page, All-Star card) — computed from CURRENT_ROUND/MONTHS/WEEK_SCHEDULE
@@ -3942,10 +3977,11 @@ function _applyRoundLabels() {
   document.querySelectorAll(".js-round-label").forEach(el => el.textContent = roundLabel);
 
   const trackerSub = document.getElementById("tracker-page-subtitle");
-  if (trackerSub) trackerSub.textContent = `Your 12-week accountability record — ${MONTHS[0]} through ${MONTHS[MONTHS.length-1]}.`;
+  if (trackerSub) trackerSub.textContent = `Your ${WEEKS.length}-week accountability record — ${MONTHS[0]} through ${MONTHS[MONTHS.length-1]}.`;
 
   const allStarCopy = document.getElementById("allstar-card-copy");
-  if (allStarCopy) allStarCopy.textContent = `Complete all 12 weekly requirements across ${MONTHS.join(", ").replace(/, ([^,]*)$/, ", and $1")} to earn All-Star status. That's 24 total updates over 90 days.`;
+  const totalRequired = WEEKS.reduce((sum, w) => sum + (w.required || 1), 0);
+  if (allStarCopy) allStarCopy.textContent = `Complete all ${WEEKS.length} weekly requirements across ${MONTHS.join(", ").replace(/, ([^,]*)$/, ", and $1")} to earn All-Star status. That's ${totalRequired} total updates over the round.`;
 }
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", _applyRoundLabels);
@@ -6298,7 +6334,7 @@ async function buildTracker() {
   const headerEl = document.getElementById("tracker-header");
   headerEl.innerHTML = `
     <div class="flex-between mb-8">
-      <span class="text-sm" style="font-weight:600;">${completed}/12 weeks complete <span style="font-weight:400;color:var(--text-muted);">· ${totalUpdates}/${totalRequired} updates</span></span>
+      <span class="text-sm" style="font-weight:600;">${completed}/${WEEKS.length} weeks complete <span style="font-weight:400;color:var(--text-muted);">· ${totalUpdates}/${totalRequired} updates</span></span>
       <span class="text-sm text-muted">${pct}%</span>
     </div>
     <div class="tracker-progress"><div class="tracker-progress-bar" style="width:${pct}%"></div></div>
