@@ -2412,7 +2412,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <span style="font-size:22px;flex-shrink:0;">📣</span>
           <div style="flex:1;min-width:0;">
             <div style="font-weight:700;font-size:13px;color:var(--text);">Add your Ambassador post</div>
-            <div style="font-size:11.5px;color:var(--text-muted);margin-top:1px;">+25 pts and a badge. Proof closes Sep 30.</div>
+            <div style="font-size:11.5px;color:var(--text-muted);margin-top:1px;">+25 pts (added Oct 1) and a badge. Proof closes Sep 30.</div>
           </div>
           <button class="btn btn-gold btn-sm" style="flex-shrink:0;" onclick="openProofUpload()">Add Proof</button>
         </div>
@@ -2434,7 +2434,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
           <span style="font-size:26px;flex-shrink:0;">🔁</span>
           <div style="flex:1;min-width:0;">
             <div style="font-weight:700;font-size:14px;color:var(--text);">Restart WAC on us</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Free access through December 31 plus 10 bonus points. Offer ends Oct 1.</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Free access through December 31 plus 10 bonus points (added Oct 1). Offer ends Oct 1.</div>
           </div>
         </div>
         <div style="display:flex;gap:8px;">
@@ -3209,6 +3209,23 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="page-title">Profile</div>
       </div>
       <div id="profile-hero" class="profile-hero"></div>
+      <!-- Lifetime Stats (all-time points, never reset at round boundaries) -->
+      <div class="card" id="profile-lifetime-card" style="display:none;">
+        <div class="card-title">Lifetime Stats</div>
+        <div class="dash-stats-grid">
+          <div class="dash-stat-card highlight">
+            <span class="dash-stat-icon">⚡</span>
+            <div class="dash-stat-value" id="life-val-total">0</div>
+            <div class="dash-stat-label">Lifetime Points</div>
+          </div>
+          <div class="dash-stat-card">
+            <span class="dash-stat-icon">🔁</span>
+            <div class="dash-stat-value" id="life-val-rounds">0</div>
+            <div class="dash-stat-label">Rounds Joined</div>
+          </div>
+        </div>
+        <div id="life-round-breakdown"></div>
+      </div>
       <!-- Push notifications card -->
       <div class="push-notif-card" id="push-notif-card">
         <div style="font-size:24px;">🔔</div>
@@ -3754,11 +3771,11 @@ textarea.form-input { resize: vertical; min-height: 80px; }
     </div>
     <div style="padding:0 20px 20px;">
       <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:var(--text);margin-bottom:4px;">Restart WAC on us</div>
-      <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">Every member gets complimentary access through December 31, plus 10 bonus points. One click and you're in.</div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">Every member gets complimentary access through December 31, plus 10 bonus points added October 1. One click and you're in.</div>
       <button class="btn btn-gold btn-block" style="margin-bottom:10px;" onclick="restartAccount(false)">Restart (+10 pts)</button>
       <button class="btn btn-outline btn-block" onclick="restartAccount(true)">Restart + Add Ambassador Proof</button>
       <button onclick="snoozeRestartModal()" style="display:block;width:100%;margin-top:10px;background:none;border:none;font-size:13px;color:var(--text-muted);text-decoration:underline;cursor:pointer;padding:6px;">Not Now</button>
-      <div id="restart-proof-note" style="display:none;font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.5;">Post about WAC linking joinwac.com, tag @jointheacc, then upload a screenshot for +25 pts and the Ambassador badge. Proof closes Sep 30.</div>
+      <div id="restart-proof-note" style="display:none;font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.5;">Post about WAC linking joinwac.com, tag @jointheacc, then upload a screenshot for +25 pts (added Oct 1) and the Ambassador badge. Proof closes Sep 30.</div>
     </div>
   </div>
 </div>
@@ -3795,7 +3812,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
-  deleteDoc, query, where, orderBy, limit, increment, arrayUnion, Timestamp
+  deleteDoc, query, where, orderBy, limit, increment, arrayUnion, Timestamp, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getFunctions, httpsCallable
@@ -4278,6 +4295,8 @@ async function resolveUser(user) {
     ambassadorBadge: d.ambassadorBadge || false,
     ambassadorProofSubmittedAt: d.ambassadorProofSubmittedAt || null,
     restartSnoozedUntil: d.restartSnoozedUntil || null,
+    restartPtsAwardedAt: d.restartPtsAwardedAt || null,
+    ambassadorPtsAwardedAt: d.ambassadorPtsAwardedAt || null,
   };
 }
 
@@ -4468,6 +4487,7 @@ function bootApp() {
   setTimeout(checkRoundEnd, 300);
   setTimeout(maybeShowRoundWelcomeModal, 350);
   setTimeout(maybeShowRestartModal, 400);
+  setTimeout(awardPendingRestartPts, 450);
   setTimeout(checkProNotifications, 2000);
   setTimeout(checkRERNotification, 2500);
 
@@ -6550,12 +6570,15 @@ async function renderAdminRegistry() {
 
     const restartedCount = all.filter(m => m.restartedAt).length;
     const proofCount = all.filter(m => m.ambassadorProofSubmittedAt).length;
+    const pendingCount = all.filter(m => (!m.restartPtsAwardedAt && (m.restartPtsPending || 0) > 0) ||
+      (m.ambassadorBadge && !m.ambassadorPtsAwardedAt && (m.ambassadorPtsPending || 0) > 0)).length;
     if (_adminRestartFilterOn) all = all.filter(m => m.restartedAt);
 
     const el = document.getElementById("admin-registry");
     el.innerHTML = `<div class="card"><div class="card-title">Full Registry — ${all.length} member${all.length !== 1 ? "s" : ""} · Round ${CURRENT_ROUND.replace("R","")} active</div>
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <span>🔁 ${restartedCount} restarted · 📣 ${proofCount} proof submitted</span>
+        <span>🔁 ${restartedCount} restarted · 📣 ${proofCount} proof submitted · ⏳ ${pendingCount} with pts pending Oct 1</span>
+        ${pendingCount ? `<button onclick="adminCreditPendingRestartPts()">Credit pending restart pts</button>` : ""}
         <button onclick="toggleAdminRestartFilter()" style="${_adminRestartFilterOn ? "background:rgba(184,134,11,0.12);border-color:var(--gold);color:var(--gold-dark);font-weight:600;" : ""}">${_adminRestartFilterOn ? "✓ Showing restarted only" : "Show restarted only"}</button>
       </div>` +
       all.map(m => {
@@ -6896,13 +6919,25 @@ async function revokeAmbassadorProof(docId, name) {
     const ref = doc(db, "wac_registry", docId);
     const snap = await getDoc(ref);
     if (!snap.exists() || !snap.data().ambassadorBadge) { showToast("Nothing to revoke."); loadDirectory(); return; }
-    await updateDoc(ref, {
+    const d = snap.data();
+    // Round pts awarded = credited on/after Oct 1, or legacy proof from before points were deferred.
+    const awarded = !!d.ambassadorPtsAwardedAt || !("ambassadorPtsPending" in d);
+    // Lifetime credited = added at proof time, or included when round pts were awarded.
+    const lifetimeCredited = !!d.ambassadorLifetimeCredited || awarded;
+    const updates = {
       ambassadorBadge: false,
       ambassadorProofUrl: "",
       ambassadorProofSubmittedAt: null,
-      points: increment(-25),
-      lifetimePoints: increment(-25)
-    });
+      ambassadorPtsPending: 0,
+      ambassadorPtsAwardedAt: null,
+      ambassadorLifetimeCredited: false
+    };
+    if (awarded) updates.points = increment(-AMBASSADOR_PTS);
+    if (lifetimeCredited) updates.lifetimePoints = increment(-AMBASSADOR_PTS);
+    await updateDoc(ref, updates);
+    if (awarded) {
+      try { await deleteDoc(doc(db, "wac_community_pts", `restart_ambassador_${docId}`)); } catch (e) {}
+    }
     showToast(`Revoked Ambassador badge for ${name}.`);
     loadDirectory();
   } catch { showToast("Failed to revoke."); }
@@ -7059,6 +7094,52 @@ function loadProfile() {
   document.getElementById("prof-type").value = currentUser.type || "";
   document.getElementById("prof-ig").value = currentUser.ig || "";
   document.getElementById("prof-website").value = currentUser.website || "";
+  loadLifetimeStats();
+}
+
+// Lifetime Stats (Profile page): lifetimePoints from the registry plus a
+// per-round breakdown (archived rounds from wac_round_archives, current round
+// from registry.points). Restart pts pending Oct 1 are shown as a note.
+async function loadLifetimeStats() {
+  const el = document.getElementById("profile-lifetime-card");
+  if (!el) return;
+  if (!currentUser || currentUser.isAdmin || !db || !currentUser.uid) { el.style.display = "none"; return; }
+  try {
+    const regSnap = await getDoc(doc(db, "wac_registry", currentUser.uid));
+    const d = regSnap.exists() ? regSnap.data() : {};
+    const lifetime = typeof d.lifetimePoints === "number" ? d.lifetimePoints : (currentUser.lifetimePoints || 0);
+    const currentPts = typeof d.points === "number" ? d.points : 0;
+    const rounds = Array.isArray(d.rounds) ? d.rounds : (currentUser.rounds || []);
+    currentUser.lifetimePoints = lifetime;
+
+    let archived = [];
+    try {
+      const arcSnap = await getDocs(query(collection(db, "wac_round_archives"), where("uid", "==", currentUser.uid)));
+      archived = arcSnap.docs.map(a => a.data()).filter(a => a.round && a.round !== CURRENT_ROUND);
+    } catch (e) { console.warn("loadLifetimeStats archives:", e.message); }
+    archived.sort((a, b) => (parseInt(String(a.round).replace("R", "")) || 0) - (parseInt(String(b.round).replace("R", "")) || 0));
+
+    document.getElementById("life-val-total").textContent = lifetime;
+    document.getElementById("life-val-rounds").textContent = rounds.length;
+
+    const row = (label, pts, sub) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--border);font-size:13px;">
+        <span style="color:var(--text);">${label}${sub ? ` <span style="font-size:11px;color:var(--text-muted);">${sub}</span>` : ""}</span>
+        <span style="font-family:'Space Mono',monospace;font-weight:700;color:var(--gold-dark);">${pts} pts</span>
+      </div>`;
+    let html = archived.map(a => row(`Round ${String(a.round).replace("R", "")}`, a.points || 0, "")).join("");
+    if (rounds.includes(CURRENT_ROUND)) {
+      html += row(`Round ${CURRENT_ROUND.replace("R", "")}`, currentPts, isRoundOver() ? "" : "(in progress)");
+    }
+    const pending = (!d.restartPtsAwardedAt && (d.restartPtsPending || 0) > 0 ? d.restartPtsPending : 0) +
+      (d.ambassadorBadge && !d.ambassadorPtsAwardedAt && (d.ambassadorPtsPending || 0) > 0 ? d.ambassadorPtsPending : 0);
+    if (pending) {
+      html += `<div style="font-size:12px;color:var(--text-muted);padding-top:10px;border-top:1px solid var(--border);">🔁 +${pending} restart pts are in your lifetime total and join your Round ${CURRENT_ROUND.replace("R", "")} points on Oct 1.</div>`;
+    }
+    document.getElementById("life-round-breakdown").innerHTML = html
+      ? `<div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);font-family:'Space Mono',monospace;margin-top:4px;padding-bottom:6px;">By Round</div>${html}`
+      : "";
+    el.style.display = "block";
+  } catch (e) { console.warn("loadLifetimeStats:", e); el.style.display = "none"; }
 }
 
 function renderProfileHero() {
@@ -7381,6 +7462,98 @@ const RESTART_CLOSE_UTC = Date.UTC(2026, 9, 2, 3, 59, 0);  // Oct 1, 2026 11:59p
 // Complimentary access granted on restart, independent of ROUND_END_TS.
 const RESTART_COMP_ACCESS_THROUGH_UTC = Date.UTC(2026, 11, 31, 4, 59, 59, 999); // Dec 31, 2026 11:59:59pm ET
 
+// Restart (+10) and Ambassador (+25) points go to lifetimePoints right away.
+// Round points (points + ledger) are held as pending and credited on or after
+// Oct 1. Ledger docs use fixed ids so a credit can never double up.
+const RESTART_PTS_START_UTC = Date.UTC(2026, 9, 1, 4, 0, 0); // Oct 1, 2026 12:00am ET
+const RESTART_PTS = 10;
+const AMBASSADOR_PTS = 25;
+
+async function _creditPendingRestartPts(uid) {
+  if (Date.now() < RESTART_PTS_START_UTC) return 0;
+  const regRef = doc(db, "wac_registry", uid);
+  return await runTransaction(db, async (tx) => {
+    const snap = await tx.get(regRef);
+    if (!snap.exists()) return 0;
+    const d = snap.data();
+    const now = Date.now();
+    const updates = {};
+    let total = 0;
+    let lifetime = 0;
+    if (d.restartedAt && !d.restartPtsAwardedAt && (d.restartPtsPending || 0) > 0) {
+      const pts = d.restartPtsPending;
+      total += pts;
+      if (!d.restartLifetimeCredited) lifetime += pts;
+      updates.restartPtsPending = 0;
+      updates.restartPtsAwardedAt = now;
+      tx.set(doc(db, "wac_community_pts", `restart_${uid}`), {
+        uid, name: d.name || "", action: "restart", type: "restart", pts, round: CURRENT_ROUND, ts: now
+      });
+    }
+    if (d.ambassadorBadge && !d.ambassadorPtsAwardedAt && (d.ambassadorPtsPending || 0) > 0) {
+      const pts = d.ambassadorPtsPending;
+      total += pts;
+      if (!d.ambassadorLifetimeCredited) lifetime += pts;
+      updates.ambassadorPtsPending = 0;
+      updates.ambassadorPtsAwardedAt = now;
+      tx.set(doc(db, "wac_community_pts", `restart_ambassador_${uid}`), {
+        uid, name: d.name || "", action: "restart_ambassador", type: "restart_ambassador", pts, round: CURRENT_ROUND, ts: now
+      });
+    }
+    if (!total) return 0;
+    updates.points = increment(total);
+    if (lifetime) updates.lifetimePoints = increment(lifetime);
+    tx.update(regRef, updates);
+    return total;
+  });
+}
+
+// Runs on login. Credits this member's pending restart points once Oct 1 arrives.
+async function awardPendingRestartPts() {
+  if (!currentUser || !currentUser.restartedAt) return;
+  if (Date.now() < RESTART_PTS_START_UTC) return;
+  const restartDone = !!currentUser.restartPtsAwardedAt;
+  const ambDone = !currentUser.ambassadorBadge || !!currentUser.ambassadorPtsAwardedAt;
+  if (restartDone && ambDone) return;
+  try {
+    const total = await _creditPendingRestartPts(currentUser.uid);
+    const snap = await getDoc(doc(db, "wac_registry", currentUser.uid));
+    if (snap.exists()) {
+      const d = snap.data();
+      currentUser.restartPtsAwardedAt = d.restartPtsAwardedAt || currentUser.restartPtsAwardedAt || Date.now();
+      currentUser.ambassadorPtsAwardedAt = d.ambassadorPtsAwardedAt || null;
+    }
+    if (total > 0) {
+      currentUser.points = (currentUser.points || 0) + total;
+      showToast(`+${total} restart pts added to your total!`);
+    }
+    lsSet("wac_session", currentUser);
+  } catch (e) { console.warn("awardPendingRestartPts failed:", e.message); }
+}
+window.awardPendingRestartPts = awardPendingRestartPts;
+
+// Admin: credit every member's pending restart points (run on or after Oct 1).
+async function adminCreditPendingRestartPts() {
+  if (!currentUser || !currentUser.isAdmin) return;
+  if (Date.now() < RESTART_PTS_START_UTC) { showToast("Restart points can't be credited until Oct 1."); return; }
+  if (!confirm("Credit all pending restart and Ambassador points now?")) return;
+  try {
+    const snap = await getDocs(collection(db, "wac_registry"));
+    let members = 0, pts = 0;
+    for (const d of snap.docs) {
+      const m = d.data();
+      const pending = (!m.restartPtsAwardedAt && (m.restartPtsPending || 0) > 0) ||
+        (m.ambassadorBadge && !m.ambassadorPtsAwardedAt && (m.ambassadorPtsPending || 0) > 0);
+      if (!pending) continue;
+      const t = await _creditPendingRestartPts(d.id);
+      if (t > 0) { members++; pts += t; }
+    }
+    showToast(`Credited ${pts} pts across ${members} member${members !== 1 ? "s" : ""}.`);
+    loadDirectory();
+  } catch (e) { showToast("Credit failed: " + (e.code || e.message)); }
+}
+window.adminCreditPendingRestartPts = adminCreditPendingRestartPts;
+
 function isRestartWindowOpen() {
   return Date.now() >= RESTART_OPEN_UTC && Date.now() < RESTART_CLOSE_UTC;
 }
@@ -7475,25 +7648,23 @@ async function restartAccount(withProof) {
       restartedAt: now,
       restartAccessThroughUTC: RESTART_COMP_ACCESS_THROUGH_UTC,
       rounds: arrayUnion(CURRENT_ROUND),
-      points: increment(10),
-      lifetimePoints: increment(10)
-    });
-    await addDoc(collection(db, "wac_community_pts"), {
-      uid: currentUser.uid,
-      name: currentUser.name,
-      type: "restart",
-      pts: 10,
-      round: CURRENT_ROUND,
-      timestamp: now
+      restartPtsPending: RESTART_PTS,
+      lifetimePoints: increment(RESTART_PTS),
+      restartLifetimeCredited: true
     });
     currentUser.restartedAt = now;
+    currentUser.lifetimePoints = (currentUser.lifetimePoints || 0) + RESTART_PTS;
     currentUser.restartAccessThroughUTC = RESTART_COMP_ACCESS_THROUGH_UTC;
     if (!(currentUser.rounds || []).includes(CURRENT_ROUND)) {
       currentUser.rounds = [...(currentUser.rounds || []), CURRENT_ROUND];
     }
-    currentUser.points = (currentUser.points || 0) + 10;
     lsSet("wac_session", currentUser);
-    showToast("Welcome back! +10 pts. Access is on us through Dec 31.");
+    if (Date.now() >= RESTART_PTS_START_UTC) {
+      showToast("Welcome back! Access is on us through Dec 31.");
+      awardPendingRestartPts();
+    } else {
+      showToast("Welcome back! Your +10 pts land Oct 1. Access is on us through Dec 31.");
+    }
     closeRestartModal();
     renderRestartOfferCard();
     renderRestartProofCard();
@@ -7553,23 +7724,21 @@ async function submitAmbassadorProof() {
       ambassadorProofUrl: proofUrl,
       ambassadorProofSubmittedAt: now,
       ambassadorBadge: true,
-      points: increment(25),
-      lifetimePoints: increment(25)
+      ambassadorPtsPending: AMBASSADOR_PTS,
+      lifetimePoints: increment(AMBASSADOR_PTS),
+      ambassadorLifetimeCredited: true
     });
-    await addDoc(collection(db, "wac_community_pts"), {
-      uid: currentUser.uid,
-      name: currentUser.name,
-      type: "restart_ambassador",
-      pts: 25,
-      round: CURRENT_ROUND,
-      timestamp: now
-    });
+    currentUser.lifetimePoints = (currentUser.lifetimePoints || 0) + AMBASSADOR_PTS;
     currentUser.ambassadorProofUrl = proofUrl;
     currentUser.ambassadorProofSubmittedAt = now;
     currentUser.ambassadorBadge = true;
-    currentUser.points = (currentUser.points || 0) + 25;
     lsSet("wac_session", currentUser);
-    showToast("Proof received! +25 pts and your Ambassador badge.");
+    if (Date.now() >= RESTART_PTS_START_UTC) {
+      showToast("Proof received! Ambassador badge unlocked.");
+      awardPendingRestartPts();
+    } else {
+      showToast("Proof received! Ambassador badge unlocked. Your +25 pts land Oct 1.");
+    }
     closeProofUpload();
     renderRestartProofCard();
   } catch (e) {
