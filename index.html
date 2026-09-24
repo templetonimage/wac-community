@@ -3735,14 +3735,15 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 <div class="modal-overlay" id="restart-modal-overlay" onclick="closeRestartModalDirect(event)">
   <div class="modal-sheet" style="max-width:480px;">
     <div class="modal-header">
-      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">Welcome Back</div>
-      <button class="modal-close" onclick="closeRestartModal()">✕</button>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold-dark);font-family:'Space Mono',monospace;">Restart Offer</div>
+      <button class="modal-close" onclick="snoozeRestartModal()">✕</button>
     </div>
     <div style="padding:0 20px 20px;">
-      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:var(--text);margin-bottom:4px;">Let's restart WAC</div>
-      <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">Your access is complimentary through December 31. One click and you're back in.</div>
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:24px;color:var(--text);margin-bottom:4px;">Restart WAC on us</div>
+      <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">Every member gets complimentary access through December 31, plus 10 bonus points. One click and you're in.</div>
       <button class="btn btn-gold btn-block" style="margin-bottom:10px;" onclick="restartAccount(false)">Restart (+10 pts)</button>
       <button class="btn btn-outline btn-block" onclick="restartAccount(true)">Restart + Add Ambassador Proof</button>
+      <button onclick="snoozeRestartModal()" style="display:block;width:100%;margin-top:10px;background:none;border:none;font-size:13px;color:var(--text-muted);text-decoration:underline;cursor:pointer;padding:6px;">Not Now</button>
       <div id="restart-proof-note" style="display:none;font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.5;">Post about WAC linking joinwac.com, tag @jointheacc, then upload a screenshot for +25 pts and the Ambassador badge. Proof closes Sep 30.</div>
     </div>
   </div>
@@ -4262,6 +4263,7 @@ async function resolveUser(user) {
     restartAccessThroughUTC: d.restartAccessThroughUTC || null,
     ambassadorBadge: d.ambassadorBadge || false,
     ambassadorProofSubmittedAt: d.ambassadorProofSubmittedAt || null,
+    restartSnoozedUntil: d.restartSnoozedUntil || null,
   };
 }
 
@@ -7379,15 +7381,48 @@ function hasActiveAccess() {
   return false;
 }
 
-function maybeShowRestartModal() {
+const RESTART_SNOOZE_MS = 48 * 60 * 60 * 1000; // "Not Now" hides the modal for 48 hours
+
+// Offer is open to every active (non-admin) member. It never shows again once
+// they restart, and "Not Now" hides it for 48 hours.
+async function maybeShowRestartModal() {
   if (!currentUser || currentUser.isAdmin) return;
   const bypass = new URLSearchParams(location.search).get("testRestart") === "1";
   if (!bypass && !isRestartWindowOpen()) return;
-  // Lapsed/paused = not enrolled in the current round.
-  if ((currentUser.rounds || []).includes(CURRENT_ROUND)) return;
   if (currentUser.restartedAt) return;
+  if (!bypass && currentUser.restartSnoozedUntil && Date.now() < currentUser.restartSnoozedUntil) return;
+  // Check the live doc so a restart or snooze from another device is respected.
+  try {
+    const snap = await getDoc(doc(db, "wac_registry", currentUser.uid));
+    if (snap.exists()) {
+      const d = snap.data();
+      if (d.restartedAt) {
+        currentUser.restartedAt = d.restartedAt;
+        currentUser.restartAccessThroughUTC = d.restartAccessThroughUTC || null;
+        lsSet("wac_session", currentUser);
+        return;
+      }
+      if (!bypass && d.restartSnoozedUntil && Date.now() < d.restartSnoozedUntil) {
+        currentUser.restartSnoozedUntil = d.restartSnoozedUntil;
+        lsSet("wac_session", currentUser);
+        return;
+      }
+    }
+  } catch (e) { /* fall through and show; restartAccount re-checks before writing */ }
   openRestartModal();
 }
+
+async function snoozeRestartModal() {
+  closeRestartModal();
+  if (!currentUser) return;
+  const until = Date.now() + RESTART_SNOOZE_MS;
+  currentUser.restartSnoozedUntil = until;
+  lsSet("wac_session", currentUser);
+  try {
+    await updateDoc(doc(db, "wac_registry", currentUser.uid), { restartSnoozedUntil: until });
+  } catch (e) { /* local snooze still applies on this device */ }
+}
+window.snoozeRestartModal = snoozeRestartModal;
 
 async function restartAccount(withProof) {
   if (!currentUser || currentUser.restartedAt) {
@@ -7423,7 +7458,9 @@ async function restartAccount(withProof) {
     });
     currentUser.restartedAt = now;
     currentUser.restartAccessThroughUTC = RESTART_COMP_ACCESS_THROUGH_UTC;
-    currentUser.rounds = [...(currentUser.rounds || []), CURRENT_ROUND];
+    if (!(currentUser.rounds || []).includes(CURRENT_ROUND)) {
+      currentUser.rounds = [...(currentUser.rounds || []), CURRENT_ROUND];
+    }
     currentUser.points = (currentUser.points || 0) + 10;
     lsSet("wac_session", currentUser);
     showToast("Welcome back! +10 pts. Access is on us through Dec 31.");
@@ -7450,7 +7487,7 @@ function closeRestartModal() {
 window.closeRestartModal = closeRestartModal;
 
 function closeRestartModalDirect(e) {
-  if (e.target === document.getElementById("restart-modal-overlay")) closeRestartModal();
+  if (e.target === document.getElementById("restart-modal-overlay")) snoozeRestartModal();
 }
 window.closeRestartModalDirect = closeRestartModalDirect;
 
