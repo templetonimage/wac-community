@@ -2943,7 +2943,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">📦 Archive Round</div>
         <div class="pro-global-danger" style="margin-bottom:16px;">
           <div class="pro-global-danger-title">Round 3 Restart (Oct 1 – Dec 31)</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">Closes Round 2 at Sep 30 and starts Round 3 on Oct 1. Archives each member's Aug–Sep points as "R2", moves everything logged since Oct 1 into Round 3 Week 1, resets points to the Round 3 total, and enrolls every current member (Round 2 or Founder) in Round 3. Lifetime points are never touched. Safe to re-run. Preview first, it writes nothing.</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">Closes Round 2 at Sep 30 and starts Round 3 on Oct 1. Archives each member's Aug–Sep points as "R2", moves everything logged since Oct 1 into Round 3 Week 1, resets points to the Round 3 total, enrolls every current member (Round 2 or Founder) in Round 3, and gives each of them the +10 restart bonus once (whether or not they tapped Restart). Lifetime points are never touched. Safe to re-run. Preview first, it writes nothing.</div>
           <button class="btn btn-outline btn-sm" onclick="startRound3Restart(true)">1. Preview</button>
           <button class="btn btn-sm" onclick="startRound3Restart(false)" style="margin-left:8px;background:var(--danger);color:#fff;border-color:var(--danger);">2. Run Round 3 Restart</button>
           <div id="r3-restart-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface);border-radius:6px;line-height:1.6;"></div>
@@ -9928,7 +9928,8 @@ function _r3Ts(data) {
 
 // Pure planner — takes plain arrays of {id, ...data} and returns every write.
 function _planRound3Restart({ registry, submissions, engagements, communityPts, posts, trackers, planMemory, planMemoryDone }) {
-  const plan = { retag: [], archives: [], registry: [], trackers: [], planMemory: [], rows: [] };
+  const plan = { retag: [], archives: [], registry: [], bonus: [], trackers: [], planMemory: [], rows: [] };
+  const hasRestartLedger = new Set(communityPts.filter(d => String(d.id).startsWith("restart_") && !String(d.id).startsWith("restart_ambassador_")).map(d => String(d.id).slice(8)));
   const r2 = {}, r3 = {};
   const bucket = (map, uid) => (map[uid] = map[uid] || { pts: 0, subs: 0 });
 
@@ -9962,15 +9963,24 @@ function _planRound3Restart({ registry, submissions, engagements, communityPts, 
     const a = r2[m.id] || { pts: 0, subs: 0 };
     const c = r3[m.id] || { pts: 0, subs: 0 };
     const isCurrent = !!m.isFounder || rounds.includes("R2") || rounds.includes("R3");
+    // Restart bonus: every current member gets the +10, whether or not they
+    // tapped Restart. One fixed-id ledger doc per member, so it can never double.
+    const grantBonus = isCurrent && !hasRestartLedger.has(m.id);
+    if (grantBonus) {
+      plan.bonus.push({ uid: m.id, name: m.name || "" });
+      c.pts += RESTART_PTS;
+    }
+    const creditLifetime = isCurrent && !m.restartLifetimeCredited;
+    const closePending = isCurrent && (!m.restartPtsAwardedAt || (m.restartPtsPending || 0) > 0);
     const enroll = isCurrent && !rounds.includes("R3");
     const hadR2 = rounds.includes("R2") || a.pts > 0 || a.subs > 0;
     if (hadR2) plan.archives.push({ uid: m.id, name: m.name || "", points: a.pts, totalPosts: a.subs });
     const regPts = typeof m.points === "number" ? m.points : 0;
     const regPosts = typeof m.totalPosts === "number" ? m.totalPosts : 0;
-    if (regPts !== c.pts || regPosts !== c.subs || enroll) {
-      plan.registry.push({ uid: m.id, points: c.pts, totalPosts: c.subs, enroll });
+    if (regPts !== c.pts || regPosts !== c.subs || enroll || creditLifetime || closePending) {
+      plan.registry.push({ uid: m.id, points: c.pts, totalPosts: c.subs, enroll, creditLifetime, closePending });
     }
-    plan.rows.push({ uid: m.id, name: m.name || m.email || m.id, regPts, r2Pts: a.pts, r3Pts: c.pts, isCurrent, enroll, hadR2 });
+    plan.rows.push({ uid: m.id, name: m.name || m.email || m.id, regPts, r2Pts: a.pts, r3Pts: c.pts, isCurrent, enroll, hadR2, grantBonus });
   });
 
   trackers.forEach(t => {
@@ -10032,17 +10042,18 @@ window.startRound3Restart = async function(dryRun) {
     const plan = _planRound3Restart({ registry, submissions, engagements, communityPts, posts, trackers, planMemory, planMemoryDone: !!meta.planMemoryMigratedAt });
     const current = plan.rows.filter(r => r.isCurrent).length;
     const summary = `${registry.length} members in registry · ${current} current (R2 or Founder) · ${plan.rows.filter(r => r.enroll).length} to enroll in R3 · ` +
-      `${plan.archives.length} R2 archives · ${plan.retag.length} Oct 1+ docs to move into R3 · ${plan.registry.length} registry updates · ` +
+      `${plan.bonus.length} to receive the +${RESTART_PTS} restart bonus · ${plan.archives.length} R2 archives · ${plan.retag.length} Oct 1+ docs to move into R3 · ${plan.registry.length} registry updates · ` +
       `${plan.trackers.length} trackers to carry over · ${plan.planMemory.length} action plan docs to re-key.` + planMemoryNote;
 
     const rows = plan.rows.slice().sort((a, b) => b.r3Pts - a.r3Pts || b.r2Pts - a.r2Pts);
     tableEl.style.display = "block";
     tableEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
-      <thead><tr>${["Member","Registry now","R2 archive (Aug–Sep)","R3 start (Oct 1+)","R3"].map((h, i) => `<th style="text-align:${i ? "right" : "left"};padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);">${h}</th>`).join("")}</tr></thead>
+      <thead><tr>${["Member","Registry now","R2 archive (Aug–Sep)","Restart +10","R3 start (Oct 1+)","R3"].map((h, i) => `<th style="text-align:${i ? "right" : "left"};padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);">${h}</th>`).join("")}</tr></thead>
       <tbody>${rows.map(r => `<tr>
         <td style="padding:6px 8px;border-bottom:1px solid var(--border);">${esc(r.name)}</td>
         <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;">${r.regPts}</td>
         <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;">${r.hadR2 ? r.r2Pts : "—"}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;">${r.isCurrent ? (r.grantBonus ? "adding" : "has it") : "—"}</td>
         <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;font-weight:700;">${r.r3Pts}</td>
         <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;">${r.isCurrent ? (r.enroll ? "enroll" : "✓") : "not enrolled"}</td>
       </tr>`).join("")}</tbody></table>`;
@@ -10050,7 +10061,7 @@ window.startRound3Restart = async function(dryRun) {
     if (dryRun) { statusEl.textContent = "Preview (nothing written): " + summary; return; }
 
     let done = 0, failed = 0, firstError = "";
-    const total = plan.retag.length + plan.archives.length + plan.registry.length + plan.trackers.length + plan.planMemory.length;
+    const total = plan.retag.length + plan.bonus.length + plan.archives.length + plan.registry.length + plan.trackers.length + plan.planMemory.length;
     const step = async (fn) => {
       try { await fn(); } catch (e) { failed++; if (!firstError) firstError = e.code || e.message; }
       done++;
@@ -10058,10 +10069,15 @@ window.startRound3Restart = async function(dryRun) {
     };
     const archivedAt = Date.now();
     for (const r of plan.retag) await step(() => updateDoc(doc(db, r.coll, r.id), r.update));
+    for (const b of plan.bonus) await step(() => setDoc(doc(db, "wac_community_pts", `restart_${b.uid}`), {
+      uid: b.uid, name: b.name, action: "restart", type: "restart", pts: RESTART_PTS, round: "R3", ts: archivedAt
+    }));
     for (const a of plan.archives) await step(() => setDoc(doc(db, "wac_round_archives", `R2_${a.uid}`), { ...a, round: "R2", archivedAt }));
     for (const m of plan.registry) {
       const update = { points: m.points, totalPosts: m.totalPosts };
       if (m.enroll) update.rounds = arrayUnion("R3");
+      if (m.creditLifetime) { update.lifetimePoints = increment(RESTART_PTS); update.restartLifetimeCredited = true; }
+      if (m.closePending) { update.restartPtsPending = 0; update.restartPtsAwardedAt = archivedAt; }
       await step(() => updateDoc(doc(db, "wac_registry", m.uid), update));
     }
     for (const t of plan.trackers) await step(() => updateDoc(doc(db, "trackers", t.id), t.update));
