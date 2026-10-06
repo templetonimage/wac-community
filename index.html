@@ -2941,11 +2941,13 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <!-- ADMIN: Archive Round -->
       <div id="admin-archive-round" style="display:none;margin-top:28px;">
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:19px;letter-spacing:-0.01em;margin-bottom:4px;">📦 Archive Round</div>
-        <div style="font-size:12px;color:var(--gold-dark);margin-bottom:10px;line-height:1.6;">⚠️ Round 1 was never archived before Round 2 launched — run the one-time catch-up below first (once), not the normal archive button, which would mislabel the archive as R2.</div>
         <div class="pro-global-danger" style="margin-bottom:16px;">
-          <div class="pro-global-danger-title">One-Time Catch-Up (run this now)</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">Archives true R1 totals correctly labeled "R1", then resets registry.points to each member's actual R2-only total — preserving any R2 points already earned. Run Backfill Round Tags + Fix Community Pts Tags first.</div>
-          <button class="btn btn-sm" onclick="catchUpArchiveR1AndFixR2Points()" style="background:var(--danger);color:#fff;border-color:var(--danger);">Catch Up: Archive R1 &amp; Fix R2 Points</button>
+          <div class="pro-global-danger-title">Round 3 Restart (Oct 1 – Dec 31)</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">Closes Round 2 at Sep 30 and starts Round 3 on Oct 1. Archives each member's Aug–Sep points as "R2", moves everything logged since Oct 1 into Round 3 Week 1, resets points to the Round 3 total, and enrolls every current member (Round 2 or Founder) in Round 3. Lifetime points are never touched. Safe to re-run. Preview first, it writes nothing.</div>
+          <button class="btn btn-outline btn-sm" onclick="startRound3Restart(true)">1. Preview</button>
+          <button class="btn btn-sm" onclick="startRound3Restart(false)" style="margin-left:8px;background:var(--danger);color:#fff;border-color:var(--danger);">2. Run Round 3 Restart</button>
+          <div id="r3-restart-status" style="display:none;margin-top:10px;font-size:13px;color:var(--text-muted);padding:8px;background:var(--surface);border-radius:6px;line-height:1.6;"></div>
+          <div id="r3-restart-table" style="display:none;margin-top:10px;max-height:360px;overflow:auto;border:1px solid var(--border);border-radius:8px;background:var(--surface);"></div>
         </div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.6;">Snapshots every member's final <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">points</code> and <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">totalPosts</code> into a permanent record, then zeroes both for the new round. <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:11px;">lifetimePoints</code> is never touched. Use this at future round boundaries, right after the round is fully over.</div>
         <div class="pro-global-danger">
@@ -3178,9 +3180,9 @@ textarea.form-input { resize: vertical; min-height: 80px; }
         <div class="form-group">
           <label class="form-label">Rounds</label>
           <div style="display:flex;gap:12px;">
-            <label style="font-size:13px;"><input type="checkbox" id="cm-r1" checked /> R1</label>
+            <label style="font-size:13px;"><input type="checkbox" id="cm-r1" /> R1</label>
             <label style="font-size:13px;"><input type="checkbox" id="cm-r2" /> R2</label>
-            <label style="font-size:13px;"><input type="checkbox" id="cm-r3" /> R3</label>
+            <label style="font-size:13px;"><input type="checkbox" id="cm-r3" checked /> R3</label>
           </div>
         </div>
         <div class="form-group" style="display:flex;gap:12px;">
@@ -3546,7 +3548,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
         <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">🔄</span><span style="font-size:13px;line-height:1.5;">Your weekly Tracker and points reset for a clean slate — your <strong>Lifetime Points</strong> keep growing across every round, nothing is lost.</span></div>
         <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">⚡</span><span style="font-size:13px;line-height:1.5;">A fresh set of Weekly Challenge Modifiers is live — check your dashboard each week for a new E-E-A-T focus.</span></div>
-        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">📈</span><span style="font-size:13px;line-height:1.5;">Requirements ramp up like last round: 1 update/week this month, 2/week next month, 3/week in the final month.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">📈</span><span style="font-size:13px;line-height:1.5;">Week 1 began October 1 and the round runs through December 31. One update per week, every week.</span></div>
       </div>
       <button class="btn btn-gold btn-block" onclick="closeRoundWelcomeModal()">Let's Go! 🚀</button>
     </div>
@@ -3838,8 +3840,8 @@ const ADMIN_EMAIL   = "nate@templetonimage.com";
 // Bump this any time a server-side change (round switch, points recompute,
 // registry field fix) needs every cached localStorage session invalidated
 // on next load, forcing a fresh Firestore read instead of stale local data.
-const SESSION_CACHE_VERSION = 3;
-const CURRENT_ROUND = "R2";
+const SESSION_CACHE_VERSION = 4;
+const CURRENT_ROUND = "R3";
 
 const PTS_ON_TIME   = 10;
 const PTS_LATE_24H  = 5;
@@ -3861,29 +3863,23 @@ const ZOOM_REPLAYS = [
 ];
 const MAX_ENG_PER_WEEK = 5;
 
-// Weekly Challenge Modifiers — one per week, keyed by weekIdx (0–11)
-// Round 2 set (Aug 1 – Oct 31, 2026) — new prompts, not reused from Round 1.
+// Weekly Challenge Modifiers — one per week, keyed by weekIdx (0–12)
+// Round 3 set (Oct 1 – Dec 31, 2026). Week 1 keeps the modifier that was already
+// live for Oct 1–7; weeks 2–13 are the prompts members had not seen yet, reshuffled
+// so the E-E-A-T signals rotate and the year-end prompts land in late December.
 const WEEKLY_CHALLENGES = [
-  { title: "Update Your Availability (Trust Signal)",  desc: "Make sure your booking calendar, contact form, or 'currently booking' messaging reflects your real availability. Stale scheduling info is one of the fastest ways to lose a visitor's trust." },
-  { title: "Add a Recent Project (Experience Signal)", desc: "Publish your most recent shoot, project, or client win — even a single image with a short caption counts. Fresh, dated proof of ongoing work is exactly what Experience signals to Google." },
-  { title: "Strengthen Your FAQ (Expertise Signal)",   desc: "Add or expand an FAQ section that answers the questions your clients actually ask before booking. Thorough, specific answers demonstrate Expertise better than generic copy ever will." },
-  { title: "Internal Linking Pass (Authority Signal)", desc: "Add at least 3 internal links between related pages on your site (services to portfolio, blog post to service page, etc). Strong internal linking helps Google understand your site's Authority and structure." },
-  { title: "Refresh Your Portfolio (Experience Signal)", desc: "Swap out one older portfolio piece for more recent, representative work. A portfolio that reflects your current skill level is a direct Experience signal for both visitors and Google." },
-  { title: "Add Location Specificity (Authority Signal)", desc: "Make sure your service area, city, or region is named clearly on at least one page — not just in your logo or header. Named geography builds local Authority in Google's eyes." },
-  { title: "Tighten Your Meta Descriptions (Trust Signal)", desc: "Rewrite the meta description on your homepage or top service page so it clearly states what you offer and who it's for. Clear, accurate previews build Trust before a visitor even clicks." },
-  { title: "Add a Process Page or Section (Expertise Signal)", desc: "Explain how you work — your process, timeline, or what a client can expect step by step. Showing your process (not just your results) is a strong Expertise signal." },
   { title: "Fix a Broken Link (Trust Signal)",          desc: "Click through your own site and find (and fix) at least one broken link, dead button, or outdated page. Broken paths quietly erode visitor Trust and hurt crawlability." },
+  { title: "Update Your About Page (Trust Signal)",     desc: "Refresh your About/bio section with something current — a recent milestone, an updated headshot, or an honest line about what's changed this year. A stale bio reads as an inactive business; a current one builds Trust immediately." },
   { title: "Add Fresh Social Proof (Authority Signal)", desc: "Add a new review, testimonial, or client shoutout with a name attached — even a screenshot of a DM or email counts if named. New, dated proof keeps your Authority signal current." },
+  { title: "Add a 'Who This Is For' Section (Expertise Signal)", desc: "Write a short section naming exactly who you serve best and what problem you solve for them. Specificity reads as Expertise; vague positioning reads as generic." },
+  { title: "Publish a Case Study (Experience Signal)",  desc: "Turn one recent project into a short before/after or problem-solution writeup, even 3–4 sentences with a photo. Concrete, dated proof of results is the clearest Experience signal you can give both visitors and Google." },
+  { title: "Check Your NAP Consistency (Trust Signal)", desc: "Confirm your Name, Address (or service area), and Phone number match exactly across your site, Google Business Profile, and any directories you're listed in. Inconsistent business info is a quiet Trust red flag for both visitors and search engines." },
+  { title: "Earn or Confirm a Backlink (Authority Signal)", desc: "Get listed in one local directory, vendor page, or partner site, or confirm an existing listing still links correctly. External sites linking to yours is one of the strongest Authority signals Google weighs." },
+  { title: "Add a Credentials or Press Mention (Expertise Signal)", desc: "Add any certification, feature, award, or press mention you haven't listed yet — even a small local write-up counts. Third-party recognition is one of the fastest ways to demonstrate Expertise." },
   { title: "Optimize One Image Set (Experience Signal)", desc: "Compress, rename with descriptive filenames, and add alt text to the images on your most-visited page. Well-optimized, well-described images are concrete proof of hands-on Experience." },
   { title: "Momentum Check — Any E-E-A-T Win",          desc: "Complete any meaningful update that strengthens your site's Experience, Expertise, Authority, or Trust. Every improvement you've made so far is a Google trust signal compounding in your favor — keep it going." },
-  { title: "Update Your About Page (Trust Signal)",     desc: "Refresh your About/bio section with something current — a recent milestone, an updated headshot, or an honest line about what's changed this year. A stale bio reads as an inactive business; a current one builds Trust immediately." },
-  { title: "Publish a Case Study (Experience Signal)",  desc: "Turn one recent project into a short before/after or problem-solution writeup, even 3–4 sentences with a photo. Concrete, dated proof of results is the clearest Experience signal you can give both visitors and Google." },
-  { title: "Add a 'Who This Is For' Section (Expertise Signal)", desc: "Write a short section naming exactly who you serve best and what problem you solve for them. Specificity reads as Expertise; vague positioning reads as generic." },
-  { title: "Earn or Confirm a Backlink (Authority Signal)", desc: "Get listed in one local directory, vendor page, or partner site, or confirm an existing listing still links correctly. External sites linking to yours is one of the strongest Authority signals Google weighs." },
-  { title: "Check Your NAP Consistency (Trust Signal)", desc: "Confirm your Name, Address (or service area), and Phone number match exactly across your site, Google Business Profile, and any directories you're listed in. Inconsistent business info is a quiet Trust red flag for both visitors and search engines." },
-  { title: "Post a Timely Update (Experience Signal)",  desc: "Share something happening right now — current availability, a seasonal offer, year-end booking info, or recent work in progress. Timely, dated content is a direct Experience signal that your business is active today, not dormant." },
-  { title: "Add a Credentials or Press Mention (Expertise Signal)", desc: "Add any certification, feature, award, or press mention you haven't listed yet — even a small local write-up counts. Third-party recognition is one of the fastest ways to demonstrate Expertise." },
   { title: "Get Tagged or Mentioned by Someone Else (Authority Signal)", desc: "Ask a recent client, collaborator, or vendor to tag you or link to your site from their own page or profile. Authority Google can verify from an outside source carries more weight than anything you say about yourself." },
+  { title: "Post a Timely Update (Experience Signal)",  desc: "Share something happening right now — current availability, a seasonal offer, year-end booking info, or recent work in progress. Timely, dated content is a direct Experience signal that your business is active today, not dormant." },
   { title: "Year-End Site Audit (Any E-E-A-T Win)",     desc: "Walk your site start to finish and fix the first thing that feels outdated, broken, or unclear — copy, a photo, a price, a dead link. Close out the year with one clean, deliberate improvement." },
 ];
 
@@ -3943,61 +3939,56 @@ function getTrialExpiryStr() {
   return new Date(currentUser.trialUntil).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"});
 }
 
-const ROUND_END_TS = Date.UTC(2027, 0, 1, 4, 59, 59, 999); // Dec 31, 2026 11:59:59pm ET (EST, UTC-5) — Round 2 end, extended from Oct 31 as part of the Oct 1 restart pack
+const ROUND_END_TS = Date.UTC(2027, 0, 1, 4, 59, 59, 999); // Dec 31, 2026 11:59:59pm ET (EST, UTC-5) — Round 3 end
 
+// Round boundaries, pinned so admin tools never depend on which round is current.
+const ROUND2_START_TS = Date.UTC(2026, 7, 1, 4, 0, 0); // Aug 1, 2026 12:00am ET
+const ROUND3_START_TS = Date.UTC(2026, 9, 1, 4, 0, 0); // Oct 1, 2026 12:00am ET
+function _roundForTs(ts) {
+  if (ts >= ROUND3_START_TS) return "R3";
+  if (ts >= ROUND2_START_TS) return "R2";
+  return "R1";
+}
+
+// Round 3 — Oct 1 to Dec 31, 2026 (13 weeks). Week 1 began Oct 1.
 const WEEK_SCHEDULE = [
-  [Date.UTC(2026,7,1,4,0,0),   Date.UTC(2026,7,8,3,59,59,999)],   // W1  Aug 1–7
-  [Date.UTC(2026,7,8,4,0,0),   Date.UTC(2026,7,15,3,59,59,999)],  // W2  Aug 8–14
-  [Date.UTC(2026,7,15,4,0,0),  Date.UTC(2026,7,22,3,59,59,999)],  // W3  Aug 15–21
-  [Date.UTC(2026,7,22,4,0,0),  Date.UTC(2026,8,1,3,59,59,999)],   // W4  Aug 22–31
-  [Date.UTC(2026,8,1,4,0,0),   Date.UTC(2026,8,8,3,59,59,999)],   // W5  Sep 1–7
-  [Date.UTC(2026,8,8,4,0,0),   Date.UTC(2026,8,15,3,59,59,999)],  // W6  Sep 8–14
-  [Date.UTC(2026,8,15,4,0,0),  Date.UTC(2026,8,22,3,59,59,999)],  // W7  Sep 15–21
-  [Date.UTC(2026,8,22,4,0,0),  Date.UTC(2026,9,1,3,59,59,999)],   // W8  Sep 22–30
-  [Date.UTC(2026,9,1,4,0,0),   Date.UTC(2026,9,8,3,59,59,999)],   // W9  Oct 1–7
-  [Date.UTC(2026,9,8,4,0,0),   Date.UTC(2026,9,15,3,59,59,999)],  // W10 Oct 8–14
-  [Date.UTC(2026,9,15,4,0,0),  Date.UTC(2026,9,22,3,59,59,999)],  // W11 Oct 15–21
-  [Date.UTC(2026,9,22,4,0,0),  Date.UTC(2026,10,1,3,59,59,999)],  // W12 Oct 22–31
+  [Date.UTC(2026,9,1,4,0,0),   Date.UTC(2026,9,8,3,59,59,999)],   // W1  Oct 1–7
+  [Date.UTC(2026,9,8,4,0,0),   Date.UTC(2026,9,15,3,59,59,999)],  // W2  Oct 8–14
+  [Date.UTC(2026,9,15,4,0,0),  Date.UTC(2026,9,22,3,59,59,999)],  // W3  Oct 15–21
+  [Date.UTC(2026,9,22,4,0,0),  Date.UTC(2026,10,1,3,59,59,999)],  // W4  Oct 22–31
   // Nov 1, 2026 is itself still EDT (UTC-4) until the 2am DST changeover that
   // morning; every boundary from Nov 1 end-of-day onward is EST (UTC-5).
-  [Date.UTC(2026,10,1,4,0,0),  Date.UTC(2026,10,8,4,59,59,999)],  // W13 Nov 1–7
-  [Date.UTC(2026,10,8,5,0,0),  Date.UTC(2026,10,15,4,59,59,999)], // W14 Nov 8–14
-  [Date.UTC(2026,10,15,5,0,0), Date.UTC(2026,10,22,4,59,59,999)], // W15 Nov 15–21
-  [Date.UTC(2026,10,22,5,0,0), Date.UTC(2026,11,1,4,59,59,999)],  // W16 Nov 22–30
-  [Date.UTC(2026,11,1,5,0,0),  Date.UTC(2026,11,8,4,59,59,999)],  // W17 Dec 1–7
-  [Date.UTC(2026,11,8,5,0,0),  Date.UTC(2026,11,15,4,59,59,999)], // W18 Dec 8–14
-  [Date.UTC(2026,11,15,5,0,0), Date.UTC(2026,11,22,4,59,59,999)], // W19 Dec 15–21
-  [Date.UTC(2026,11,22,5,0,0), Date.UTC(2026,11,29,4,59,59,999)], // W20 Dec 22–28
-  [Date.UTC(2026,11,29,5,0,0), Date.UTC(2027,0,1,4,59,59,999)],   // W21 Dec 29–31
+  [Date.UTC(2026,10,1,4,0,0),  Date.UTC(2026,10,8,4,59,59,999)],  // W5  Nov 1–7
+  [Date.UTC(2026,10,8,5,0,0),  Date.UTC(2026,10,15,4,59,59,999)], // W6  Nov 8–14
+  [Date.UTC(2026,10,15,5,0,0), Date.UTC(2026,10,22,4,59,59,999)], // W7  Nov 15–21
+  [Date.UTC(2026,10,22,5,0,0), Date.UTC(2026,11,1,4,59,59,999)],  // W8  Nov 22–30
+  [Date.UTC(2026,11,1,5,0,0),  Date.UTC(2026,11,8,4,59,59,999)],  // W9  Dec 1–7
+  [Date.UTC(2026,11,8,5,0,0),  Date.UTC(2026,11,15,4,59,59,999)], // W10 Dec 8–14
+  [Date.UTC(2026,11,15,5,0,0), Date.UTC(2026,11,22,4,59,59,999)], // W11 Dec 15–21
+  [Date.UTC(2026,11,22,5,0,0), Date.UTC(2026,11,29,4,59,59,999)], // W12 Dec 22–28
+  [Date.UTC(2026,11,29,5,0,0), Date.UTC(2027,0,1,4,59,59,999)],   // W13 Dec 29–31
 ];
 
+// Week ids are prefixed per round ("r3w1") so a member's tracker doc never
+// reads a previous round's checkmarks. Round 2 used "w1"–"w21".
 const WEEKS = [
-  {id:"w1",  label:"Week 1", dates:"Aug 1–7",    month:"August",    required:1},
-  {id:"w2",  label:"Week 2", dates:"Aug 8–14",   month:"August",    required:1},
-  {id:"w3",  label:"Week 3", dates:"Aug 15–21",  month:"August",    required:1},
-  {id:"w4",  label:"Week 4", dates:"Aug 22–31",  month:"August",    required:1},
-  {id:"w5",  label:"Week 1", dates:"Sep 1–7",    month:"September", required:2},
-  {id:"w6",  label:"Week 2", dates:"Sep 8–14",   month:"September", required:2},
-  {id:"w7",  label:"Week 3", dates:"Sep 15–21",  month:"September", required:2},
-  {id:"w8",  label:"Week 4", dates:"Sep 22–30",  month:"September", required:2},
-  {id:"w9",  label:"Week 1", dates:"Oct 1–7",    month:"October",   required:1},
-  {id:"w10", label:"Week 2", dates:"Oct 8–14",   month:"October",   required:1},
-  {id:"w11", label:"Week 3", dates:"Oct 15–21",  month:"October",   required:1},
-  {id:"w12", label:"Week 4", dates:"Oct 22–31",  month:"October",   required:1},
-  {id:"w13", label:"Week 1", dates:"Nov 1–7",    month:"November",  required:1},
-  {id:"w14", label:"Week 2", dates:"Nov 8–14",   month:"November",  required:1},
-  {id:"w15", label:"Week 3", dates:"Nov 15–21",  month:"November",  required:1},
-  {id:"w16", label:"Week 4", dates:"Nov 22–30",  month:"November",  required:1},
-  {id:"w17", label:"Week 1", dates:"Dec 1–7",    month:"December",  required:1},
-  {id:"w18", label:"Week 2", dates:"Dec 8–14",   month:"December",  required:1},
-  {id:"w19", label:"Week 3", dates:"Dec 15–21",  month:"December",  required:1},
-  {id:"w20", label:"Week 4", dates:"Dec 22–28",  month:"December",  required:1},
-  {id:"w21", label:"Week 5", dates:"Dec 29–31",  month:"December",  required:1},
+  {id:"r3w1",  label:"Week 1", dates:"Oct 1–7",    month:"October",   required:1},
+  {id:"r3w2",  label:"Week 2", dates:"Oct 8–14",   month:"October",   required:1},
+  {id:"r3w3",  label:"Week 3", dates:"Oct 15–21",  month:"October",   required:1},
+  {id:"r3w4",  label:"Week 4", dates:"Oct 22–31",  month:"October",   required:1},
+  {id:"r3w5",  label:"Week 1", dates:"Nov 1–7",    month:"November",  required:1},
+  {id:"r3w6",  label:"Week 2", dates:"Nov 8–14",   month:"November",  required:1},
+  {id:"r3w7",  label:"Week 3", dates:"Nov 15–21",  month:"November",  required:1},
+  {id:"r3w8",  label:"Week 4", dates:"Nov 22–30",  month:"November",  required:1},
+  {id:"r3w9",  label:"Week 1", dates:"Dec 1–7",    month:"December",  required:1},
+  {id:"r3w10", label:"Week 2", dates:"Dec 8–14",   month:"December",  required:1},
+  {id:"r3w11", label:"Week 3", dates:"Dec 15–21",  month:"December",  required:1},
+  {id:"r3w12", label:"Week 4", dates:"Dec 22–28",  month:"December",  required:1},
+  {id:"r3w13", label:"Week 5", dates:"Dec 29–31",  month:"December",  required:1},
 ];
-const MONTHS = ["August", "September", "October", "November", "December"];
-// October dropped from the original 1/2/3 ramp to a flat 1/week, effective Oct 1, 2026.
-// Round extended through Dec 31, 2026 as part of the Oct 1 restart pack — Nov/Dec added at the same flat 1/week rate.
-const MONTH_REQS = {"August":"1 update/week", "September":"2 updates/week", "October":"1 update/week", "November":"1 update/week", "December":"1 update/week"};
+const MONTHS = ["October", "November", "December"];
+// Flat 1 update/week for the whole round.
+const MONTH_REQS = {"October":"1 update/week", "November":"1 update/week", "December":"1 update/week"};
 
 // Round-label text that appears in static HTML (auth screen, leaderboard,
 // tracker page, All-Star card) — computed from CURRENT_ROUND/MONTHS/WEEK_SCHEDULE
@@ -4013,6 +4004,16 @@ function _applyRoundLabels() {
 
   const allStarCopy = document.getElementById("allstar-card-copy");
   const totalRequired = WEEKS.reduce((sum, w) => sum + (w.required || 1), 0);
+  const clearFeedSel = document.getElementById("clear-feed-week-select");
+  if (clearFeedSel) {
+    Array.from(clearFeedSel.querySelectorAll("option")).forEach(o => { if (o.value !== "") o.remove(); });
+    WEEKS.forEach((w, i) => {
+      const o = document.createElement("option");
+      o.value = String(i);
+      o.textContent = `W${i + 1} · ${w.dates}`;
+      clearFeedSel.appendChild(o);
+    });
+  }
   if (allStarCopy) allStarCopy.textContent = `Complete all ${WEEKS.length} weekly requirements across ${MONTHS.join(", ").replace(/, ([^,]*)$/, ", and $1")} to earn All-Star status. That's ${totalRequired} total updates over the round.`;
 }
 if (document.readyState === "loading") {
@@ -4130,13 +4131,13 @@ function getWeekIndex() {
   for (let i = 0; i < WEEK_SCHEDULE.length; i++) {
     if (now >= WEEK_SCHEDULE[i][0] && now <= WEEK_SCHEDULE[i][1]) return i;
   }
-  // If before round start, return 0; if after, return 11
+  // If before round start, return 0; if after, return the last week
   if (now < WEEK_SCHEDULE[0][0]) return 0;
-  return 11;
+  return WEEK_SCHEDULE.length - 1;
 }
 
 function getWeekDeadline(weekIdx) {
-  return WEEK_SCHEDULE[weekIdx] ? WEEK_SCHEDULE[weekIdx][1] : WEEK_SCHEDULE[11][1];
+  return WEEK_SCHEDULE[weekIdx] ? WEEK_SCHEDULE[weekIdx][1] : WEEK_SCHEDULE[WEEK_SCHEDULE.length - 1][1];
 }
 
 function showToast(msg) {
@@ -4657,6 +4658,7 @@ async function refreshChallengeAvailability() {
     } else {
       if (weekIdx < 0) return;
       constraints.push(where("weekIdx", "==", weekIdx));
+      constraints.push(where("round", "==", CURRENT_ROUND));
     }
     const q = query(collection(db, "submissions"), ...constraints);
     const snap = await getDocs(q);
@@ -4736,7 +4738,7 @@ window.loadDashboard = async function() {
     if (weekEl) weekEl.textContent = `Week ${trialIdx + 1} of 4`;
   } else {
     if (roundEl) roundEl.textContent = 'Round ' + CURRENT_ROUND.replace('R', '');
-    if (weekEl) weekEl.textContent = weekIdx >= 0 ? 'Week ' + (weekIdx + 1) + ' of 12' : '—';
+    if (weekEl) weekEl.textContent = weekIdx >= 0 ? 'Week ' + (weekIdx + 1) + ' of ' + WEEKS.length : '—';
   }
 
   const metaEl = document.getElementById('dash-date-meta');
@@ -4890,8 +4892,8 @@ function _renderDashboard({total, postPts, engPts, communityPts, trackerPostCoun
   _dashCountUp(document.getElementById('dash-val-community'), communityPts || 0, 280);
   _dashCountUp(document.getElementById('dash-val-count'), subsCount,         360);
 
-  // All-Star progress bar (24 total required updates across 12 weeks)
-  const totalRequired = 24;
+  // All-Star progress bar (total required updates across the round)
+  const totalRequired = WEEKS.reduce((sum, w) => sum + (w.required || 1), 0);
   const pct = Math.min(Math.round((trackerPostCount / totalRequired) * 100), 100);
   const subEl = document.getElementById('dash-allstar-sub');
   if (subEl) subEl.textContent = getTrialWeekIndex() !== -1
@@ -5377,7 +5379,9 @@ async function getWeeklyPVRCount() {
       where("weekIdx", "==", weekIdx),
       where("type", "==", "pvr"));
     const snap = await getDocs(q);
-    return snap.size;
+    // weekIdx restarts at 0 every round — only count requests from this week.
+    const weekStart = WEEK_SCHEDULE[weekIdx] ? WEEK_SCHEDULE[weekIdx][0] : 0;
+    return snap.docs.filter(d => (d.data().timestamp || 0) >= weekStart).length;
   } catch { return 0; }
 }
 
@@ -5398,6 +5402,7 @@ async function submitPVR() {
       type: "pvr",
       pvr_url: url,
       pvr_prompt: prompt,
+      round: CURRENT_ROUND,
       weekIdx,
       replies: [],
       props: [],
@@ -5472,6 +5477,7 @@ async function submitPVRReply(postId, postAuthorUid) {
     await addDoc(collection(db, "engagements"), {
       author: currentUser.name,
       authorUid: currentUser.uid,
+      round: CURRENT_ROUND,
       weekIdx,
       targetUrl: "",
       note: `PVR feedback on ${postAuthorUid}`,
@@ -8184,7 +8190,8 @@ async function generateActionPlanNow() {
         if (weekIdx < 0) return 0;
         const q = query(collection(db, "submissions"),
           where("authorUid", "==", currentUser.uid),
-          where("weekIdx", "==", weekIdx));
+          where("weekIdx", "==", weekIdx),
+          where("round", "==", CURRENT_ROUND));
         const snap = await getDocs(q);
         return snap.size;
       })(),
@@ -8629,7 +8636,7 @@ async function clearFeedPostsByWeek() {
   const sel = document.getElementById("clear-feed-week-select");
   if (!sel || sel.value === "") { showToast("Select a week first."); return; }
   const weekIdx = parseInt(sel.value, 10);
-  const WEEK_LABELS = ["W1 · Jun 1–7","W2 · Jun 8–14","W3 · Jun 15–21","W4 · Jun 22–30","W5 · Jul 1–7","W6 · Jul 8–14","W7 · Jul 15–21","W8 · Jul 22–31","W9 · Aug 1–7","W10 · Aug 8–14","W11 · Aug 15–21","W12 · Aug 22–31"];
+  const WEEK_LABELS = WEEKS.map((w, i) => `W${i + 1} · ${w.dates}`);
   const label = WEEK_LABELS[weekIdx] || `Week ${weekIdx + 1}`;
   if (!confirm(`Delete all feed posts for ${label}?\n\nThis removes feed cards only. Tracker submissions, engagement records, and points are NOT affected.`)) return;
   const statusEl = document.getElementById("clear-feed-status");
@@ -9403,8 +9410,7 @@ window.resetAllPoints = async function() {
 // filter Round 1 activity by round.
 window.backfillRoundTags = async function() {
   if (!currentUser || !currentUser.isAdmin) return;
-  const splitDateStr = new Date(WEEK_SCHEDULE[0][0]).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
-  if (!confirm(`Tag untagged activity docs by timestamp: before ${splitDateStr} → R1, on/after → ${CURRENT_ROUND}?\n\nOnly touches docs missing a round field. Safe to re-run.`)) return;
+  if (!confirm(`Tag untagged activity docs by timestamp: before Aug 1 → R1, Aug 1 to Sep 30 → R2, Oct 1 onward → R3?\n\nOnly touches docs missing a round field. Safe to re-run.`)) return;
 
   const statusEl = document.getElementById("round-tag-backfill-status");
   statusEl.style.display = "block";
@@ -9412,7 +9418,6 @@ window.backfillRoundTags = async function() {
 
   const collections = ["submissions", "engagements", "posts", "wac_community_pts", "expert_reviews"];
   const report = {}; // collName -> { tagged, skipped, failed, firstError }
-  const ROUND2_START = WEEK_SCHEDULE[0][0]; // Aug 1, 2026 04:00 UTC — anything before this is prior-round activity
 
   for (const collName of collections) {
     report[collName] = { tagged: 0, skipped: 0, failed: 0, firstError: "" };
@@ -9428,7 +9433,7 @@ window.backfillRoundTags = async function() {
       const data = d.data();
       if (data.round) { report[collName].skipped++; continue; }
       const ts = typeof data.timestamp === "number" ? data.timestamp : (typeof data.ts === "number" ? data.ts : 0);
-      const roundTag = ts >= ROUND2_START ? CURRENT_ROUND : "R1";
+      const roundTag = _roundForTs(ts);
       try {
         await updateDoc(doc(db, collName, d.id), { round: roundTag });
         report[collName].tagged++;
@@ -9473,7 +9478,7 @@ window.fixCommunityPtsRoundTags = async function() {
   statusEl.style.display = "block";
   statusEl.textContent = "Checking wac_community_pts tags...";
 
-  const ROUND2_START = WEEK_SCHEDULE[0][0];
+  const ROUND2_START = ROUND2_START_TS;
   try {
     const snap = await getDocs(query(collection(db, "wac_community_pts"), where("round", "==", "R1")));
     let fixed = 0, checked = 0;
@@ -9481,11 +9486,11 @@ window.fixCommunityPtsRoundTags = async function() {
       checked++;
       const ts = typeof d.data().ts === "number" ? d.data().ts : 0;
       if (ts >= ROUND2_START) {
-        await updateDoc(doc(db, "wac_community_pts", d.id), { round: CURRENT_ROUND });
+        await updateDoc(doc(db, "wac_community_pts", d.id), { round: _roundForTs(ts) });
         fixed++;
       }
     }
-    statusEl.textContent = `Checked ${checked} R1-tagged docs, corrected ${fixed} to ${CURRENT_ROUND}.`;
+    statusEl.textContent = `Checked ${checked} R1-tagged docs, corrected ${fixed}.`;
     showToast(`Corrected ${fixed} mistagged community points doc(s).`);
   } catch (e) {
     statusEl.textContent = `Error: ${e.message}`;
@@ -9897,6 +9902,188 @@ window.archiveRound = async function() {
     showToast("Archive failed: " + e.message);
   }
 };
+// ==============================
+// ADMIN — ROUND 3 RESTART (Oct 1 – Dec 31, 2026)
+// ==============================
+// Round 2 is closed at Sep 30 and Round 3 starts Oct 1. This tool:
+//   1. Moves activity logged on/after Oct 1 (submissions, engagements,
+//      community points, posts) into R3 and renumbers its week (R2's W9 is
+//      R3's W1).
+//   2. Archives each member's Aug 1 – Sep 30 total to wac_round_archives as "R2".
+//   3. Sets registry.points / totalPosts to the member's R3-only total and
+//      enrolls every current member (R2 or Founder) in R3.
+//   4. Carries Oct 1+ tracker checkmarks into the R3 week ids.
+//   5. Re-keys WAC Pro action plan memory to R3 week numbers (once).
+// Everything is computed from timestamps on the activity docs, never from
+// registry.points, so it is safe to re-run. lifetimePoints is never touched.
+// dryRun = true reads only and shows what would change.
+const R3_OLD_WEEK_OFFSET = 8; // R2 W9 (Oct 1–7) → R3 W1
+
+function _r3Ts(data) {
+  const v = data.timestamp !== undefined ? data.timestamp : data.ts;
+  if (typeof v === "number") return v;
+  if (v && typeof v.toMillis === "function") return v.toMillis();
+  return 0;
+}
+
+// Pure planner — takes plain arrays of {id, ...data} and returns every write.
+function _planRound3Restart({ registry, submissions, engagements, communityPts, posts, trackers, planMemory, planMemoryDone }) {
+  const plan = { retag: [], archives: [], registry: [], trackers: [], planMemory: [], rows: [] };
+  const r2 = {}, r3 = {};
+  const bucket = (map, uid) => (map[uid] = map[uid] || { pts: 0, subs: 0 });
+
+  const sweep = (collName, docs, uidField, isSubmission) => {
+    docs.forEach(d => {
+      const ts = _r3Ts(d);
+      const uid = d[uidField];
+      const inR3 = ts >= ROUND3_START_TS;
+      const inR2 = !inR3 && (d.round === "R2" || (!d.round && ts >= ROUND2_START_TS));
+      if (inR3 && d.round !== "R3") {
+        const update = { round: "R3" };
+        if (collName !== "wac_community_pts" && typeof d.weekIdx === "number" && d.weekIdx >= R3_OLD_WEEK_OFFSET) {
+          update.weekIdx = d.weekIdx - R3_OLD_WEEK_OFFSET;
+          const w = WEEKS[update.weekIdx];
+          if (isSubmission && w) update.weekLabel = `${w.label} (${w.dates})`;
+        }
+        plan.retag.push({ coll: collName, id: d.id, update });
+      }
+      if (!uid || collName === "posts") return;
+      if (inR3) { const b = bucket(r3, uid); b.pts += d.pts || 0; if (isSubmission) b.subs++; }
+      else if (inR2) { const b = bucket(r2, uid); b.pts += d.pts || 0; if (isSubmission) b.subs++; }
+    });
+  };
+  sweep("submissions", submissions.filter(d => !d.isTrial), "authorUid", true);
+  sweep("engagements", engagements, "authorUid", false);
+  sweep("wac_community_pts", communityPts, "uid", false);
+  sweep("posts", posts, "authorUid", false);
+
+  registry.forEach(m => {
+    const rounds = Array.isArray(m.rounds) ? m.rounds : [];
+    const a = r2[m.id] || { pts: 0, subs: 0 };
+    const c = r3[m.id] || { pts: 0, subs: 0 };
+    const isCurrent = !!m.isFounder || rounds.includes("R2") || rounds.includes("R3");
+    const enroll = isCurrent && !rounds.includes("R3");
+    const hadR2 = rounds.includes("R2") || a.pts > 0 || a.subs > 0;
+    if (hadR2) plan.archives.push({ uid: m.id, name: m.name || "", points: a.pts, totalPosts: a.subs });
+    const regPts = typeof m.points === "number" ? m.points : 0;
+    const regPosts = typeof m.totalPosts === "number" ? m.totalPosts : 0;
+    if (regPts !== c.pts || regPosts !== c.subs || enroll) {
+      plan.registry.push({ uid: m.id, points: c.pts, totalPosts: c.subs, enroll });
+    }
+    plan.rows.push({ uid: m.id, name: m.name || m.email || m.id, regPts, r2Pts: a.pts, r3Pts: c.pts, isCurrent, enroll, hadR2 });
+  });
+
+  trackers.forEach(t => {
+    const tracked = t.tracked || {};
+    const update = {};
+    WEEKS.forEach((w, i) => {
+      const old = tracked["w" + (i + 1 + R3_OLD_WEEK_OFFSET)];
+      if (Array.isArray(old) && old.some(Boolean) && !Array.isArray(tracked[w.id])) {
+        update["tracked." + w.id] = old.slice(0, w.required || 1);
+      }
+    });
+    if (Object.keys(update).length) plan.trackers.push({ id: t.id, update });
+  });
+
+  if (!planMemoryDone) {
+    planMemory.forEach(pm => {
+      const old = pm.weeklyPlans || {};
+      if (!Object.keys(old).length || pm.weeklyPlansR2) return;
+      const next = {};
+      Object.keys(old).forEach(k => {
+        const n = parseInt(k, 10);
+        if (!isNaN(n) && n >= R3_OLD_WEEK_OFFSET) next[n - R3_OLD_WEEK_OFFSET] = old[k];
+      });
+      plan.planMemory.push({ id: pm.id, update: { weeklyPlansR2: old, weeklyPlans: next } });
+    });
+  }
+  return plan;
+}
+
+window.startRound3Restart = async function(dryRun) {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const statusEl = document.getElementById("r3-restart-status");
+  const tableEl = document.getElementById("r3-restart-table");
+  statusEl.style.display = "block";
+  if (CURRENT_ROUND !== "R3") { statusEl.textContent = "This tool only runs while CURRENT_ROUND is R3."; return; }
+  if (!dryRun) {
+    if (!confirm("Run the Round 3 restart?\n\nArchives Aug–Sep as Round 2, moves Oct 1+ activity into Round 3, resets every member's points to their Round 3 total, and enrolls current members in Round 3.\n\nRun Preview first if you haven't.")) return;
+    if (!confirm("Are you sure? Points will be reset for every member.")) return;
+  }
+  statusEl.textContent = "Reading Firestore...";
+
+  try {
+    const all = async (name) => (await getDocs(collection(db, name))).docs.map(d => ({ ...d.data(), id: d.id }));
+    const [registry, submissions, engagements, communityPts, trackers] = await Promise.all([
+      all("wac_registry"), all("submissions"), all("engagements"), all("wac_community_pts"), all("trackers")
+    ]);
+    const postsSnap = await getDocs(query(collection(db, "posts"), where("timestamp", ">=", ROUND3_START_TS)));
+    const posts = postsSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+
+    const metaRef = doc(db, "wac_round_archives", "_meta_R3_restart");
+    let meta = {};
+    try { const ms = await getDoc(metaRef); if (ms.exists()) meta = ms.data(); } catch (e) {}
+    let planMemory = [], planMemoryNote = "";
+    if (!meta.planMemoryMigratedAt) {
+      try { planMemory = await all("wac_action_plan_memory"); }
+      catch (e) { planMemoryNote = ` Action plan memory could not be read (${e.code || e.message}).`; }
+    }
+
+    const plan = _planRound3Restart({ registry, submissions, engagements, communityPts, posts, trackers, planMemory, planMemoryDone: !!meta.planMemoryMigratedAt });
+    const current = plan.rows.filter(r => r.isCurrent).length;
+    const summary = `${registry.length} members in registry · ${current} current (R2 or Founder) · ${plan.rows.filter(r => r.enroll).length} to enroll in R3 · ` +
+      `${plan.archives.length} R2 archives · ${plan.retag.length} Oct 1+ docs to move into R3 · ${plan.registry.length} registry updates · ` +
+      `${plan.trackers.length} trackers to carry over · ${plan.planMemory.length} action plan docs to re-key.` + planMemoryNote;
+
+    const rows = plan.rows.slice().sort((a, b) => b.r3Pts - a.r3Pts || b.r2Pts - a.r2Pts);
+    tableEl.style.display = "block";
+    tableEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead><tr>${["Member","Registry now","R2 archive (Aug–Sep)","R3 start (Oct 1+)","R3"].map((h, i) => `<th style="text-align:${i ? "right" : "left"};padding:7px 8px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);">${h}</th>`).join("")}</tr></thead>
+      <tbody>${rows.map(r => `<tr>
+        <td style="padding:6px 8px;border-bottom:1px solid var(--border);">${esc(r.name)}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;">${r.regPts}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;">${r.hadR2 ? r.r2Pts : "—"}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;font-weight:700;">${r.r3Pts}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;">${r.isCurrent ? (r.enroll ? "enroll" : "✓") : "not enrolled"}</td>
+      </tr>`).join("")}</tbody></table>`;
+
+    if (dryRun) { statusEl.textContent = "Preview (nothing written): " + summary; return; }
+
+    let done = 0, failed = 0, firstError = "";
+    const total = plan.retag.length + plan.archives.length + plan.registry.length + plan.trackers.length + plan.planMemory.length;
+    const step = async (fn) => {
+      try { await fn(); } catch (e) { failed++; if (!firstError) firstError = e.code || e.message; }
+      done++;
+      if (done % 10 === 0) statusEl.textContent = `Working... ${done}/${total}`;
+    };
+    const archivedAt = Date.now();
+    for (const r of plan.retag) await step(() => updateDoc(doc(db, r.coll, r.id), r.update));
+    for (const a of plan.archives) await step(() => setDoc(doc(db, "wac_round_archives", `R2_${a.uid}`), { ...a, round: "R2", archivedAt }));
+    for (const m of plan.registry) {
+      const update = { points: m.points, totalPosts: m.totalPosts };
+      if (m.enroll) update.rounds = arrayUnion("R3");
+      await step(() => updateDoc(doc(db, "wac_registry", m.uid), update));
+    }
+    for (const t of plan.trackers) await step(() => updateDoc(doc(db, "trackers", t.id), t.update));
+    let planFailed = 0;
+    for (const pm of plan.planMemory) {
+      const before = failed;
+      await step(() => updateDoc(doc(db, "wac_action_plan_memory", pm.id), pm.update));
+      if (failed > before) planFailed++;
+    }
+    const metaUpdate = { lastRunAt: archivedAt };
+    if (!meta.planMemoryMigratedAt && !planMemoryNote && !planFailed) metaUpdate.planMemoryMigratedAt = archivedAt;
+    try { await setDoc(metaRef, metaUpdate, { merge: true }); } catch (e) {}
+
+    statusEl.textContent = (failed ? `Finished with ${failed} failure(s) (${firstError}). Re-run to retry. ` : "Done. ") + summary;
+    showToast(failed ? `Round 3 restart finished with ${failed} failure(s).` : "Round 3 restart complete.");
+    if (typeof loadLeaderboard === "function") loadLeaderboard();
+  } catch (e) {
+    statusEl.textContent = `Error: ${e.code || e.message}`;
+    showToast("Round 3 restart failed: " + (e.code || e.message));
+  }
+};
+
 // ONE-TIME CATCH-UP: Round 1 was never archived before CURRENT_ROUND was
 // flipped to R2 at launch. registry.points has been carrying the full R1
 // total forward ever since, and any R2 points already earned (before the
@@ -9911,6 +10098,7 @@ window.archiveRound = async function() {
 // Backfill Round Tags (and Fix Community Pts Tags) first.
 window.catchUpArchiveR1AndFixR2Points = async function() {
   if (!currentUser || !currentUser.isAdmin) return;
+  if (CURRENT_ROUND !== "R2") { showToast("The R1 catch-up only applied during Round 2."); return; }
   if (!confirm("One-time catch-up: archive true R1 totals, then reset registry.points to each member's actual R2-only total (preserving any R2 points already earned)?\n\nThis writes to wac_round_archives and updates wac_registry.")) return;
   if (!confirm("Are you sure? This cannot be undone.")) return;
 
