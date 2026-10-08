@@ -9235,7 +9235,7 @@ window.loadAdminSubmissions = async function() {
       const noteB64 = btoa(unescape(encodeURIComponent(noteField)));
       const uidB64  = btoa(unescape(encodeURIComponent(s.authorUid || "")));
       return `<div class="admin-sub-row" style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:var(--surface);"
-        data-id="${s.id}" data-coll="${collName}" data-uid="${uidB64}" data-pts="${s.pts}" data-url="${urlB64}" data-note="${noteB64}">
+        data-id="${s.id}" data-coll="${collName}" data-uid="${uidB64}" data-pts="${s.pts}" data-url="${urlB64}" data-note="${noteB64}" data-week="${typeof s.weekIdx === "number" ? s.weekIdx : ""}">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;">
           <div style="flex:1;min-width:0;">
             <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">
@@ -9248,6 +9248,7 @@ window.loadAdminSubmissions = async function() {
           <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
             <span style="font-weight:700;color:var(--gold);font-size:14px;">+${s.pts}</span>
             <button class="btn btn-outline btn-sm admin-sub-edit-btn" style="font-size:11px;padding:4px 10px;">Edit</button>
+            ${(!isEng && !s.isTrial && s.round === CURRENT_ROUND) ? '<button class="btn btn-outline btn-sm admin-sub-week-btn" style="font-size:11px;padding:4px 10px;">Week</button>' : ""}
             <button class="btn btn-sm admin-sub-del-btn" style="font-size:11px;padding:4px 10px;background:var(--danger);color:#fff;border-color:var(--danger);">Del</button>
           </div>
         </div>
@@ -9261,7 +9262,8 @@ window.loadAdminSubmissions = async function() {
       if (!row) return;
       const editBtn = e.target.closest(".admin-sub-edit-btn");
       const delBtn  = e.target.closest(".admin-sub-del-btn");
-      if (!editBtn && !delBtn) return;
+      const weekBtn = e.target.closest(".admin-sub-week-btn");
+      if (!editBtn && !delBtn && !weekBtn) return;
       const docId   = row.dataset.id;
       const coll    = row.dataset.coll;
       const uid     = decodeURIComponent(escape(atob(row.dataset.uid)));
@@ -9270,6 +9272,7 @@ window.loadAdminSubmissions = async function() {
       const note    = decodeURIComponent(escape(atob(row.dataset.note)));
       if (editBtn) adminOpenEditSubmission(docId, coll, uid, pts, url, note);
       if (delBtn)  adminDeleteSubmission(docId, coll, uid, pts);
+      if (weekBtn) adminMoveSubmissionWeek(docId, uid, parseInt(row.dataset.week, 10));
     };
   } catch (e) {
     console.error("loadAdminSubmissions error:", e);
@@ -9307,6 +9310,63 @@ window.adminOpenEditSubmission = function(docId, collName, authorUid, currentPts
       showToast("Update failed.");
     }
   })();
+};
+
+// Move a current-round submission to a different week. Points are untouched
+// (they were already credited). Also ticks the target week on the member's
+// tracker so it counts toward All-Star. The week it came from is left alone.
+// Pure planner: returns { error } or the exact writes to make.
+function _planMoveSubmissionWeek({ subId, fromIdx, targetIdx, memberSubs, trackerData }) {
+  if (!Number.isInteger(targetIdx) || targetIdx < 0 || targetIdx >= WEEKS.length) {
+    return { error: `Enter a week from 1 to ${WEEKS.length}.` };
+  }
+  if (targetIdx === fromIdx) return { error: "It's already in that week." };
+  const w = WEEKS[targetIdx];
+  const required = w.required || 1;
+  const taken = memberSubs.filter(s => s.id !== subId && !s.isTrial && s.round === CURRENT_ROUND && s.weekIdx === targetIdx).length;
+  if (taken >= required) {
+    return { error: `This member already has ${taken} submission(s) in Week ${targetIdx + 1}. Delete or move that one first.` };
+  }
+  const checks = _weekChecks(trackerData, w);
+  const open = checks.indexOf(false);
+  let trackerUpdate = null;
+  if (open !== -1) {
+    checks[open] = true;
+    trackerUpdate = { ...((trackerData && trackerData.tracked) || {}), [w.id]: checks };
+  }
+  return {
+    subUpdate: { weekIdx: targetIdx, weekLabel: `${w.label} (${w.dates})` },
+    trackerUpdate,
+    weekName: `Week ${targetIdx + 1} (${w.dates})`
+  };
+}
+
+window.adminMoveSubmissionWeek = async function(docId, authorUid, fromIdx) {
+  if (!currentUser || !currentUser.isAdmin) return;
+  const fromName = Number.isInteger(fromIdx) ? `Week ${fromIdx + 1}` : "no week";
+  const raw = prompt(`Move this submission to which week? Enter 1 to ${WEEKS.length}.\n\nCurrently: ${fromName}`, "");
+  if (raw === null) return;
+  const targetIdx = /^\s*\d+\s*$/.test(raw) ? parseInt(raw, 10) - 1 : NaN;
+  try {
+    const [subsSnap, trackerSnap] = await Promise.all([
+      getDocs(query(collection(db, "submissions"), where("authorUid", "==", authorUid))),
+      getDoc(doc(db, "trackers", authorUid))
+    ]);
+    const memberSubs = subsSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+    const trackerData = trackerSnap.exists() ? trackerSnap.data() : {};
+    const plan = _planMoveSubmissionWeek({ subId: docId, fromIdx, targetIdx, memberSubs, trackerData });
+    if (plan.error) { showToast(plan.error); return; }
+    if (!confirm(`Move to ${plan.weekName}?\n\nPoints stay the same. ${plan.trackerUpdate ? "That week will be ticked on the member's tracker." : "That week is already ticked on the member's tracker."}`)) return;
+    await updateDoc(doc(db, "submissions", docId), plan.subUpdate);
+    if (plan.trackerUpdate) {
+      await setDoc(doc(db, "trackers", authorUid), { uid: authorUid, tracked: plan.trackerUpdate }, { merge: true });
+    }
+    showToast(`Moved to ${plan.weekName}.`);
+    await loadAdminSubmissions();
+  } catch (e) {
+    console.error("adminMoveSubmissionWeek error:", e);
+    showToast("Move failed.");
+  }
 };
 
 window.adminDeleteSubmission = async function(docId, collName, authorUid, pts) {
