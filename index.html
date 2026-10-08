@@ -6245,7 +6245,9 @@ async function loadMySubmissions() {
     // Update submit button state based on whether this week is already submitted
     const currentWeekIdx = getWeekIndex();
     const currentWeekRequired = currentWeekIdx >= 0 ? (WEEKS[currentWeekIdx].required || 1) : 1;
-    const weekSubmitted = currentWeekIdx >= 0 && items.filter(s => s.weekIdx === currentWeekIdx).length >= currentWeekRequired;
+    // weekIdx restarts at 0 every round, so only this round's submissions count.
+    // Without the round check, a prior-round Week 1 submission locks the button.
+    const weekSubmitted = currentWeekIdx >= 0 && items.filter(s => s.round === CURRENT_ROUND && s.weekIdx === currentWeekIdx).length >= currentWeekRequired;
     _updateSubmitBtnState(weekSubmitted);
     const el = document.getElementById("my-submissions");
     if (!items.length) { el.innerHTML = '<p class="text-sm text-muted">No submissions yet.</p>'; return; }
