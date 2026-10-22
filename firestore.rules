@@ -1,0 +1,233 @@
+rules_version = '2';
+
+// WAC Firestore rules — Security Stage 2 (Oct 2026)
+// - No catch-all: any collection not listed here is denied.
+// - Admin = nate@templetonimage.com. Experts = registry isExpert == true (admin-set).
+// - Cloud Functions use the Admin SDK and skip these rules (Stripe webhook, Pro AI, nudges, digest).
+// - Assumes public sign-up stays OFF, so every signed-in account is a member, an expert, or the admin.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ───────────────────────────────────────────────
+    function signedIn() { return request.auth != null; }
+    function isAdmin()  { return signedIn() && request.auth.token.email == 'nate@templetonimage.com'; }
+    function me()       { return request.auth.uid; }
+    function regPath()  { return /databases/$(database)/documents/wac_registry/$(request.auth.uid); }
+    function isExpert() { return signedIn() && exists(regPath()) && get(regPath()).data.get('isExpert', false) == true; }
+
+    function changed()         { return request.resource.data.diff(resource.data).affectedKeys(); }
+    function onlyChanges(keys) { return changed().hasOnly(keys); }
+    function oldN(k)           { return resource.data.get(k, 0); }
+    function newN(k)           { return request.resource.data.get(k, 0); }
+    function shortStr(k, n)    { return !(k in request.resource.data) || (request.resource.data[k] is string && request.resource.data[k].size() <= n); }
+    function ptsField(v)       { return v is number && v >= -25 && v <= 25; }
+
+    // ── Member registry ───────────────────────────────────────
+    // Members may only touch these fields on their own doc. Everything else
+    // (isPro, trialUntil, isExpert, isVIP, rounds, name, email, restart/ambassador
+    // grants, nudge counters) is admin- or Cloud Function-only.
+    function memberRegistryKeys() {
+      return ['lastLogin', 'points', 'lifetimePoints', 'totalPosts', 'isAllStar',
+              'business', 'type', 'ig', 'website', 'photoURL',
+              'restartSnoozedUntil', 'activeSiteBriefId',
+              'restartPtsPending', 'restartPtsAwardedAt', 'ambassadorPtsPending', 'ambassadorPtsAwardedAt'];
+    }
+    // Normal point writes: one award or deduction at a time (largest single award is +25),
+    // lifetimePoints moves with points, totalPosts moves by at most 1.
+    function normalPtsOk() {
+      return !changed().hasAny(['points', 'lifetimePoints', 'totalPosts', 'restartPtsPending', 'ambassadorPtsPending'])
+        || (newN('points') is number && newN('lifetimePoints') is number && newN('totalPosts') is number
+            && !changed().hasAny(['restartPtsPending', 'ambassadorPtsPending'])
+            && math.abs(newN('points') - oldN('points')) <= 25
+            && newN('lifetimePoints') - oldN('lifetimePoints') == newN('points') - oldN('points')
+            && math.abs(newN('totalPosts') - oldN('totalPosts')) <= 1);
+    }
+    // One-time credit of pending Restart (+10) / Ambassador (+25) points on first login after Oct 1.
+    // Points must equal exactly what was pending on the doc; pending is zeroed; each credit happens once.
+    function creditOk() {
+      let r = changed().hasAny(['restartPtsAwardedAt']);
+      let a = changed().hasAny(['ambassadorPtsAwardedAt']);
+      let rp = r ? resource.data.get('restartPtsPending', 0) : 0;
+      let ap = a ? resource.data.get('ambassadorPtsPending', 0) : 0;
+      let rl = (r && resource.data.get('restartLifetimeCredited', false) != true) ? rp : 0;
+      let al = (a && resource.data.get('ambassadorLifetimeCredited', false) != true) ? ap : 0;
+      return (!r || (resource.data.get('restartPtsAwardedAt', null) == null
+                     && resource.data.get('restartedAt', null) != null
+                     && rp is number && rp > 0 && rp <= 10
+                     && request.resource.data.get('restartPtsPending', -1) == 0))
+        && (!a || (resource.data.get('ambassadorPtsAwardedAt', null) == null
+                     && resource.data.get('ambassadorBadge', false) == true
+                     && ap is number && ap > 0 && ap <= 25
+                     && request.resource.data.get('ambassadorPtsPending', -1) == 0))
+        && (r || !changed().hasAny(['restartPtsPending']))
+        && (a || !changed().hasAny(['ambassadorPtsPending']))
+        && newN('points') - oldN('points') == rp + ap
+        && newN('lifetimePoints') - oldN('lifetimePoints') == rl + al
+        && !changed().hasAny(['totalPosts']);
+    }
+    function memberRegistryUpdateOk() {
+      return onlyChanges(memberRegistryKeys())
+        && (!changed().hasAny(['isAllStar']) || request.resource.data.isAllStar == true)
+        && (!changed().hasAny(['lastLogin']) || request.resource.data.lastLogin is number)
+        && shortStr('business', 300) && shortStr('type', 200) && shortStr('ig', 200) && shortStr('website', 500)
+        && shortStr('activeSiteBriefId', 200)
+        && (!changed().hasAny(['photoURL']) || (request.resource.data.photoURL is string && request.resource.data.photoURL.size() <= 300000))
+        && (changed().hasAny(['restartPtsAwardedAt', 'ambassadorPtsAwardedAt']) ? creditOk() : normalPtsOk());
+    }
+    match /wac_registry/{regId} {
+      allow read: if signedIn();
+      allow update: if isAdmin() || (signedIn() && regId == me() && memberRegistryUpdateOk());
+      allow create, delete: if isAdmin();
+
+      // Website brief builder (Get Started) — private to the member.
+      match /siteBriefs/{briefId} {
+        allow read, write: if isAdmin() || (signedIn() && regId == me());
+      }
+    }
+
+    // ── Feed ──────────────────────────────────────────────────
+    function ownsPost()  { return signedIn() && resource.data.get('authorUid', '') == me(); }
+    function newReply()  { return request.resource.data.replies[request.resource.data.replies.size() - 1]; }
+    match /posts/{postId} {
+      allow read: if signedIn();
+      allow create: if isAdmin()
+        || (signedIn() && request.resource.data.get('authorUid', '') == me()
+            && request.resource.data.get('propsCount', 0) == 0
+            && request.resource.data.get('props', []).size() == 0
+            && request.resource.data.get('replies', []).size() == 0
+            && (request.resource.data.get('type', '') != 'expert-response' || isExpert()));
+      allow update: if isAdmin()
+        // author edits their own text / link / PVR prompt / expert response body
+        || (ownsPost() && onlyChanges(['text', 'url', 'pvr_prompt', 'body', 'editedAt']))
+        // anyone gives Props: one name added, count kept in sync
+        || (signedIn() && onlyChanges(['props', 'propsCount'])
+            && request.resource.data.props is list
+            && request.resource.data.props.size() == resource.data.get('props', []).size() + 1
+            && request.resource.data.propsCount == request.resource.data.props.size())
+        // anyone replies: exactly one reply added, signed as themselves
+        || (signedIn() && onlyChanges(['replies'])
+            && request.resource.data.replies is list
+            && request.resource.data.replies.size() == resource.data.get('replies', []).size() + 1
+            && newReply().get('uid', '') == me()
+            && newReply().keys().hasOnly(['name', 'uid', 'text', 'timestamp'])
+            && newReply().get('text', '') is string && newReply().get('text', '').size() <= 5000);
+      allow delete: if isAdmin() || ownsPost();
+    }
+
+    // ── Weekly challenge ──────────────────────────────────────
+    function ownsWork()    { return signedIn() && resource.data.get('authorUid', '') == me(); }
+    function newOwnWork()  { return signedIn() && request.resource.data.get('authorUid', '') == me()
+                                    && ptsField(request.resource.data.get('pts', 0))
+                                    && request.resource.data.get('pts', 0) >= 0; }
+    match /submissions/{subId} {
+      allow read: if signedIn();
+      allow create: if isAdmin() || newOwnWork();
+      allow update: if isAdmin() || (ownsWork() && onlyChanges(['url', 'note', 'editedAt']));
+      allow delete: if isAdmin() || ownsWork();
+    }
+    match /engagements/{engId} {
+      allow read: if signedIn();
+      allow create: if isAdmin() || newOwnWork();
+      allow update: if isAdmin();
+      allow delete: if isAdmin() || ownsWork();
+    }
+    match /trackers/{uid} {
+      allow read: if isAdmin() || (signedIn() && uid == me());
+      allow create: if isAdmin()
+        || (signedIn() && uid == me() && request.resource.data.get('uid', '') == me()
+            && request.resource.data.keys().hasOnly(['uid', 'tracked']));
+      allow update: if isAdmin()
+        || (signedIn() && uid == me() && request.resource.data.get('uid', '') == me()
+            && onlyChanges(['uid', 'tracked']));
+      allow delete: if isAdmin();
+    }
+    match /wac_community_pts/{id} {
+      allow read: if signedIn();
+      allow create: if isAdmin()
+        || (signedIn() && request.resource.data.get('uid', '') == me() && ptsField(request.resource.data.get('pts', 0)));
+      allow update, delete: if isAdmin();
+    }
+
+    // ── Expert Reviews ────────────────────────────────────────
+    // Requesters see their own; experts and admin see all. The weekly digest
+    // runs as a Cloud Function (Admin SDK), so nothing here is public.
+    match /expert_reviews/{reviewId} {
+      allow read: if isAdmin() || isExpert() || (signedIn() && resource.data.get('requesterUid', '') == me());
+      allow create: if isAdmin()
+        || (signedIn() && request.resource.data.get('requesterUid', '') == me()
+            && request.resource.data.get('status', '') == 'pending'
+            && request.resource.data.keys().hasOnly(['requesterUid', 'requesterName', 'requesterEmail', 'pageUrl',
+                                                    'feedbackRequest', 'monthKey', 'status', 'createdAt']));
+      allow update: if isAdmin()
+        || (isExpert() && onlyChanges(['status', 'responseText', 'respondedAt']));
+      allow delete: if isAdmin();
+    }
+
+    // ── Backlink Repository ───────────────────────────────────
+    match /wac_backlinks/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isAdmin()
+        || (signedIn() && uid == me() && request.resource.data.get('uid', '') == me()
+            && request.resource.data.keys().hasOnly(['uid', 'displayName', 'siteUrl', 'siteNiche', 'siteDescription',
+                                                    'exchangeType', 'contactEmail', 'listedAt', 'isActive']));
+      allow delete: if isAdmin() || (signedIn() && uid == me());
+    }
+
+    // ── Coworking ─────────────────────────────────────────────
+    match /wac_coworking_sessions/{sessionId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+      match /rsvps/{uid} {
+        allow read: if signedIn();
+        allow create, update: if isAdmin()
+          || (signedIn() && uid == me() && request.resource.data.get('uid', '') == me()
+              && request.resource.data.keys().hasOnly(['uid', 'name', 'rsvpAt']));
+        allow delete: if isAdmin() || (signedIn() && uid == me());
+      }
+      match /attendees/{uid} {
+        allow read: if signedIn();
+        allow write: if isAdmin();
+      }
+    }
+
+    // ── Reports in, admin reads ───────────────────────────────
+    match /bug_reports/{id} {
+      allow create: if signedIn() && request.resource.data.get('uid', '') == me();
+      allow read, update, delete: if isAdmin();
+    }
+    match /platform_errors/{id} {
+      allow create: if signedIn();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── Admin-only content (members read) ─────────────────────
+    match /announcements/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /resources/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /wac_round_archives/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // ── WAC Pro archives: owner reads, only Cloud Functions write ──
+    match /wac_action_plan_memory/{uid} {
+      allow read: if isAdmin() || (signedIn() && uid == me());
+      allow write: if false;
+    }
+    match /wac_copy_assist/{uid} {
+      allow read: if isAdmin() || (signedIn() && uid == me());
+      allow write: if false;
+    }
+    match /wac_seo_analysis/{uid} {
+      allow read: if isAdmin() || (signedIn() && uid == me());
+      allow write: if false;
+    }
+
+    // wac_config (sale round) is read only by Cloud Functions: no client rule = denied.
+  }
+}
