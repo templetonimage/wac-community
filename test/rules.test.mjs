@@ -86,13 +86,13 @@ test("ALLOW removeProfilePhoto", () => assertSucceeds(updateDoc(reg(ALICE), { ph
 test("ALLOW snoozeRestartModal", () => assertSucceeds(updateDoc(reg(ALICE), { restartSnoozedUntil: Date.now() + 1000 })));
 test("ALLOW gsSave: activeSiteBriefId", () => assertSucceeds(updateDoc(reg(ALICE), { activeSiteBriefId: "b1" })));
 test("ALLOW _creditPendingRestartPts: restart +10 and ambassador +25 credited once (transaction)", () =>
-  assertSucceeds(runTransaction(db(RESTARTER), async (tx) => {
-    const r = doc(db(RESTARTER), "wac_registry/rs");
+  assertSucceeds((async () => { const f = db(RESTARTER); return runTransaction(f, async (tx) => {
+    const r = doc(f, "wac_registry/rs");
     await tx.get(r);
-    tx.set(doc(db(RESTARTER), "wac_community_pts/restart_rs"), { uid: "rs", name: "Re", action: "restart", type: "restart", pts: 10, round: "R2", ts: 1 });
-    tx.set(doc(db(RESTARTER), "wac_community_pts/restart_ambassador_rs"), { uid: "rs", name: "Re", action: "restart_ambassador", type: "restart_ambassador", pts: 25, round: "R2", ts: 1 });
+    tx.set(doc(f, "wac_community_pts/restart_rs"), { uid: "rs", name: "Re", action: "restart", type: "restart", pts: 10, round: "R2", ts: 1 });
+    tx.set(doc(f, "wac_community_pts/restart_ambassador_rs"), { uid: "rs", name: "Re", action: "restart_ambassador", type: "restart_ambassador", pts: 25, round: "R2", ts: 1 });
     tx.update(r, { restartPtsPending: 0, restartPtsAwardedAt: 2, ambassadorPtsPending: 0, ambassadorPtsAwardedAt: 2, points: increment(35) });
-  })));
+  }); })()));
 test("ALLOW credit ambassador only (+25)", () => assertSucceeds(updateDoc(reg(RESTARTER), { ambassadorPtsPending: 0, ambassadorPtsAwardedAt: 2, points: increment(25) })));
 test("ALLOW credit both, plain update (+35)", () => assertSucceeds(updateDoc(reg(RESTARTER), { restartPtsPending: 0, restartPtsAwardedAt: 2, ambassadorPtsPending: 0, ambassadorPtsAwardedAt: 2, points: increment(35) })));
 test("ALLOW credit restart only (+10)", () => assertSucceeds(updateDoc(reg(RESTARTER), { restartPtsPending: 0, restartPtsAwardedAt: 2, points: increment(10) })));
