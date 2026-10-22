@@ -2817,7 +2817,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
       </div>
       <div class="card mt-16" style="background:linear-gradient(135deg,var(--accent-bg),var(--surface));">
         <div class="card-title">⭐ WAC All-Star</div>
-        <p class="text-sm text-muted" id="allstar-card-copy">Complete all 21 weekly requirements across August through December to earn All-Star status. That's 25 total updates over the round.</p>
+        <p class="text-sm text-muted" id="allstar-card-copy">Complete all 20 weekly requirements across August through December to earn All-Star status. That's 24 total updates over the round.</p>
       </div>
     </div>
 
@@ -3884,7 +3884,6 @@ const WEEKLY_CHALLENGES = [
   { title: "Check Your NAP Consistency (Trust Signal)", desc: "Confirm your Name, Address (or service area), and Phone number match exactly across your site, Google Business Profile, and any directories you're listed in. Inconsistent business info is a quiet Trust red flag for both visitors and search engines." },
   { title: "Post a Timely Update (Experience Signal)",  desc: "Share something happening right now — current availability, a seasonal offer, year-end booking info, or recent work in progress. Timely, dated content is a direct Experience signal that your business is active today, not dormant." },
   { title: "Add a Credentials or Press Mention (Expertise Signal)", desc: "Add any certification, feature, award, or press mention you haven't listed yet — even a small local write-up counts. Third-party recognition is one of the fastest ways to demonstrate Expertise." },
-  { title: "Get Tagged or Mentioned by Someone Else (Authority Signal)", desc: "Ask a recent client, collaborator, or vendor to tag you or link to your site from their own page or profile. Authority Google can verify from an outside source carries more weight than anything you say about yourself." },
   { title: "Year-End Site Audit (Any E-E-A-T Win)",     desc: "Walk your site start to finish and fix the first thing that feels outdated, broken, or unclear — copy, a photo, a price, a dead link. Close out the year with one clean, deliberate improvement." },
 ];
 
@@ -3968,8 +3967,7 @@ const WEEK_SCHEDULE = [
   [Date.UTC(2026,11,1,5,0,0),  Date.UTC(2026,11,8,4,59,59,999)],  // W17 Dec 1–7
   [Date.UTC(2026,11,8,5,0,0),  Date.UTC(2026,11,15,4,59,59,999)], // W18 Dec 8–14
   [Date.UTC(2026,11,15,5,0,0), Date.UTC(2026,11,22,4,59,59,999)], // W19 Dec 15–21
-  [Date.UTC(2026,11,22,5,0,0), Date.UTC(2026,11,29,4,59,59,999)], // W20 Dec 22–28
-  [Date.UTC(2026,11,29,5,0,0), Date.UTC(2027,0,1,4,59,59,999)],   // W21 Dec 29–31
+  [Date.UTC(2026,11,22,5,0,0), Date.UTC(2027,0,1,4,59,59,999)],   // W20 Dec 22–31 (extended Week 4)
 ];
 
 const WEEKS = [
@@ -3992,8 +3990,7 @@ const WEEKS = [
   {id:"w17", label:"Week 1", dates:"Dec 1–7",    month:"December",  required:1},
   {id:"w18", label:"Week 2", dates:"Dec 8–14",   month:"December",  required:1},
   {id:"w19", label:"Week 3", dates:"Dec 15–21",  month:"December",  required:1},
-  {id:"w20", label:"Week 4", dates:"Dec 22–28",  month:"December",  required:1},
-  {id:"w21", label:"Week 5", dates:"Dec 29–31",  month:"December",  required:1},
+  {id:"w20", label:"Week 4", dates:"Dec 22–31",  month:"December",  required:1},
 ];
 const MONTHS = ["August", "September", "October", "November", "December"];
 // October dropped from the original 1/2/3 ramp to a flat 1/week, effective Oct 1, 2026.
