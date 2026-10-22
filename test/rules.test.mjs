@@ -93,6 +93,8 @@ test("ALLOW _creditPendingRestartPts: restart +10 and ambassador +25 credited on
     tx.set(doc(db(RESTARTER), "wac_community_pts/restart_ambassador_rs"), { uid: "rs", name: "Re", action: "restart_ambassador", type: "restart_ambassador", pts: 25, round: "R2", ts: 1 });
     tx.update(r, { restartPtsPending: 0, restartPtsAwardedAt: 2, ambassadorPtsPending: 0, ambassadorPtsAwardedAt: 2, points: increment(35) });
   })));
+test("ALLOW credit ambassador only (+25)", () => assertSucceeds(updateDoc(reg(RESTARTER), { ambassadorPtsPending: 0, ambassadorPtsAwardedAt: 2, points: increment(25) })));
+test("ALLOW credit both, plain update (+35)", () => assertSucceeds(updateDoc(reg(RESTARTER), { restartPtsPending: 0, restartPtsAwardedAt: 2, ambassadorPtsPending: 0, ambassadorPtsAwardedAt: 2, points: increment(35) })));
 test("ALLOW credit restart only (+10)", () => assertSucceeds(updateDoc(reg(RESTARTER), { restartPtsPending: 0, restartPtsAwardedAt: 2, points: increment(10) })));
 test("DENY credit more than pending", () => assertFails(updateDoc(reg(RESTARTER), { restartPtsPending: 0, restartPtsAwardedAt: 2, points: increment(30) })));
 test("DENY credit without zeroing pending (repeatable)", () => assertFails(updateDoc(reg(RESTARTER), { restartPtsAwardedAt: 2, points: increment(10) })));
