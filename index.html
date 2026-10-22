@@ -3841,6 +3841,11 @@ const ADMIN_EMAIL   = "nate@templetonimage.com";
 // on next load, forcing a fresh Firestore read instead of stale local data.
 const SESSION_CACHE_VERSION = 3;
 const CURRENT_ROUND = "R2";
+// Member-facing name for the Oct 1 restart period. Internal round id stays CURRENT_ROUND
+// so points, history, and round-scoped queries are unchanged.
+const ROUND_DISPLAY_NAME = "Final Round of 2026";
+// The restart counts Oct 1–7 (WEEKS/WEEK_SCHEDULE index 8) as Week 1, through Dec 31.
+const RESTART_WEEK_IDX = 8;
 
 const PTS_ON_TIME   = 10;
 const PTS_LATE_24H  = 5;
@@ -4003,7 +4008,7 @@ const MONTH_REQS = {"August":"1 update/week", "September":"2 updates/week", "Oct
 function _applyRoundLabels() {
   const roundNum = CURRENT_ROUND.replace("R", "");
   const roundYear = new Date(WEEK_SCHEDULE[0][0]).getUTCFullYear();
-  const roundLabel = `Round ${roundNum} · ${MONTHS[0].slice(0,3)}–${MONTHS[MONTHS.length-1].slice(0,3)} ${roundYear}`;
+  const roundLabel = `${ROUND_DISPLAY_NAME} · Oct–${MONTHS[MONTHS.length-1].slice(0,3)}`;
   document.querySelectorAll(".js-round-label").forEach(el => el.textContent = roundLabel);
 
   const trackerSub = document.getElementById("tracker-page-subtitle");
@@ -4762,8 +4767,10 @@ window.loadDashboard = async function() {
     if (roundEl) roundEl.textContent = 'Free Trial';
     if (weekEl) weekEl.textContent = `Week ${trialIdx + 1} of 4`;
   } else {
-    if (roundEl) roundEl.textContent = 'Round ' + CURRENT_ROUND.replace('R', '');
-    if (weekEl) weekEl.textContent = weekIdx >= 0 ? 'Week ' + (weekIdx + 1) + ' of 12' : '—';
+    if (roundEl) roundEl.textContent = ROUND_DISPLAY_NAME;
+    if (weekEl) weekEl.textContent = weekIdx < 0 ? '—'
+      : weekIdx >= RESTART_WEEK_IDX ? `Week ${weekIdx - RESTART_WEEK_IDX + 1} of ${WEEKS.length - RESTART_WEEK_IDX}`
+      : `Week ${weekIdx + 1} of ${WEEKS.length}`;
   }
 
   const metaEl = document.getElementById('dash-date-meta');
@@ -7161,7 +7168,7 @@ async function loadLifetimeStats() {
       </div>`;
     let html = archived.map(a => row(`Round ${String(a.round).replace("R", "")}`, a.points || 0, "")).join("");
     if (rounds.includes(CURRENT_ROUND)) {
-      html += row(`Round ${CURRENT_ROUND.replace("R", "")}`, currentPts, isRoundOver() ? "" : "(in progress)");
+      html += row(ROUND_DISPLAY_NAME, currentPts, isRoundOver() ? "" : "(in progress)");
     }
     const pending = (!d.restartPtsAwardedAt && (d.restartPtsPending || 0) > 0 ? d.restartPtsPending : 0) +
       (d.ambassadorBadge && !d.ambassadorPtsAwardedAt && (d.ambassadorPtsPending || 0) > 0 ? d.ambassadorPtsPending : 0);
@@ -7879,7 +7886,7 @@ function showWelcomeModal() {
   const key = `wac_welcomed_${currentUser.uid}`;
   if (localStorage.getItem(key)) return;
   const titleEl = document.getElementById("welcome-modal-title");
-  if (titleEl) titleEl.textContent = `Welcome to Round ${CURRENT_ROUND.replace("R","")}! 👋`;
+  if (titleEl) titleEl.textContent = `Welcome to the ${ROUND_DISPLAY_NAME}! 👋`;
   document.getElementById("welcome-overlay").classList.add("open");
 }
 
@@ -7904,8 +7911,8 @@ function maybeShowRoundWelcomeModal() {
   const roundLabel = `${MONTHS[0].slice(0,3)}–${MONTHS[MONTHS.length-1].slice(0,3)} ${new Date(WEEK_SCHEDULE[0][0]).getUTCFullYear()}`;
   const titleEl = document.getElementById("round-welcome-title");
   const subEl = document.getElementById("round-welcome-sub");
-  if (titleEl) titleEl.textContent = `Welcome to Round ${roundNum}!`;
-  if (subEl) subEl.textContent = `Round ${roundNum} · ${roundLabel} is live — here's what's new.`;
+  if (titleEl) titleEl.textContent = `Welcome to the ${ROUND_DISPLAY_NAME}!`;
+  if (subEl) subEl.textContent = `${ROUND_DISPLAY_NAME} · Oct–Dec is live — here's what's new.`;
 
   document.getElementById("round-welcome-overlay").classList.add("open");
 }
