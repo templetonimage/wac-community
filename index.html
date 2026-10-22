@@ -3534,6 +3534,33 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   </div>
 </div>
 
+<!-- FORCED PASSWORD CHANGE — shown after signing in with the shared starter password -->
+<div class="welcome-overlay" id="force-pw-overlay" style="z-index:3000;">
+  <div class="welcome-modal">
+    <div class="welcome-header">
+      <div class="welcome-logo">WAC</div>
+      <div style="font-size:13px;letter-spacing:0.12em;text-transform:uppercase;opacity:0.85;">Website Accountability Challenge</div>
+    </div>
+    <div class="welcome-body">
+      <h3>Set your own password 🔒</h3>
+      <p class="text-sm text-muted" style="margin-bottom:14px;line-height:1.6;">You signed in with the starter password that every new member gets. Choose your own so nobody else can get into your account.</p>
+      <div class="form-group">
+        <label class="form-label">New password (8+ characters)</label>
+        <input type="password" id="force-pw-new" class="form-input" autocomplete="new-password" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm new password</label>
+        <input type="password" id="force-pw-confirm" class="form-input" autocomplete="new-password" />
+      </div>
+      <div id="force-pw-error" style="display:none;color:var(--danger);font-size:13px;margin-top:4px;"></div>
+    </div>
+    <div class="welcome-footer">
+      <button class="btn btn-gold btn-block" id="force-pw-btn" onclick="submitForcedPasswordChange()">Save Password</button>
+      <button class="welcome-dismiss" onclick="handleLogout()">Sign out</button>
+    </div>
+  </div>
+</div>
+
 <!-- ROUND WELCOME-BACK MODAL — shown once per round to returning members active in the new round -->
 <div class="modal-overlay" id="round-welcome-overlay" onclick="closeRoundWelcomeModalDirect(event)">
   <div class="modal-sheet" style="max-width:480px;">
@@ -4242,15 +4269,30 @@ function togglePassVisibility() {
   else { inp.type = "password"; btn.textContent = "👁"; }
 }
 
+// SHA-256 of the shared starter password new members receive. Signing in with it
+// triggers a required password change. Only the hash is kept here.
+const STARTER_PW_SHA256 = "0cf3947d988b3f32fdaace7c7c0cf5e7078b0d1d57dd96f3a39f916b09848c17";
+const FORCE_PW_KEY = "wac_must_change_pw";
+async function _sha256Hex(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+async function _isStarterPassword(pass) {
+  try { return (await _sha256Hex(pass)) === STARTER_PW_SHA256; } catch (e) { return false; }
+}
+
 async function handleLogin() {
   const email = document.getElementById("auth-email").value.trim();
   const pass = document.getElementById("auth-pass").value;
   const errEl = document.getElementById("auth-error");
   errEl.style.display = "none";
   if (!email || !pass) { errEl.textContent = "Please enter email and password."; errEl.style.display = "block"; return; }
+  // Flag before signing in: the app boots from the auth listener, which can fire first.
+  if (await _isStarterPassword(pass)) lsSet(FORCE_PW_KEY, email.toLowerCase());
   try {
     await signInWithEmailAndPassword(auth, email, pass);
   } catch (e) {
+    try { localStorage.removeItem(FORCE_PW_KEY); } catch (x) {}
     let msg = "Login failed. Check your credentials.";
     if (e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") msg = "Incorrect password.";
     else if (e.code === "auth/user-not-found") msg = "No account found with this email.";
@@ -4278,6 +4320,45 @@ async function changePassword() {
     document.getElementById("new-pass").value = "";
   } catch (e) {
     showToast("Failed to update password. You may need to re-login.");
+  }
+}
+
+function maybeRequirePasswordChange() {
+  if (!currentUser || currentUser.isAdmin) return;
+  const flagged = lsGet(FORCE_PW_KEY);
+  if (!flagged || flagged !== (currentUser.email || "").toLowerCase()) return;
+  document.getElementById("force-pw-overlay").classList.add("open");
+}
+
+async function submitForcedPasswordChange() {
+  const p1 = document.getElementById("force-pw-new").value;
+  const p2 = document.getElementById("force-pw-confirm").value;
+  const errEl = document.getElementById("force-pw-error");
+  const btn = document.getElementById("force-pw-btn");
+  const fail = (msg) => { errEl.textContent = msg; errEl.style.display = "block"; };
+  errEl.style.display = "none";
+  if (!p1 || p1.length < 8) return fail("Use at least 8 characters.");
+  if (p1 !== p2) return fail("The two passwords don't match.");
+  if (await _isStarterPassword(p1)) return fail("Choose a password that's different from the starter password.");
+  btn.disabled = true; btn.textContent = "Saving...";
+  try {
+    await updatePassword(auth.currentUser, p1);
+    try { localStorage.removeItem(FORCE_PW_KEY); } catch (x) {}
+    document.getElementById("force-pw-new").value = "";
+    document.getElementById("force-pw-confirm").value = "";
+    document.getElementById("force-pw-overlay").classList.remove("open");
+    showToast("Password updated! 🔒");
+  } catch (e) {
+    if (e && e.code === "auth/requires-recent-login") {
+      fail("For security, please sign out, sign back in with the starter password, and set your new password right away.");
+    } else if (e && e.code === "auth/weak-password") {
+      fail("That password is too weak. Try a longer one.");
+    } else {
+      fail("Couldn't update your password. Please try again.");
+      logPlatformError("forcedPasswordChange", (e && (e.code || e.message)) || "unknown");
+    }
+  } finally {
+    btn.disabled = false; btn.textContent = "Save Password";
   }
 }
 
@@ -4514,6 +4595,7 @@ function bootApp() {
   if (dashNav) dashNav.classList.add("active");
 
   // 8. Delayed features
+  setTimeout(maybeRequirePasswordChange, 250);
   setTimeout(showWelcomeModal, 600);
   setTimeout(initPushNotifications, 1000);
   setTimeout(checkRoundEnd, 300);
@@ -7039,6 +7121,7 @@ async function createMemberAccount() {
   const resultEl = document.getElementById("cm-result");
 
   if (!name || !email || !pass) { showToast("Name, email, and password required."); return; }
+  if (pass.length < 8) { showToast("Password must be at least 8 characters."); return; }
 
   const rounds = [];
   if (document.getElementById("cm-r1").checked) rounds.push("R1");
@@ -7048,20 +7131,10 @@ async function createMemberAccount() {
   const isVIP = document.getElementById("cm-vip").checked;
 
   try {
-    // Step 1: Create Firebase Auth user via REST API (without signing out admin)
-    const apiKey = FIREBASE_CONFIG.apiKey;
-    const resp = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password: pass, returnSecureToken: true })
-    });
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error.message);
-
-    const uid = data.localId;
-
-    // Step 2: Create wac_registry doc
-    await addRegistryMember(uid, name, email, website, ig, biz, type, rounds, isFounder, isVIP);
+    // Steps 1+2: the admin-only createMemberAccount Cloud Function checks the registry
+    // for the email, creates the login, then the wac_registry doc (keyed by Auth UID).
+    const createMember = httpsCallable(functions, "createMemberAccount");
+    await createMember({ name, email, password: pass, website, ig, business: biz, type, rounds, isFounder, isVIP });
 
     // Step 3: Show success
     resultEl.innerHTML = `<div class="card" style="background:#f0fdf4;border-color:#86efac;">
@@ -8706,6 +8779,7 @@ window.handleLogin = handleLogin;
 window.handleLogout = handleLogout;
 window.handleForgotPassword = handleForgotPassword;
 window.changePassword = changePassword;
+window.submitForcedPasswordChange = submitForcedPasswordChange;
 window.togglePassVisibility = togglePassVisibility;
 window.navTo = navTo;
 window.submitPost = submitPost;
